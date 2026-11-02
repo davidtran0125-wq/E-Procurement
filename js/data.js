@@ -127,14 +127,21 @@ window.DATA = {
     { id: 'PO-2026-0846', type: 'PO', title: 'Quạt hút công nghiệp – Kho C', date: '05/10/2026', status: 'Delivered', mats: ['EQP-31501'], vendor: 'V-1004', qty: '13 cái', price: 6615000, value: 86000000 },
     { id: 'PO-2026-0848', type: 'PO', title: 'Bê tông M300 + bơm – Kho A', date: '07/10/2026', status: 'Delivered', mats: ['CON-24330', 'SRV-52210'], vendor: 'V-1009', qty: '420 m³', price: 1320000, value: 580400000 },
     { id: 'PO-2026-0858', type: 'PO', title: 'Release CT-2026-008 · thép D16', date: '14/10/2026', status: 'Delivered', mats: ['CON-24015'], vendor: 'V-1001', qty: '45 tấn', price: 15627500, value: 703237500 },
-    { id: 'PO-2026-0861', type: 'PO', title: 'Xi măng PCB40 – Dự án Kho A', date: '16/10/2026', status: 'Partially received', mats: ['CON-24102'], vendor: 'V-1002', qty: '120 tấn', price: 1680000, value: 201600000 },
-    { id: 'PO-2026-0866', type: 'PO', title: 'Thép D20 – Nhà xưởng C2', date: '19/10/2026', status: 'Confirmed', mats: ['CON-24020'], vendor: 'V-1001', qty: '30 tấn', price: 15350000, value: 460500000 },
+    { id: 'PO-2026-0861', type: 'PO', title: 'Xi măng PCB40 – Dự án Kho A', date: '16/10/2026', status: 'Partially received', mats: ['CON-24102'], vendor: 'V-1002', qty: '120 tấn', price: 1680000, value: 201600000, note: 'NCR-2026-014 open · 5 tấn rejected' },
+    { id: 'PO-2026-0866', type: 'PO', title: 'Thép D20 – Nhà xưởng C2', date: '19/10/2026', status: 'Partially received', mats: ['CON-24020'], vendor: 'V-1001', qty: '30 tấn', price: 15350000, value: 460500000 },
     { id: 'PO-2026-0869', type: 'PO', title: 'Bơm ly tâm 75kW – Nhà máy Bình Dương', date: '29/10/2026', status: 'Sent · not confirmed', mats: ['EQP-31244'], vendor: 'V-1003', qty: '2 cái', price: 182000000, value: 364000000, note: '3 days overdue' },
-    { id: 'PO-2026-0874', type: 'PO', title: 'Container HCM–HN tháng 10', date: '20/10/2026', status: 'Confirmed', mats: ['LOG-61012'], vendor: 'V-1006', qty: '12 chuyến', price: 18500000, value: 222000000 },
+    { id: 'PO-2026-0874', type: 'PO', title: 'Container HCM–HN tháng 10', date: '20/10/2026', status: 'Delivered', mats: ['LOG-61012'], vendor: 'V-1006', qty: '12 chuyến', price: 18500000, value: 222000000 },
     { id: 'PO-2026-0877', type: 'PO', title: 'Thép D16 – Nhà xưởng C2 (TND-2026-024)', date: '21/10/2026', status: 'Partially received', mats: ['CON-24015'], vendor: 'V-1001', qty: '80 tấn', price: 15200000, value: 1216000000, note: 'GRN-2026-1532 50 tấn 28/10 · 30 tấn due 06/11 · Rev.2 pending' },
     { id: 'PO-2026-0882', type: 'PO', title: 'Tủ điện MSB – Nhà xưởng C2', date: '02/11/2026', status: 'Draft', mats: ['EQP-31402'], vendor: 'V-1004', qty: '2 bộ', price: 193000000, value: 386000000 },
-    { id: 'GRN-2026-1518', type: 'GRN', title: 'Xi măng PCB40 · 55 tấn accepted', date: '24/10/2026', status: 'Accepted with NCR', mats: ['CON-24102'], vendor: 'V-1002' },
-    { id: 'GRN-2026-1532', type: 'GRN', title: 'Thép D16 · 50 tấn on time & in full', date: '28/10/2026', status: 'Accepted', mats: ['CON-24015'], vendor: 'V-1001' },
+    { id: 'GRN-2026-1470', type: 'GRN', title: 'Thuê kho bãi Phú Mỹ · tháng 9', date: '30/09/2026', status: 'Accepted', mats: ['LOG-61045'], vendor: 'V-1006', po: 'PO-2026-0812' },
+    { id: 'GRN-2026-1490', type: 'GRN', title: 'Thép D16 · 45 tấn (CT-2026-008 release)', date: '16/10/2026', status: 'Accepted', mats: ['CON-24015'], vendor: 'V-1001', po: 'PO-2026-0858' },
+    { id: 'GRN-2026-1497', type: 'GRN', title: 'Quạt hút công nghiệp · 13 cái', date: '18/10/2026', status: 'Accepted', mats: ['EQP-31501'], vendor: 'V-1004', po: 'PO-2026-0846' },
+    { id: 'GRN-2026-1501', type: 'GRN', title: 'Bê tông M300 · 420 m³ + bơm 4 ca', date: '20/10/2026', status: 'Accepted', mats: ['CON-24330', 'SRV-52210'], vendor: 'V-1009', po: 'PO-2026-0848' },
+    { id: 'GRN-2026-1518', type: 'GRN', title: 'Xi măng PCB40 · 55 tấn accepted', date: '24/10/2026', status: 'Accepted with NCR', mats: ['CON-24102'], vendor: 'V-1002', po: 'PO-2026-0861' },
+    { id: 'GRN-2026-1525', type: 'GRN', title: 'Container HCM–HN · 12 chuyến tháng 10', date: '31/10/2026', status: 'Accepted', mats: ['LOG-61012'], vendor: 'V-1006', po: 'PO-2026-0874' },
+    { id: 'GRN-2026-1528', type: 'GRN', title: 'Thép D20 · lô 1 · 15 tấn', date: '27/10/2026', status: 'Accepted', mats: ['CON-24020'], vendor: 'V-1001', po: 'PO-2026-0866' },
+    { id: 'GRN-2026-1532', type: 'GRN', title: 'Thép D16 · 50 tấn on time & in full', date: '28/10/2026', status: 'Accepted', mats: ['CON-24015'], vendor: 'V-1001', po: 'PO-2026-0877' },
+    { id: 'GRN-2026-1539', type: 'GRN', title: 'Thép D20 · lô 2 · 15 tấn quarantined (thiếu CQ)', date: '31/10/2026', status: 'Rejected with NCR', mats: ['CON-24020'], vendor: 'V-1001', po: 'PO-2026-0866' },
     { id: 'CT-2025-007', type: 'CT', title: 'Fixed price – Xi măng An Khang 2025–2026', date: '01/10/2025', status: 'Expired', mats: ['CON-24102'], vendor: 'V-1002', note: 'Expired 30/09/2026' },
     { id: 'CT-2025-019', type: 'CT', title: 'Rate card Logistics Sao Việt', date: '01/01/2025', status: 'Expiring', mats: ['LOG-61012'], vendor: 'V-1006', note: 'Expires 31/12/2026' },
     { id: 'CT-2026-008', type: 'CT', title: 'Framework – Thép Minh Phát 2026', date: '01/01/2026', status: 'Expiring', mats: ['CON-24015', 'CON-24020'], vendor: 'V-1001', note: '1.200 tấn commitment · 640 tấn released · 01/01–31/12/2026' },
@@ -142,13 +149,15 @@ window.DATA = {
     { id: 'CT-2026-014', type: 'CT', title: 'Generator maintenance – Đại Phong', date: '28/10/2026', status: 'Pending signature', mats: ['EQP-31007'], vendor: 'V-1003', value: 240000000 },
     { id: 'INV-2026-0314', type: 'INV', title: 'Thuê kho bãi tháng 9', date: '05/10/2026', status: 'Ready for payment', mats: ['LOG-61045'], vendor: 'V-1006', value: 105000000 },
     { id: 'INV-2026-0318', type: 'INV', title: 'Thép D16 – PO-2026-0858', date: '20/10/2026', status: 'Matched', mats: ['CON-24015'], vendor: 'V-1001', value: 703237500 },
-    { id: 'INV-2026-0320', type: 'INV', title: 'Xi măng PCB40 – GRN-2026-1518', date: '26/10/2026', status: 'Matched', mats: ['CON-24102'], vendor: 'V-1002', value: 93500000 },
+    { id: 'INV-2026-0319', type: 'INV', title: 'Thép D16 – GRN-2026-1532', date: '29/10/2026', status: 'Matched', mats: ['CON-24015'], vendor: 'V-1001', value: 760000000 },
+    { id: 'INV-2026-0320', type: 'INV', title: 'Xi măng PCB40 – GRN-2026-1518', date: '26/10/2026', status: 'Exception · price +1,2%', mats: ['CON-24102'], vendor: 'V-1002', value: 93500000 },
     { id: 'INV-2026-0321', type: 'INV', title: 'Bê tông M300 – PO-2026-0848', date: '28/10/2026', status: 'Blocked · legal check', mats: ['CON-24330'], vendor: 'V-1009', value: 290400000 },
     { id: 'INV-2026-0322', type: 'INV', title: 'Container HCM–HN – PO-2026-0874', date: '30/10/2026', status: 'Exception · price +2,7%', mats: ['LOG-61012'], vendor: 'V-1006', value: 228000000 },
     { id: 'INV-2026-0323', type: 'INV', title: 'Vật tư phụ – Trường Sơn', date: '31/10/2026', status: '1 line: No Material ID', mats: ['EQP-31501'], vendor: 'V-1004', value: 14200000 },
-    { id: 'NCR-2026-009', type: 'NCR', title: 'Thép D16 · sai lệch khối lượng lô 3', date: '18/08/2026', status: 'Closed · accepted with discount', mats: ['CON-24015'], vendor: 'V-1001' },
-    { id: 'NCR-2026-014', type: 'NCR', title: 'Xi măng PCB40 · 5 bao rách', date: '24/10/2026', status: 'Open', mats: ['CON-24102'], vendor: 'V-1002' },
-    { id: 'NCR-2026-017', type: 'NCR', title: 'Thép D20 · thiếu CQ lô 2', date: '31/10/2026', status: 'Awaiting supplier', mats: ['CON-24020'], vendor: 'V-1001' },
+    { id: 'INV-2026-0324', type: 'INV', title: 'Vệ sinh công nghiệp T10 – PO-2026-0831', date: '01/11/2026', status: 'Matched', mats: ['SRV-52118'], vendor: 'V-1005', value: 62000000 },
+    { id: 'NCR-2026-009', type: 'NCR', title: 'Thép D16 · sai lệch khối lượng lô 3', date: '18/08/2026', status: 'Closed · accepted with discount', mats: ['CON-24015'], vendor: 'V-1001', po: 'PO-2026-0705' },
+    { id: 'NCR-2026-014', type: 'NCR', title: 'Xi măng PCB40 · 5 tấn bao rách, ẩm', date: '24/10/2026', status: 'Open', mats: ['CON-24102'], vendor: 'V-1002', po: 'PO-2026-0861' },
+    { id: 'NCR-2026-017', type: 'NCR', title: 'Thép D20 · thiếu CQ lô 2', date: '31/10/2026', status: 'Awaiting supplier', mats: ['CON-24020'], vendor: 'V-1001', po: 'PO-2026-0866' },
     { id: 'PO-2026-0702', type: 'PO', title: 'Máy phát điện 500kVA – Nhà máy Bình Dương', date: '18/05/2026', status: 'Closed', mats: ['EQP-31007'], vendor: 'V-1003', qty: '1 bộ', price: 1610000000, value: 1610000000 },
     { id: 'PO-2026-0760', type: 'PO', title: 'Quạt hút công nghiệp – Kho B', date: '08/08/2026', status: 'Closed', mats: ['EQP-31501'], vendor: 'V-1004', qty: '12 cái', price: 6800000, value: 81600000 },
     { id: 'PO-2026-0772', type: 'PO', title: 'Biến tần 55kW – Dây chuyền 2', date: '20/08/2026', status: 'Closed', mats: ['EQP-31455'], vendor: 'V-1004', qty: '2 cái', price: 74500000, value: 149000000 },
@@ -191,8 +200,8 @@ window.DATA = {
   /* Notifications for the signed-in Procurement user — 6 unread (R-15) */
   notifications: [
     { id: 'N-801', type: 'PR approval', text: 'PR-2026-0431 Máy phát điện 500kVA waits for your approval (1,85 tỷ ₫)', doc: 'PR-2026-0431', mats: ['EQP-31007'], at: '02/11/2026 08:15', read: false, action: 'Review', href: '#/approvals?id=PR-2026-0431' },
-    { id: 'N-802', type: 'PO overdue', text: 'PO-2026-0869 not confirmed by Đại Phong — 3 days overdue, escalated to buyer', doc: 'PO-2026-0869', mats: ['EQP-31244'], at: '02/11/2026 07:00', read: false, action: 'Follow up', href: '#/po' },
-    { id: 'N-803', type: 'Invoice exception', text: 'INV-2026-0322 Sao Việt — unit price +2,7% vs PO-2026-0874 (tolerance ±0,5%)', doc: 'INV-2026-0322', mats: ['LOG-61012'], at: '01/11/2026 16:42', read: false, action: 'Resolve', href: '#/invoices' },
+    { id: 'N-802', type: 'PO overdue', text: 'PO-2026-0869 not confirmed by Đại Phong — 3 days overdue, escalated to buyer', doc: 'PO-2026-0869', mats: ['EQP-31244'], at: '02/11/2026 07:00', read: false, action: 'Follow up', href: '#/po/PO-2026-0869' },
+    { id: 'N-803', type: 'Invoice exception', text: 'INV-2026-0322 Sao Việt — unit price +2,7% vs PO-2026-0874 (tolerance ±0,5%)', doc: 'INV-2026-0322', mats: ['LOG-61012'], at: '01/11/2026 16:42', read: false, action: 'Resolve', href: '#/invoices/INV-2026-0322' },
     { id: 'N-804', type: 'Tender', text: 'TND-2026-031 closes 05/11/2026 17:00 · 4 of 5 bids received · sealed', doc: 'TND-2026-031', mats: ['CON-24015', 'CON-24102', 'CON-24330'], at: '01/11/2026 09:00', read: false, action: 'Open', href: '#/tenders/TND-2026-031' },
     { id: 'N-805', type: 'Evaluation', text: 'TND-2026-029 award recommendation due 04/11/2026 — submit the Tờ trình', doc: 'TND-2026-029', mats: ['CON-24330'], at: '31/10/2026 17:30', read: false, action: 'Evaluate', href: '#/tenders/TND-2026-029' },
     { id: 'N-806', type: 'Price alert', text: 'LOG-61012 last price 18.500.000 ₫ is +8,9% vs 90-day average', doc: 'PO-2026-0874', mats: ['LOG-61012'], at: '31/10/2026 11:05', read: false, action: 'Open', href: '#/material360?id=LOG-61012' },
@@ -226,7 +235,7 @@ window.DATA = {
   const ext = {
     'V-1001': { terms: '30 days · advance 30% / 70%', phone: '0283 812 4471', address: '125 Quốc lộ 1A, P. Bình Hưng Hòa, Q. Bình Tân, TP.HCM', since: '15/03/2019', riskReasons: ['NCR-2026-017 awaiting supplier (CON-24020 · minor)'],
       bank: { now: 'Vietcombank ···· 2210', pending: 'BIDV ···· 0937', requested: '30/10/2026 16:40', by: 'Võ Thị Lan (portal)' } },
-    'V-1002': { terms: '45 days', phone: '0251 382 6650', address: 'KCN Biên Hòa 2, TP. Biên Hòa, Đồng Nai', since: '02/06/2020', riskReasons: ['NCR-2026-014 open (CON-24102 · 5 bao rách)'], bank: { now: 'ACB ···· 5521' } },
+    'V-1002': { terms: '45 days', phone: '0251 382 6650', address: 'KCN Biên Hòa 2, TP. Biên Hòa, Đồng Nai', since: '02/06/2020', riskReasons: ['NCR-2026-014 open (CON-24102 · 5 tấn bao rách)'], bank: { now: 'ACB ···· 5521' } },
     'V-1003': { terms: '30 days', phone: '0274 377 9012', address: 'KCN VSIP 1, TP. Thuận An, Bình Dương', since: '20/09/2018', riskReasons: ['Single source for EQP-31007', 'PO-2026-0869 not confirmed · 3 days overdue', 'ISO 9001 expires 28/11/2026'], bank: { now: 'Techcombank ···· 8843' } },
     'V-1004': { terms: '45 days', phone: '0283 991 2044', address: '88 Đường số 7, KCN Tân Tạo, Q. Bình Tân, TP.HCM', since: '11/01/2021', riskReasons: [], bank: { now: 'VietinBank ···· 1176' } },
     'V-1005': { terms: '30 days', phone: '0283 620 1188', address: '45 Nguyễn Văn Linh, Q.7, TP.HCM', since: '05/01/2022', riskReasons: [], bank: { now: 'Vietcombank ···· 4402' } },
@@ -432,4 +441,117 @@ window.DATA = {
   ];
   D.delegation = { to: 'Lê Quốc Huy', from: '10/11/2026', until: '14/11/2026', cap: 500000000, types: ['PR approval', 'PO change order'], above: 'Đỗ Hoàng Nam' };
   D.sodRules = [['Requester ≠ approver of the same PR / change order / Material ID request', 'Block'], ['Vendor creator ≠ vendor approver', 'Block'], ['PO buyer ≠ GRN receiver', 'Warn'], ['Tender evaluator ≠ award approver', 'Block']];
+})(window.DATA);
+
+/* ---------- Phase 4: purchase orders & goods receipt (F-61..F-69), invoices & matching (F-70..F-75), price history (F-76..F-80), reports (F-81..F-86) ---------- */
+(function (D) {
+  D.company = { name: '[YOUR COMPANY]', mst: '[YOUR MST]', address: '[YOUR ADDRESS]' };
+  D.poStats = { total: 128 };
+  D.tolerance = { price: 0.5, qty: 2 };
+  D.fx = { USD: 25420, EUR: 27610, src: 'Vietcombank selling rate', at: '02/11/2026' };
+  const done = (q, due, grn) => [q, due, grn];
+  /* PO details. lines[].sched = [qty, promised date, GRN no.]. revs newest first. */
+  D.pos = {
+    'PO-2026-0877': { vendor: 'V-1001', pr: 'PR-2026-0412', tender: 'TND-2026-024', contract: null, buyer: 'Nguyễn Minh Anh', site: 'Nhà xưởng C2 · KCN Tân Tạo, Q. Bình Tân, TP.HCM', terms: '30 days after invoice · advance 30% / 70%', rev: 1,
+      lines: [{ mat: 'CON-24015', qty: 80, price: 15200000, sched: [done(50, '28/10/2026', 'GRN-2026-1532'), done(30, '06/11/2026', null)] }],
+      confirm: { status: 'Confirmed', by: 'Võ Thị Lan (portal)', at: '24/10/2026 09:12', note: 'Rev.1 re-confirmed' },
+      revs: [{ no: 2, status: 'Pending approval', at: '01/11/2026 11:20', by: 'Nguyễn Minh Anh', diff: 'CON-24015 qty 80 → 85 tấn · value 1.216.000.000 → 1.292.000.000 ₫ (+76.000.000 ₫)', reason: 'Thêm 5 tấn cho sàn tầng lửng.', change: [{ i: 0, qty: 85 }], approval: 'PO-2026-0877 Rev.2' },
+        { no: 1, status: 'Current · re-confirmed by supplier 24/10/2026', at: '23/10/2026 14:00', by: 'Nguyễn Minh Anh', diff: 'Delivery 2 (30 tấn): 03/11 → 06/11/2026 · no value change, no approval step', reason: 'Công trường chưa sẵn sàng bãi tập kết.' },
+        { no: 0, status: 'Superseded', at: '21/10/2026 10:00', by: 'Nguyễn Minh Anh', diff: 'Original issue from TND-2026-024 award', reason: '' }],
+      files: [{ type: 'Signed PO', name: 'PO-2026-0877_Rev1_signed.pdf', ver: 'v2', by: 'Nguyễn Minh Anh', date: '23/10/2026', mats: ['CON-24015'] },
+        { type: 'Mill certificate', name: 'CQ-MP-2610-118.pdf', ver: 'v1', by: 'Võ Thị Lan', date: '28/10/2026', mats: ['CON-24015'], supplier: true },
+        { type: 'Biên bản giao nhận', name: 'BBGN_GRN-2026-1532.pdf', ver: 'v1', by: 'Phan Văn Lộc', date: '28/10/2026', mats: ['CON-24015'] }] },
+    'PO-2026-0861': { vendor: 'V-1002', pr: 'PR-2026-0428', tender: null, contract: null, buyer: 'Nguyễn Minh Anh', site: 'Kho A · KCN Sóng Thần, Bình Dương', terms: '45 days after invoice', rev: 0,
+      lines: [{ mat: 'CON-24102', qty: 120, price: 1680000, sched: [done(60, '24/10/2026', 'GRN-2026-1518'), done(60, '07/11/2026', null)] }],
+      confirm: { status: 'Confirmed', by: 'Ngô Văn Tài (portal)', at: '17/10/2026 08:40' }, revs: [{ no: 0, status: 'Current', at: '16/10/2026 09:00', by: 'Nguyễn Minh Anh', diff: 'Original issue (RFQ ≤ 500tr)', reason: '' }], files: [] },
+    'PO-2026-0869': { vendor: 'V-1003', pr: 'PR-2026-0434', tender: null, contract: null, buyer: 'Lê Quốc Huy', site: 'Nhà máy Bình Dương · KCN VSIP 1', terms: '30 days after invoice', rev: 0,
+      lines: [{ mat: 'EQP-31244', qty: 2, price: 182000000, sched: [done(2, '26/11/2026', null)] }],
+      confirm: { status: 'Not confirmed', sent: '29/10/2026 15:00', note: 'Reminder at 48 h (31/10) · escalated to the buyer at 72 h · 3 days overdue' }, revs: [{ no: 0, status: 'Current', at: '29/10/2026 15:00', by: 'Lê Quốc Huy', diff: 'Original issue', reason: '' }], files: [] },
+    'PO-2026-0882': { vendor: 'V-1004', pr: 'PR-2026-0436', tender: null, contract: null, buyer: 'Lê Quốc Huy', site: 'Nhà xưởng C2 · KCN Tân Tạo, Q. Bình Tân, TP.HCM', terms: '45 days after invoice', rev: 0,
+      lines: [{ mat: 'EQP-31402', qty: 2, price: 193000000, sched: [done(2, '20/11/2026', null)] }], confirm: null, revs: [], files: [] },
+    'PO-2026-0874': { vendor: 'V-1006', pr: null, tender: null, contract: 'CT-2025-019', buyer: 'Trần Bảo Ngọc', site: 'Kho Cát Lái → Kho Hà Nội', terms: '30 days after invoice', rev: 0,
+      lines: [{ mat: 'LOG-61012', qty: 12, price: 18500000, sched: [done(12, '31/10/2026', 'GRN-2026-1525')] }], confirm: { status: 'Confirmed', by: 'Lý Thanh Tùng (portal)', at: '20/10/2026 16:05' }, revs: [], files: [] },
+    'PO-2026-0848': { vendor: 'V-1009', pr: 'PR-2026-0421', tender: null, contract: null, buyer: 'Nguyễn Minh Anh', site: 'Kho A · KCN Sóng Thần, Bình Dương', terms: '30 days after invoice', rev: 0,
+      lines: [{ mat: 'CON-24330', qty: 420, price: 1320000, sched: [done(420, '20/10/2026', 'GRN-2026-1501')] }, { mat: 'SRV-52210', qty: 4, price: 6500000, sched: [done(4, '20/10/2026', 'GRN-2026-1501')] }], confirm: { status: 'Confirmed', by: 'Châu Ngọc Mai (portal)', at: '08/10/2026 10:00' }, revs: [], files: [] },
+    'PO-2026-0858': { vendor: 'V-1001', pr: null, tender: null, contract: 'CT-2026-008', buyer: 'Nguyễn Minh Anh', site: 'Nhà xưởng C1', terms: '30 days after invoice', rev: 0,
+      lines: [{ mat: 'CON-24015', qty: 45, price: 15627500, sched: [done(45, '16/10/2026', 'GRN-2026-1490')] }], confirm: { status: 'Confirmed', by: 'Võ Thị Lan (portal)', at: '14/10/2026 15:30' }, revs: [], files: [] },
+    'PO-2026-0846': { vendor: 'V-1004', pr: null, tender: null, contract: null, buyer: 'Lê Quốc Huy', site: 'Kho C', terms: '45 days after invoice', rev: 0,
+      lines: [{ mat: 'EQP-31501', qty: 13, price: 6615000, sched: [done(13, '18/10/2026', 'GRN-2026-1497')] }], confirm: { status: 'Confirmed', by: 'Đặng Thị Hoa (portal)', at: '06/10/2026 09:00' }, revs: [], files: [] },
+    'PO-2026-0866': { vendor: 'V-1001', pr: 'PR-2026-0426', tender: null, contract: null, buyer: 'Lê Quốc Huy', site: 'Nhà xưởng C2', terms: '30 days after invoice', rev: 1,
+      lines: [{ mat: 'CON-24020', qty: 30, price: 15350000, sched: [done(15, '27/10/2026', 'GRN-2026-1528'), done(15, '31/10/2026', 'GRN-2026-1539')] }], confirm: { status: 'Confirmed', by: 'Võ Thị Lan (portal)', at: '21/10/2026 08:30', note: 'Rev.1 re-confirmed' },
+      revs: [{ no: 1, status: 'Current', at: '20/10/2026 14:02', by: 'Nguyễn Minh Anh', diff: 'Lot 1 date 24/10 → 27/10/2026 · no price change', reason: 'Đổi ngày giao, không đổi giá.' }, { no: 0, status: 'Superseded', at: '19/10/2026 09:00', by: 'Nguyễn Minh Anh', diff: 'Original issue (spot PO, not released from CT-2026-008)', reason: '' }], files: [] },
+    'PO-2026-0812': { vendor: 'V-1006', pr: null, tender: null, contract: null, buyer: 'Trần Bảo Ngọc', site: 'KCN Phú Mỹ, Bà Rịa – Vũng Tàu', terms: '30 days after invoice', rev: 0,
+      lines: [{ mat: 'LOG-61045', qty: 3000, price: 105000, sched: [done(1000, '30/09/2026', 'GRN-2026-1470'), done(1000, '31/10/2026', null), done(1000, '30/11/2026', null)] }], confirm: { status: 'Confirmed', by: 'Lý Thanh Tùng (portal)', at: '26/09/2026 10:00' }, revs: [], files: [] },
+    'PO-2026-0831': { vendor: 'V-1005', pr: null, tender: null, contract: null, buyer: 'Trần Bảo Ngọc', site: 'Nhà máy Bình Dương', terms: '30 days after invoice', rev: 0,
+      lines: [{ mat: 'SRV-52118', qty: 1, price: 62000000, sched: [done(1, '31/10/2026', 'SES-2026-0141')] }], confirm: { status: 'Confirmed', by: 'Bùi Minh Khoa (portal)', at: '01/10/2026 11:00' }, revs: [], files: [] }
+  };
+  /* Goods receipts (F-64/F-65, R-07). lines: [poLine, schedIdx, delivered, accepted, rejected, reason]. checks: [document, ok, note] */
+  const std = (cq) => [['CO/CQ per lot', cq !== false, cq === false ? 'Missing for this lot' : 'Checked'], ['Biên bản giao nhận', true, 'Signed by both parties'], ['Photos', true, '4 photos']];
+  D.grns = {
+    'GRN-2026-1532': { po: 'PO-2026-0877', date: '28/10/2026', receiver: 'Phan Văn Lộc (Thủ kho C2)', inspector: 'Hồ Thị Thanh (QC)', lines: [[0, 0, 50, 50, 0, '']], checks: [['Mill certificate', true, 'CQ-MP-2610-118.pdf'], ...std()] },
+    'GRN-2026-1518': { po: 'PO-2026-0861', date: '24/10/2026', receiver: 'Đinh Văn Phú (Thủ kho A)', inspector: 'Hồ Thị Thanh (QC)', lines: [[0, 0, 60, 55, 5, 'Bao rách, xi măng ẩm vón cục · 5 tấn (100 bao)']], checks: std(), ncr: 'NCR-2026-014' },
+    'GRN-2026-1490': { po: 'PO-2026-0858', date: '16/10/2026', receiver: 'Phan Văn Lộc (Thủ kho C2)', inspector: 'Hồ Thị Thanh (QC)', lines: [[0, 0, 45, 45, 0, '']], checks: [['Mill certificate', true, 'CQ-MP-2610-097.pdf'], ...std()] },
+    'GRN-2026-1497': { po: 'PO-2026-0846', date: '18/10/2026', receiver: 'Đinh Văn Phú (Thủ kho A)', inspector: 'Lê Quốc Huy', lines: [[0, 0, 13, 13, 0, '']], checks: std() },
+    'GRN-2026-1501': { po: 'PO-2026-0848', date: '20/10/2026', receiver: 'Đinh Văn Phú (Thủ kho A)', inspector: 'Hồ Thị Thanh (QC)', lines: [[0, 0, 420, 420, 0, ''], [1, 0, 4, 4, 0, '']], checks: [['Phiếu kết quả nén mẫu', true, 'R7 đạt 312 kG/cm²'], ...std()] },
+    'GRN-2026-1525': { po: 'PO-2026-0874', date: '31/10/2026', receiver: 'Kho Hà Nội (POD)', inspector: 'Trần Bảo Ngọc', lines: [[0, 0, 12, 12, 0, '']], checks: [['Proof of delivery (POD)', true, '12 / 12 trips'], ['Biên bản giao nhận', true, 'Signed']] },
+    'GRN-2026-1528': { po: 'PO-2026-0866', date: '27/10/2026', receiver: 'Phan Văn Lộc (Thủ kho C2)', inspector: 'Hồ Thị Thanh (QC)', lines: [[0, 0, 15, 15, 0, '']], checks: std() },
+    'GRN-2026-1539': { po: 'PO-2026-0866', date: '31/10/2026', receiver: 'Phan Văn Lộc (Thủ kho C2)', inspector: 'Hồ Thị Thanh (QC)', lines: [[0, 1, 15, 0, 15, 'Thiếu CQ lô 2 — quarantined until the CQ is received']], checks: std(false), ncr: 'NCR-2026-017' },
+    'GRN-2026-1470': { po: 'PO-2026-0812', date: '30/09/2026', receiver: 'Trần Bảo Ngọc', inspector: 'Trần Bảo Ngọc', lines: [[0, 0, 1000, 1000, 0, '']], checks: [['Biên bản nghiệm thu tháng 9', true, 'Signed']] },
+    'SES-2026-0141': { po: 'PO-2026-0831', date: '31/10/2026', receiver: 'Trần Bảo Ngọc', inspector: 'Trần Bảo Ngọc', ses: true, sla: [99.2, 98], lines: [[0, 0, 1, 1, 0, '']], checks: [['Service entry sheet (biên bản nghiệm thu)', true, 'SLA 99,2% vs target 98%']] }
+  };
+  /* NCRs (R-07): action Return | Replace | Accept with discount */
+  D.ncrs = {
+    'NCR-2026-014': { grn: 'GRN-2026-1518', po: 'PO-2026-0861', mat: 'CON-24102', qty: 5, action: 'Return to vendor', discount: null, raised: '24/10/2026 15:10', by: 'Hồ Thị Thanh (QC)', supplier: 'Awaiting supplier confirmation · due 05/11/2026', status: 'Open' },
+    'NCR-2026-017': { grn: 'GRN-2026-1539', po: 'PO-2026-0866', mat: 'CON-24020', qty: 15, action: 'Replace', discount: null, raised: '31/10/2026 16:00', by: 'Hồ Thị Thanh (QC)', supplier: 'Awaiting supplier · send CQ lô 2 or replace the lot', status: 'Awaiting supplier' },
+    'NCR-2026-009': { grn: 'GRN-2026-1311', po: 'PO-2026-0705', mat: 'CON-24015', qty: 1.2, action: 'Accept with discount', discount: 3, raised: '18/08/2026 10:00', by: 'Hồ Thị Thanh (QC)', supplier: 'Accepted by Võ Thị Lan 20/08/2026', status: 'Closed' }
+  };
+  /* E-invoices (R-01, R-02). lines: [Material ID | null, description, qty, unit price excl. VAT, previously invoiced qty on the PO line] */
+  D.invoices = {
+    'INV-2026-0314': { po: 'PO-2026-0812', grn: 'GRN-2026-1470', mau: '1', kh: '1C26TSV', no: '00000871', cqt: '00D1F3A7B2C94E5F8A6B1C2D3E4F5A6B7C', src: 'Inbox hoadon@', type: 'Original', lines: [['LOG-61045', 'Thuê kho bãi tháng 9/2026', 1000, 105000, 0]], stage: 3, exported: '30/10/2026 18:00' },
+    'INV-2026-0318': { po: 'PO-2026-0858', grn: 'GRN-2026-1490', mau: '1', kh: '1C26TMP', no: '00001231', cqt: '00B7C2D9E1F04A3B5C6D7E8F9A0B1C2D3E', src: 'Portal', type: 'Replacement', orig: '1C26TMP · 00001229 (wrong delivery address)', lines: [['CON-24015', 'Thép cây D16 CB400-V', 45, 15627500, 0]], stage: 2 },
+    'INV-2026-0319': { po: 'PO-2026-0877', grn: 'GRN-2026-1532', mau: '1', kh: '1C26TMP', no: '00001248', cqt: '00C4A8E2B6D14F7A9B3C5D7E9F1A3B5C7D', src: 'Portal', type: 'Original', lines: [['CON-24015', 'Thép cây D16 CB400-V', 50, 15200000, 0]], stage: 2 },
+    'INV-2026-0320': { po: 'PO-2026-0861', grn: 'GRN-2026-1518', mau: '1', kh: '1C26TAK', no: '00003317', cqt: '00E9B1C3D5F7A24B6C8D0E2F4A6B8C0D2E', src: 'Portal', type: 'Original', lines: [['CON-24102', 'Xi măng PCB40 (bao 50 kg)', 55, 1700000, 0]], stage: 1, assigned: 'Nguyễn Minh Anh', hold: 'On hold · price exception', resolveBy: '05/11/2026' },
+    'INV-2026-0321': { po: 'PO-2026-0848', grn: 'GRN-2026-1501', mau: '1', kh: '1C26TTP', no: '00000564', cqt: '', gdt: 'Không tìm thấy hóa đơn trên hệ thống GDT', src: 'Inbox hoadon@', type: 'Original', lines: [['CON-24330', 'Bê tông thương phẩm M300', 220, 1320000, 0]], stage: 0, hold: 'Blocked · legal check' },
+    'INV-2026-0322': { po: 'PO-2026-0874', grn: 'GRN-2026-1525', mau: '1', kh: '1C26TSV', no: '00000902', cqt: '00A2B4C6D8E0F13A5B7C9D1E3F5A7B9C1D', src: 'Portal', type: 'Original', lines: [['LOG-61012', 'Vận chuyển container 40ft HCM–HN (gồm phụ phí nhiên liệu)', 12, 19000000, 0]], stage: 1, assigned: 'Trần Bảo Ngọc', hold: 'On hold · price exception', resolveBy: '04/11/2026' },
+    'INV-2026-0323': { po: 'PO-2026-0846', grn: 'GRN-2026-1497', mau: '1', kh: '1C26TTS', no: '00002210', cqt: '00F1E3D5C7B9A02B4C6D8E0F2A4B6C8D0E', src: 'Inbox hoadon@', type: 'Original', lines: [['EQP-31501', 'Quạt hút công nghiệp D1380', 2, 6615000, 11], [null, 'Bộ giá đỡ quạt + bulong (vật tư phụ)', 1, 970000, 0]], stage: 1, assigned: 'Lê Quốc Huy', hold: 'On hold · map line 2 to a Material ID', resolveBy: '05/11/2026' },
+    'INV-2026-0324': { po: 'PO-2026-0831', grn: 'SES-2026-0141', mau: '1', kh: '1C26THL', no: '00000415', cqt: '00B3D5F7A9C1E24A6C8E0A2C4E6A8C0E2A', src: 'Portal', type: 'Original', lines: [['SRV-52118', 'Dịch vụ vệ sinh công nghiệp tháng 10/2026', 1, 62000000, 0]], stage: 2 }
+  };
+  D.invoiceStats = { total: 24, toMatch: 9, exceptions: 3, ready: 6, blocked: 1 };
+  /* Price records (F-80) not derivable from POs/invoices/bids above. src: PO | Bid | Quotation | Invoice | Contract. cur/orig for foreign currency (R-23) */
+  D.priceRecords = [
+    { mat: 'CON-24015', date: '30/09/2026', src: 'Bid', doc: 'TND-2026-024', vendor: 'V-1001', qty: 80, price: 15200000, use: 'Awarded' },
+    { mat: 'CON-24015', date: '30/09/2026', src: 'Bid', doc: 'TND-2026-024', vendor: 'V-1011', qty: 80, price: 15980000, use: 'Tender round 1' },
+    { mat: 'CON-24015', date: '30/09/2026', src: 'Bid', doc: 'TND-2026-024', vendor: 'V-1002', qty: 80, price: 16380000, use: 'Tender round 1' },
+    { mat: 'CON-24015', date: '30/09/2026', src: 'Bid', doc: 'TND-2026-024', vendor: 'V-1008', qty: 80, price: 16600000, use: 'Tender round 1' },
+    { mat: 'CON-24015', date: '01/10/2026', src: 'Contract', doc: 'CT-2026-008', vendor: 'V-1001', qty: null, price: 15627500, use: 'Contract price Q4 (Phụ lục 01)' },
+    { mat: 'CON-24015', date: '15/09/2026', src: 'PO', doc: 'PO-2026-0802', vendor: 'V-1001', qty: 45, price: 16450000, use: 'Contract release' },
+    { mat: 'CON-24015', date: '10/08/2026', src: 'PO', doc: 'PO-2026-0705', vendor: 'V-1001', qty: 45, price: 16450000, use: 'Contract release' },
+    { mat: 'CON-24015', date: '22/07/2026', src: 'Quotation', doc: 'QT-TL-0722', vendor: 'V-1011', qty: 20, price: 16300000, use: 'Spot quote' },
+    { mat: 'EQP-31007', date: '29/10/2026', src: 'Quotation', doc: 'BaoGia_DaiPhong_500kVA', vendor: 'V-1003', qty: 1, price: 1850000000, use: 'PR estimate (PR-2026-0431)' },
+    { mat: 'EQP-31007', date: '27/10/2026', src: 'Quotation', doc: 'QT-IMP-2610-07', vendor: null, vname: 'Cummins Power Generation (import)', qty: 1, price: 62500 * 25420, cur: 'USD', orig: 62500, use: 'Spot quote · imported' },
+    { mat: 'EQP-31244', date: '26/10/2026', src: 'Quotation', doc: 'QT-TS-2610', vendor: 'V-1004', qty: 2, price: 178500000, use: 'Spot quote' },
+    { mat: 'LOG-61012', date: '15/09/2026', src: 'Bid', doc: 'TND-2026-027', vendor: 'V-1006', qty: 36, price: 18500000, use: 'Awarded' }
+  ];
+  /* Reports (F-81..F-86) */
+  D.reports = {
+    otif: { onTime: 94.0, inFull: 96.8, deliveries: 1284, late: 77, short: 41 },
+    /* vendor: [deliveries, on time %, in full %] — OTIF = vendor.otif */
+    otifVendors: { 'V-1001': [24, 97.9, 97.9], 'V-1002': [34, 94.1, 97.1], 'V-1003': [19, 94.7, 94.7], 'V-1004': [25, 92.0, 96.0], 'V-1005': [25, 96.0, 100], 'V-1006': [45, 88.9, 97.8], 'V-1008': [25, 88.0, 96.0], 'V-1009': [79, 94.9, 97.5], 'V-1010': [30, 93.3, 96.7], 'V-1011': [46, 93.5, 95.7] },
+    saving: { reported: 9.7, rate: 5.2, target: 4, avoidance: 2.1, validated: 8.9 },
+    savings: [
+      { id: 'SAV-2026-118', mat: 'CON-24015', doc: 'TND-2026-024 → PO-2026-0877', type: 'Price reduction', base: 16450000, award: 15200000, qty: 80, status: 'Validated', by: 'Đỗ Hoàng Nam · 25/10/2026' },
+      { id: 'SAV-2026-121', mat: 'EQP-31007', doc: 'PO-2026-0702', type: 'Cost avoidance', base: 1700000000, award: 1610000000, qty: 1, status: 'Validated', by: 'Đỗ Hoàng Nam · 30/05/2026' },
+      { id: 'SAV-2026-116', mat: 'CON-24015', doc: 'CT-2026-008 → PO-2026-0858', type: 'Price reduction', base: 16450000, award: 15627500, qty: 45, status: 'Validated', by: 'Đỗ Hoàng Nam · 20/10/2026' },
+      { id: 'SAV-2026-117', mat: 'CON-24325', doc: 'PO-2026-0844', type: 'Negotiated terms', base: 1180000, award: 1150000, qty: 300, status: 'Validated', by: 'Đỗ Hoàng Nam · 22/10/2026' },
+      { id: 'SAV-2026-120', mat: 'SRV-52003', doc: 'CT-2026-011', type: 'Negotiated terms', base: 49500000, award: 48000000, qty: 12, status: 'Submitted', by: '' },
+      { id: 'SAV-2026-119', mat: 'EQP-31244', doc: 'PO-2026-0855', type: 'Negotiated terms', base: 190000000, award: 182000000, qty: 2, status: 'Submitted', by: '' },
+      { id: 'SAV-2026-109', mat: 'LOG-61012', doc: 'TND-2026-027', type: 'Price reduction', base: 18900000, award: 18500000, qty: 36, status: 'Validated', by: 'Đỗ Hoàng Nam · 18/09/2026' },
+      { id: 'SAV-2026-122', mat: 'CON-24330', doc: 'TND-2026-029', type: 'Price reduction', tender: 'TND-2026-029', status: 'Draft', by: '' }
+    ],
+    /* Spend YTD by vendor, tỷ ₫ excl. VAT (top 5 = 77,17 = 41,4% of 186,4) */
+    spendVendor: [['V-1001', 24.6], ['V-1002', 16.2], ['V-1003', 14.1], ['V-1009', 12.3], ['V-1006', 9.97], ['V-1004', 8.4], ['V-1005', 6.2], ['V-1011', 5.1], ['V-1010', 4.3], ['V-1008', 3.6]],
+    otherVendors: 82,
+    coverage: 87.4,
+    cycle: { median: 9.5, target: 10, approval: 1.6, tender: 18, routes: [['≤ 200tr · Dept head', 4.0, 112], ['≤ 2 tỷ · + Procurement Lead', 9.0, 64], ['> 2 tỷ · + Finance Director', 16.5, 18], ['Contract release (no tender)', 3.5, 41]] }
+  };
 })(window.DATA);

@@ -7,7 +7,7 @@
   const D = () => window.DATA;
   const NOW = '02/11/2026 10:30';
   const st = { tab: 'mine', type: 'all', sel: null, picked: [], comment: '', cerr: '', dlg: null, derr: {}, ovr: null, oerr: '', lastId: null };
-  const TYPES = ['PR approval', 'Award recommendation', 'PO change order', 'New Material ID', 'Vendor change', 'Invoice exception'];
+  const TYPES = ['PR approval', 'Award recommendation', 'PO approval', 'PO change order', 'New Material ID', 'Vendor change', 'Invoice exception'];
 
   const ts = (s) => { const [d, t = '00:00'] = s.split(' '); const x = App.dt(d); const [h, m] = t.split(':').map(Number); x.setHours(h, m); return x; };
   const hoursLeft = (a) => (ts(a.sla) - ts(NOW)) / 36e5;
@@ -70,7 +70,7 @@
     const decide = `<form id="ap-form" class="stack decide-panel" novalidate aria-labelledby="ap-dec-h"><h3 id="ap-dec-h" class="h-sub mt-0">Your decision</h3><div class="field"><label for="ap-c">Comment</label><textarea id="ap-c" aria-describedby="ap-c-h${st.cerr ? ' ap-c-e' : ''}"${st.cerr ? ' aria-invalid="true"' : ''}>${esc(st.comment)}</textarea><span class="hint" id="ap-c-h">Optional to approve · required (at least 10 characters) to reject or return.</span>${st.cerr ? `<span class="err" id="ap-c-e" role="alert">${esc(st.cerr)}</span>` : ''}</div>
       <p class="small mt-0">Approving as <b>${esc(S.me())}</b>${ob ? ` on behalf of <b>${esc(ob)}</b>` : ''} · step ${i} of ${n} · next: ${i < n && nx ? esc(nx) : 'final approval'}</p>
       <div class="row-acts decide-acts"><button type="button" class="btn" data-ap="decide" data-d="Returned">Return for changes</button><button type="button" class="btn btn-d" data-ap="decide" data-d="Rejected">Reject</button><button type="button" class="btn btn-p" data-ap="decide" data-d="Approved"${blocked(a) ? ' disabled' : ''}>Approve</button></div></form>`;
-    const link = a.type === 'PR approval' ? `<a class="btn btn-sm" href="#/pr/${esc(a.id)}">Open PR</a>` : a.type === 'Award recommendation' ? `<a class="btn btn-sm" href="#/tenders/${esc(a.id)}">Open tender</a>` : a.type === 'New Material ID' ? `<a class="btn btn-sm" href="#/material360?id=${esc(a.id)}">Material 360°</a>` : a.type === 'Vendor change' ? `<a class="btn btn-sm" href="#/vendors/${esc(a.id)}">Open vendor</a>` : '';
+    const link = a.type === 'PR approval' ? `<a class="btn btn-sm" href="#/pr/${esc(a.id)}">Open PR</a>` : a.type === 'Award recommendation' ? `<a class="btn btn-sm" href="#/tenders/${esc(a.id)}">Open tender</a>` : a.type === 'New Material ID' ? `<a class="btn btn-sm" href="#/material360?id=${esc(a.id)}">Material 360°</a>` : a.type === 'Vendor change' ? `<a class="btn btn-sm" href="#/vendors/${esc(a.id)}">Open vendor</a>` : /^PO /.test(a.type) ? `<a class="btn btn-sm" href="#/po/${esc(a.id.split(' ')[0])}">Open PO</a>` : a.type === 'Invoice exception' ? `<a class="btn btn-sm" href="#/invoices/${esc(a.id)}">Open invoice</a>` : '';
     const files = pr && pr.files.length ? `<h3 class="h-sub">Attachments</h3><ul class="plain small">${pr.files.map((f) => `<li>${esc(f.type)} · <span class="mono">${esc(f.name)}</span> ${esc(f.ver)}${f.supplier ? ' ' + pill('Uploaded by supplier', 'info') : ''}</li>`).join('')}</ul>` : '';
     return card(`${a.id} · ${a.type}`, `<p class="mt-0"><b>${esc(a.title)}</b><br><span class="small muted">Requested by ${esc(a.by)} · ${a.value != null ? vnd(a.value) + ' excl. VAT' : 'no value'} · ${esc(a.step)}${a.note ? ' · ' + esc(a.note) : ''}</span></p>
       ${sod}${lines}${budget}${chainHtml}${files}${decide}`, link);
@@ -123,6 +123,7 @@
       return `${a.id} approved · step ${i + 1} of ${n} → ${a.assignee}`;
     }
     D().approvals.splice(D().approvals.indexOf(a), 1);
+    if (App.po) App.po.onDecide(a, d); if (App.inv) App.inv.onDecide(a, d);
     if (a.type === 'Award recommendation') {
       const t = D().tenders[a.id];
       if (d === 'Approved') {

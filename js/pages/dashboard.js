@@ -149,7 +149,7 @@
           { h: 'Vendor', r: (v) => `<a href="#/vendors/${esc(v.id)}"><span class="mono small">${esc(v.id)}</span> ${esc(v.name)}</a>`, w: 'minmax(240px,2fr)' }, { h: 'Category', k: 'cat' }, { h: 'MST', r: (v) => `<span class="mono small">${esc(v.mst)}</span>` }, { h: 'Status', r: (v) => pill(v.status, v.status === 'Preferred' ? 'success' : v.status === 'Probation' ? 'warning' : v.status === 'Approved' ? 'info' : 'neutral') }
         ], vens, { min: 620, empty: 'No vendors' }), '<a class="btn btn-sm" href="#/vendors">Vendors</a>')}
         ${card(`Documents (${docs.length})`, table([
-          { h: 'Number', r: (d) => `<a class="mono" href="#/${route[d.type]}${['CT', 'PR', 'TND'].includes(d.type) ? '/' + d.id : ''}">${esc(d.id)}</a>`, w: '150px' }, { h: 'Title', k: 'title', w: 'minmax(200px,2fr)' }, { h: 'Date', k: 'date', w: '110px' },
+          { h: 'Number', r: (d) => `<a class="mono" href="#/${route[d.type]}${['CT', 'PR', 'TND', 'PO', 'INV'].includes(d.type) ? '/' + d.id : d.po ? '/' + d.po : ''}">${esc(d.id)}</a>`, w: '150px' }, { h: 'Title', k: 'title', w: 'minmax(200px,2fr)' }, { h: 'Date', k: 'date', w: '110px' },
           { h: 'Material IDs', r: (d) => (d.mats || []).map(mid).join(' '), w: 'minmax(160px,1.5fr)' }, { h: 'Status', r: (d) => pill(d.status, 'neutral') }
         ], docs, { min: 760, empty: 'No documents' }))}` : ''}`;
     },

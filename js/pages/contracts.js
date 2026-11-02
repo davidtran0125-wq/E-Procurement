@@ -118,7 +118,7 @@
       { h: 'Change', r: (l) => (l.q3 && l.q4 ? `${l.q4 < l.q3 ? '−' : '+'}${pct(Math.abs(l.q4 - l.q3) / l.q3 * 100)}` : '—'), cls: 'num', w: '90px' }
     ], c.lines, { min: 620, label: 'Contract prices' }) + `<p class="small muted">${esc(c.adjust)}</p>`);
     const releases = card(`Released POs (${c.releases.length})`, table([
-      { h: 'PO', r: (r) => (doc(r[0]) ? `<a class="mono" href="#/po">${esc(r[0])}</a>` : `<span class="mono">${esc(r[0])}</span>`), w: '130px' }, { h: 'Date', r: (r) => esc(r[4]), w: '110px' },
+      { h: 'PO', r: (r) => (doc(r[0]) ? `<a class="mono" href="#/po/${esc(r[0])}">${esc(r[0])}</a>` : `<span class="mono">${esc(r[0])}</span>`), w: '130px' }, { h: 'Date', r: (r) => esc(r[4]), w: '110px' },
       { h: 'Material ID', r: (r) => mid(r[1]), w: '120px' }, { h: 'Qty', r: (r) => `${num(r[2])} ${esc((App.material(r[1]) || {}).uom || '')}`, cls: 'num', w: '100px' },
       { h: 'Unit price', r: (r) => vnd(r[3]), cls: 'num', w: '140px' }, { h: 'Value', r: (r) => vnd(r[2] * r[3]), cls: 'num', w: '160px' }
     ], c.releases.slice().reverse(), { min: 760, empty: 'No POs released yet', label: 'Released POs' }));
