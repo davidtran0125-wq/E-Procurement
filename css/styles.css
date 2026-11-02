@@ -346,3 +346,59 @@ ul.plain.qlinks { list-style: none; padding: 0; display: grid; gap: 6px; }
 ul.plain.qlinks li { margin: 0; } ul.plain.qlinks a { display: flex; align-items: center; justify-content: space-between; min-height: 40px; padding: 8px 12px; border: 1px solid var(--border); border-radius: 8px; text-decoration: none; color: var(--ink); font-weight: 500; }
 ul.plain.qlinks a::after { content: "›"; color: var(--muted); font-size: 18px; } ul.plain.qlinks a:hover { border-color: var(--primary); color: var(--primary); }
 @media (max-width: 600px) { .steps { flex-wrap: wrap; row-gap: 4px; overflow-x: visible; } }
+
+/* =====================================================================
+   Layout system v2 (redesign batch 1) — the single spec is docs/ui-guidelines.md.
+   Spacing scale: 4 · 8 · 12 · 16 · 24. Type scale: 12 · 13 · 14 · 16 · 22.
+   Page = header → KPI row (max 5 equal tiles) → sub-nav → 12-col grid of equal blocks (span 12/6/4).
+   ===================================================================== */
+:root { --s1: 4px; --s2: 8px; --s3: 12px; --s4: 16px; --s5: 24px; --fs-xs: 12px; --fs-s: 13px; --fs-m: 14px; --fs-l: 16px; --fs-xl: 22px; --radius: 10px; --blk-h: 36px; }
+.content { gap: var(--s4); }
+.page-h { align-items: flex-end; gap: var(--s3); }
+.page-h .page-t { min-width: 0; flex: 1 1 320px; }
+.page-h h1 { font-size: var(--fs-xl); line-height: 1.3; overflow-wrap: anywhere; }
+.page-h .sub { font-size: var(--fs-s); }
+.page-h .acts { align-items: center; }
+.page-h .acts .inp { height: 40px; }
+/* KPI row: equal tiles, one row on desktop */
+.kpis { display: grid; gap: var(--s4); grid-template-columns: repeat(var(--kn, 4), minmax(0, 1fr)); }
+.kpis-1 { --kn: 1; } .kpis-2 { --kn: 2; } .kpis-3 { --kn: 3; } .kpis-4 { --kn: 4; } .kpis-5 { --kn: 5; }
+.kpis .kpi { padding: var(--s4); display: flex; flex-direction: column; gap: 2px; min-height: 104px; }
+.kpis .kpi-l { font-size: var(--fs-s); } .kpis .kpi-v { font-size: var(--fs-xl); margin: 2px 0; overflow-wrap: anywhere; } .kpis .kpi-n { font-size: var(--fs-xs); }
+/* Sub-functions: tabs routed as #/module/sub */
+.subnav { display: flex; gap: var(--s1); border-bottom: 1px solid var(--border); overflow-x: auto; scrollbar-width: thin; }
+.subnav a { flex: none; display: inline-flex; align-items: center; gap: 6px; min-height: 40px; padding: 0 var(--s3); font: 600 var(--fs-s) var(--font); color: var(--muted); text-decoration: none; border-bottom: 2px solid transparent; margin-bottom: -1px; white-space: nowrap; }
+.subnav a:hover { color: var(--ink); }
+.subnav a[aria-current=page] { color: var(--primary); border-bottom-color: var(--primary); }
+/* Block grid: 12 columns, spans 12 / 6 / 4 only, equal heights per row */
+.blocks { display: grid; gap: var(--s4); grid-template-columns: repeat(12, minmax(0, 1fr)); align-items: stretch; }
+.blk { grid-column: span 12; display: flex; flex-direction: column; padding: var(--s5); min-width: 0; }
+.blk.s-6 { grid-column: span 6; } .blk.s-4 { grid-column: span 4; }
+.blk-h { display: flex; align-items: center; flex-wrap: wrap; gap: var(--s2); min-height: var(--blk-h); margin-bottom: var(--s3); }
+.blk-h h2 { font-size: var(--fs-l); line-height: 1.3; }
+.blk-h h2:empty { display: none; }
+.blk-b { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: var(--s3); }
+.blk-b > p, .blk-b > ul, .blk-b > ol, .blk-b > dl { margin: 0; }
+.blk-b > .filters { margin: 0; }
+@media (max-width: 1200px) { .blk.s-4 { grid-column: span 6; } .kpis-5 { --kn: 3; } }
+@media (max-width: 900px) {
+  .blk.s-6, .blk.s-4 { grid-column: span 12; }
+  .blk { padding: var(--s4); }
+  .kpis, .kpis-5, .kpis-4, .kpis-3 { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: var(--s3); }
+  .kpis .kpi { min-height: 92px; padding: var(--s3); } .kpis .kpi-v { font-size: 20px; }
+  .page-h h1 { font-size: 20px; }
+}
+/* Buttons, pills and tables: one size each */
+.btn { height: 40px; font-size: var(--fs-s); } .btn-sm { height: 36px; min-height: 36px; padding: 0 var(--s3); font-size: var(--fs-xs); }
+.pill { font-size: var(--fs-xs); line-height: 18px; }
+.th { font-size: var(--fs-xs); } .td { font-size: var(--fs-m); }
+.filters { gap: var(--s2); } .filters .inp { height: 40px; }
+/* Language switch: VI | EN */
+.lang { gap: 6px; } .lang span[aria-hidden] { color: var(--border); }
+.login-lang { align-self: flex-end; }
+/* Dashboard filters and Material 360 switcher inside page actions */
+.acts .field.inline { gap: var(--s2); } .acts .field.inline label { white-space: nowrap; }
+#m360-id { max-width: 280px; }
+@media (max-width: 900px) { .page-h .acts { width: 100%; } .acts .field.inline { flex: 1 1 160px; } .acts .field.inline .inp { width: 100%; } #m360-id { max-width: 100%; flex: 1 1 100%; } }
+.rule-list { display: grid; gap: var(--s2); } .rule-list li { margin: 0; }
+.split-2 { display: grid; gap: var(--s4); grid-template-columns: repeat(2, minmax(0, 1fr)); } @media (max-width: 900px) { .split-2 { grid-template-columns: minmax(0, 1fr); } }

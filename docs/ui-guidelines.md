@@ -1,70 +1,47 @@
-# ProcureLink UI guidelines (for Phase 2+)
+# ProcureLink UI spec (single source)
 
-Visual source of truth: `docs/04-design-brief.md` §3. Use tokens in `css/styles.css` (`var(--primary)` etc.), never hex inline. No gradients, no left-border accent cards, no emoji. Prefer classes over `style=""`.
+Tokens live in `css/styles.css` (`:root`). No hex inline, no gradients, no emoji, no `style=""` except data-driven bar widths.
 
-## Page structure
-- `.page-h` > `<div><h1>…</h1><div class="sub">…</div></div>` + `.acts` (buttons, right-aligned; wraps on mobile).
-- Sections: `App.card(title, body, actions)` (`.card`, `.card-h`, `.card-a`). Layout: `.grid` (auto cards), `.grid-2` (2fr/1fr, stacks <900px), `.grid-k` (KPI row, 2-up on phones), `.stack` (vertical 16px rhythm), `.form-grid`, `.filters`.
-- KPI: `App.kpi(label, value, note, tone)`; tone = success|warning|danger.
+## 1. Language (js/i18n.js)
+- Bilingual, **Vietnamese by default**; header/login switch `VI | EN` (`data-act="lang"`) stores `pl.lang` and re-renders. Numbers, money and dates always use vi-VN.
+- Every UI string goes through `App.t(key, params)` — dotted keys (`vd.e.mstReq`), `{name}` placeholders. Fallback: current language → English → key (dev hosts log `[i18n] missing key`).
+- Register keys next to the page: `I18N.add({ 'xx.key': ['English', 'Tiếng Việt'] })` (always both).
+- Data values (statuses, types, categories, known data text) are translated with `App.tv(value)`; `App.pill()` does it automatically. Add values with `I18N.values({...})`, patterned data text with `I18N.patterns([[regex, replacement]])`.
+- Not translated: vendor/item names, doc codes (PR-, PO-, CT-, TND-, CERT-…), standard terms (OTIF, VAT, GRN, NCR, MST, SLA, ISO). English data descriptions are wrapped in `lang="en"`.
+- Validation errors are stored as keys (or `[key, params]`) and translated at render time.
+- `npm test` fails if any literal `t('key')` in `js/` is missing from vi or en.
 
-## Data display
-- Material IDs: always `App.mid(id)` (chip link to Material 360). Other doc numbers: `App.docid(id)` or `<a class="mono">`.
-- Status: `App.pill(text, tone)` — always text + colour.
-- Tables: `App.table(cols, rows, {min, empty, label})`. Numbers/money columns get `cls: 'num'` (right-aligned, tabular, no wrap). Wide tables scroll inside `.tbl-wrap` (keyboard-focusable region); the page must never scroll horizontally. Pass `label` for screen readers.
-- Money: `App.vnd`, `App.ty`, `App.num`, `App.pct` — do not hand-format.
-- Charts: `App.chart.line({... label})` (SVG, `role="img"` + `aria-label` required) and `App.chart.bars(rows, fmt)` (HTML div bars).
+## 2. Page layout
+`App.layout({ title | titleHtml, crumbs, subtitle, actions, alerts, kpis, subnav, blocks })` renders, in this order:
+1. **Header** — h1 (22px), subtitle (13px), actions right (wrap on mobile). One primary button.
+2. **KPI row** — `App.kpi(label, value, noteHtml, tone)`, max 5 equal tiles in one row (2 per row ≤900px).
+3. **Sub-nav** — `App.subnav(base, [[sub, labelKey, badge?]], cur, qs)` → tabs routed as `#/base/sub` (first item = `#/base`). Resolve with `App.sub(items, sub)`; unknown subs fall back to the first and show `App.unknownSub(items, sub)`.
+4. **Blocks** — `App.block(title, body, { span: 12 | 6 | 4, actions })` in a 12-column grid. Rows stretch to equal height. 4 → 6 below 1200px; all 12 below 900px.
 
-## States
-- Empty: `App.emptyState(title, note, actionHtml)` or `.empty` inside tables.
-- Loading: `App.loading(label)`.
-- Error: `App.errorState(message, retryHtml)` (`.alert-danger`, `role="alert"`). Other alerts: `.alert-info|warning|success`.
-- Confirmation: `App.toast(msg)` or `data-act="toast" data-msg="…"`.
+Rule: the main tab of a module shows only its core (KPI row + main list/primary block). Settings, rules, logs, history, attachments, evaluations, forms and exports are sub-functions.
 
-## Controls & forms
-- Buttons: `.btn` (secondary), `.btn-p` (primary, one per area), `.btn-sm` (32px, in cards/rows), `.btn-d` (destructive). `.linkish` for text buttons.
-- Fields: `.field` > `<label for>` + input + `.hint` / `.err` (link via `aria-describedby`, set `aria-invalid`). Segmented: `.seg`. Checkboxes: `.chk` label wrapper.
-- Tabs: `App.tabs(id, [[key, label, html]])` (ARIA tabs built in).
+## 3. Scales
+- Spacing: 4 · 8 · 12 · 16 · 24 (`--s1..--s5`). Grid gap 16, block padding 24 (16 on mobile).
+- Type: 12 · 13 · 14 · 16 · 22 (`--fs-xs..--fs-xl`). Block title 16, KPI value 22.
+- Buttons: `.btn` 40px, `.btn-sm` 36px, `.btn-p` primary, `.btn-d` destructive. Pills: `App.pill(text, tone)` 12px.
+- Tables: `App.table(cols, rows, {min, empty, label})`; numbers `cls: 'num'`; wide tables scroll inside `.tbl-wrap` — the page never scrolls horizontally.
+- Forms: `App.field(id, label, value, {options, req, hint, err, ph, area, mode, type})`.
 
-## Accessibility & responsive
-- Every input has a label; icon-only buttons have `aria-label`. Touch targets ≥36px. Contrast ≥4.5:1 (use `--muted` #5F6672 as the lightest text).
-- Focus ring is global (`:focus-visible`); do not remove outlines.
-- Breakpoint 900px: sidebar becomes a drawer (`App.setMenu(open)`; closes on Esc, scrim click and navigation). Verify at 390 / 768 / 1440.
+## 4. Robustness
+- Router error boundary: a throwing `render`/`mount` shows an alert inside the shell; other screens keep working. Unknown routes, IDs (`#/vendors/V-9999`, `#/contracts/X`, `material360?id=X`) and subs render a message, never a blank page.
+- Google Fonts loads non-blocking; the system font stack is the fallback.
+- Verify over HTTP (`node server.js`), not `file://`: deep link + reload on every route, VI and EN, 1440 and 390, zero console errors, no horizontal scroll.
 
-## Access & shell
-- Register pages with `roles: [...]` when they show internal data. `App.render()` redirects other roles to `App.HOME[role]` with a "No access" notice.
-- Signed-in user: `App.state.user` (restored from `pl.user`). Shell labels go through `App.t(label)` (EN/VI, `pl.lang`). Text search uses `App.matches(text, q)` (accent-, case- and space-insensitive).
+## 5. Sub-function map (batch 1)
+| Module | Main | Sub-functions |
+|---|---|---|
+| Dashboard | Action required | analytics, tenders, prices |
+| Notifications | Inbox | rules |
+| Material IDs | List | new, rules (numbering + VAT), workflow, log |
+| Material 360° (`?id=`) | Linked tiles, master data, certificates + alt UoM, purchase chain | price, vendors, docs, files |
+| Vendors | List | new · profile `V-x`: overview, materials, docs, settings (status, bank, delete), edit |
+| Evaluation | Progress | scorecard (`?vendor=`), templates, history |
+| Contracts | List | new, offcontract · detail `CT-x`: overview, prices, terms, files |
+| Certificates | Register | review (`?id=`), expiring, blocks, upload |
 
-## Spacing & layout utilities (Phase 2)
-- Spacing: `.mt-0`, `.mt-s` (8px), `.mt` (12px) instead of `style="margin-top:…"`. Sub-headings inside cards: `h3.h-sub`.
-- Action rows: `.row-acts` (right), `.row-acts.start` (left), `.row-acts.between` (label left, actions right; in `ul.plain` rows get dividers).
-- Inline chips in text: `.chips.chips-inline`. Inputs in tables: `.inp.w-full`, `.inp.inp-num` (right-aligned numbers), `.inp.inp-score`.
-- Editable grids: define column templates as a class (e.g. `.tc-cols`) and min width (`.tbl-640`); only data-driven widths (bar fills) may stay inline.
-- Text buttons inside tables (`.tbl .linkish`) get a 36px target.
-
-## Workflow screens (Phase 3)
-- Small buttons (`.btn-sm`) are 36px high to meet the target size rule.
-- Progress: `ol.steps` renders a connected stepper — each `li` holds `.st-n` (number or check) + `.st-l`; mark `done` / `cur` (+ `aria-current="step"`) and add a `.sr` "(done)" for screen readers. Keep `.steps` `position: relative` so `.sr` text stays clipped.
-- Long detail pages (tender detail) get a sticky `nav.sec-nav` of buttons (`data-sec="<card id>"`) that scroll to and focus the card; cards get `id` + `tabindex="-1"`. Do not use `href="#…"` (the router owns the hash).
-- Comparison matrices: `App.table(..., { cls: 'mtx' })` — sticky first column, shaded summary rows (label cell in `<b>`), the lowest compliant price wrapped in `.best` plus a "Lowest" pill (never colour alone). `App.table` accepts `opts.cls` (added to `.tbl-wrap`) and headers carry `role="columnheader"`.
-- Inbox pattern: `.ap-split` (list | sticky detail at ≥1200px, stacked below) with `ul.ap-list > li.ap-item` (checkbox · main · `.ap-side` value/SLA/Review). Selected item: `.sel` + `aria-current`.
-- Decisions: wrap in `.decide-panel` with an `h3` "Your decision"; the comment always has a `.hint` explaining when it is required, the `.err` is appended to `aria-describedby`; primary action last in `.decide-acts`.
-- Validation: `.err` text is prefixed with "!" via CSS; invalid textarea/select/`.inp` get the danger border through `aria-invalid="true"`.
-- Empty states (`.state`) render as a dashed, tinted box so they read as intentional. `.dl` stacks to one column under 480px.
-
-## Documents, matching & insights (Phase 4)
-- Money KPI rows (PO detail): `.grid-k.kpi-money` scales the value so "₫" never orphans.
-- Totals: `dl.dl-tot` (or `.dl-num` for budget figures) — labels left, figures right/tabular; mark the grand total `dt.tot` + `dd.tot` (ruled). Print totals add `.po-tot` (right-aligned block).
-- Legend swatches inside text: `<span class="sw sb-inv|sb-warn|sb-pr|sb-rest" aria-hidden="true">` matching the `.stack-bar` segments (PR budget card).
-- PO detail lists: `ul.plain.grn-list` (receipts + QC pills), `ul.plain.ncr-list`, `ol.plain.rev-list` (revision timeline, newest first, current dot in primary).
-- Match grids: wrap variances with `.var.var-ok` / `.var.var-bad` (always the signed % text + `.sr` "within/outside tolerance"); the offending invoice figure gets `.var-cell`; result pills are prefixed "✓"/"!". Pass `cls: 'match-grid'` so rows with an exception get a light danger tint. The match card spans the full width above the 2-column area so variance columns are visible without scrolling at 1440.
-- Charts: `App.chart.line({... name, series: [{name, values (null = gap)}]})` adds up to 3 extra series in brief order (orange, aqua, yellow) with an HTML legend (`.chart-legend`) and direct end labels in ink; put the series values in the `label` too. `bars` rows with `dim` render a grey bar with muted text (no opacity).
-- Segmented controls whose labels must not wrap: `.seg.seg-nw`. Dates in tables: `<span class="nowrap">`.
-- Print (`@media print`, `@page A4 14mm/12mm`): app chrome, crumbs and `.no-print` hidden, white page, table min-widths dropped, rows/signature block don't split, pill colours kept (`print-color-adjust: exact`).
-
-## Supplier portal & admin console (Phase 5)
-- Record lists (notifications, Q&A, invoices, bid history): `ul.plain.rows` — no bullets, divider between items. Any `ul.plain` whose items are `li.row-acts` also drops bullets automatically.
-- Supplier overview quick links: `ul.plain.qlinks` renders full-width 40px link tiles with a chevron; keep the "Action needed" card first with one primary `Open` per urgent row (danger tone).
-- Stepper (`ol.steps`) wraps onto several lines under 600px instead of scrolling (invoice status, PO confirmation).
-- Text buttons in lists (`ul.plain .linkish`, e.g. allowlist "Remove") get a 36px target.
-- No inline styles: `.m-0` replaces `style="margin:0"`, `.mt-0` replaces `margin-top:0`, fixed-width editable grids use `.tbl-980` / `.tbl-1000`. Only data-driven bar widths stay inline.
-- Admin settings grids (notification rules, matrix) follow the editable-grid rule: column template class (`.nr-cols`) + min-width class inside `.tbl-wrap`.
+Older conventions (`App.card`, `.grid-2`, `.grid-k`, `App.tabs`) remain for pages not yet migrated (tenders, PR, PO, invoices, approvals, price, reports, supplier, admin).

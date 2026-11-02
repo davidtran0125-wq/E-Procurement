@@ -32,6 +32,24 @@ const { createServer } = require('../server.js');
     const pages = Object.keys((ctx.App && ctx.App.pages) || {});
     console.log(`\n${assets.length} assets, ${pages.length} pages registered: ${pages.join(', ')}`);
     if (!pages.includes('login')) { failed++; console.error('FAIL login page not registered'); }
+    // i18n: every literal App.t / t('key') used in js/ must exist in both dictionaries (vi + en)
+    const fs = require('fs'); const path = require('path');
+    const I = ctx.I18N; const files = [];
+    const walk = (d) => fs.readdirSync(d, { withFileTypes: true }).forEach((f) => { const p = path.join(d, f.name); if (f.isDirectory()) walk(p); else if (f.name.endsWith('.js')) files.push(p); });
+    walk(path.join(__dirname, '..', 'js'));
+    const missing = [];
+    let used = 0;
+    for (const f of files) {
+      const src = fs.readFileSync(f, 'utf8');
+      for (const m of src.matchAll(/(?:\bApp\.t|(?<![\w.$])t)\(\s*'((?:[^'\\]|\\.)+)'\s*[,)]/g)) {
+        used++;
+        const k = m[1].replace(/\\'/g, "'");
+        ['vi', 'en'].forEach((l) => { if (!I || I.dict[l][k] == null) missing.push(`${path.relative(process.cwd(), f)}: ${l} '${k}'`); });
+      }
+    }
+    if (!I) { failed++; console.error('FAIL I18N not loaded'); }
+    else if (missing.length) { failed++; console.error(`FAIL i18n: ${missing.length} missing key(s)\n  ` + [...new Set(missing)].join('\n  ')); }
+    else console.log(`i18n: ${used} literal keys used, all present in vi and en (${Object.keys(I.dict.vi).length} keys)`);
   } catch (e) { failed++; console.error('FAIL', e.message); }
   srv.close();
   process.exit(failed ? 1 : 0);
