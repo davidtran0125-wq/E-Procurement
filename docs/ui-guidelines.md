@@ -60,3 +60,11 @@ Visual source of truth: `docs/04-design-brief.md` §3. Use tokens in `css/styles
 - Charts: `App.chart.line({... name, series: [{name, values (null = gap)}]})` adds up to 3 extra series in brief order (orange, aqua, yellow) with an HTML legend (`.chart-legend`) and direct end labels in ink; put the series values in the `label` too. `bars` rows with `dim` render a grey bar with muted text (no opacity).
 - Segmented controls whose labels must not wrap: `.seg.seg-nw`. Dates in tables: `<span class="nowrap">`.
 - Print (`@media print`, `@page A4 14mm/12mm`): app chrome, crumbs and `.no-print` hidden, white page, table min-widths dropped, rows/signature block don't split, pill colours kept (`print-color-adjust: exact`).
+
+## Supplier portal & admin console (Phase 5)
+- Record lists (notifications, Q&A, invoices, bid history): `ul.plain.rows` — no bullets, divider between items. Any `ul.plain` whose items are `li.row-acts` also drops bullets automatically.
+- Supplier overview quick links: `ul.plain.qlinks` renders full-width 40px link tiles with a chevron; keep the "Action needed" card first with one primary `Open` per urgent row (danger tone).
+- Stepper (`ol.steps`) wraps onto several lines under 600px instead of scrolling (invoice status, PO confirmation).
+- Text buttons in lists (`ul.plain .linkish`, e.g. allowlist "Remove") get a 36px target.
+- No inline styles: `.m-0` replaces `style="margin:0"`, `.mt-0` replaces `margin-top:0`, fixed-width editable grids use `.tbl-980` / `.tbl-1000`. Only data-driven bar widths stay inline.
+- Admin settings grids (notification rules, matrix) follow the editable-grid rule: column template class (`.nr-cols`) + min-width class inside `.tbl-wrap`.

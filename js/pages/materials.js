@@ -132,7 +132,7 @@
 
   function side() {
     const C = D().categories;
-    const numbering = card('Numbering rules', `<p class="small" style="margin-top:0">Format <span class="mono">CAT-NNNNN</span>. Number reserved on submit, assigned on approval, never reused (e.g. LOG-61013 blocked as duplicate of LOG-61012).</p>` + table([
+    const numbering = card('Numbering rules', `<p class="small mt-0">Format <span class="mono">CAT-NNNNN</span>. Number reserved on submit, assigned on approval, never reused (e.g. LOG-61013 blocked as duplicate of LOG-61012).</p>` + table([
       { h: 'Category', r: (c) => `<b class="mono">${c.code}</b> ${esc(c.name)}` }, { h: 'Range', r: (c) => `<span class="mono small">${c.range[0]}–${c.range[1]}</span>` }, { h: 'Next', r: (c) => `<span class="mono small">${c.code}-${c.next}</span>` }
     ], C, { min: 340 }));
     const flow = card('Approval workflow', `<ol class="flow"><li><b>Requester</b><span class="small muted">Submits; number reserved</span></li><li><b>Material master owner</b><span class="small muted">Duplicate, spec, VAT, certificates</span></li><li><b>Admin</b><span class="small muted">Assigns code after Finance confirms VAT</span></li></ol>

@@ -142,6 +142,7 @@ svg.chart { width: 100%; height: auto; }
 .seg button + button { border-left: 1px solid var(--input); }
 .seg button[aria-selected=true], .seg button[aria-pressed=true] { background: var(--primary-soft); color: var(--primary); }
 .linkish { border: 0; background: none; padding: 0; font: inherit; color: var(--primary); text-decoration: underline; cursor: pointer; }
+ul.plain .linkish { min-height: 36px; padding: 0 4px; }
 .field input[aria-invalid=true] { border-color: var(--bad); }
 
 /* Login */
@@ -210,7 +211,7 @@ svg.chart { width: 100%; height: auto; }
 .dl dd { min-width: 0; overflow-wrap: anywhere; }
 .tbl-wrap { position: relative; }
 /* Phase-2 utilities (see docs/ui-guidelines.md) */
-.mt-0 { margin-top: 0; } .mt-s { margin-top: 8px; } .mt { margin-top: 12px; }
+.m-0 { margin: 0; } .mt-0 { margin-top: 0; } .mt-s { margin-top: 8px; } .mt { margin-top: 12px; }
 .h-sub { font-size: 13px; font-weight: 600; margin: 16px 0 8px; }
 .row-acts.start { justify-content: flex-start; } .row-acts.between { justify-content: space-between; align-items: center; }
 ul.plain > li.row-acts { padding: 6px 0; border-top: 1px solid var(--divider); } ul.plain > li.row-acts:first-child { border-top: 0; }
@@ -281,7 +282,7 @@ ul.plain > li.row-acts { padding: 6px 0; border-top: 1px solid var(--divider); }
 .seg-wrap button { flex: 0 1 auto; border-bottom: 1px solid var(--input); margin-bottom: -1px; }
 .po-cols { grid-template-columns: minmax(200px,2fr) 150px 170px minmax(120px,1fr) 160px 130px minmax(170px,1.5fr); }
 .sb-cols { grid-template-columns: minmax(200px,2fr) 110px 170px minmax(150px,1.2fr) 120px 100px 160px; }
-.tbl-1000 { min-width: 1000px; }
+.tbl-1000 { min-width: 1000px; } .tbl-980 { min-width: 980px; }
 .nr-cols { grid-template-columns: minmax(200px,2fr) 120px minmax(160px,1.4fr) 80px 80px 80px 130px; }
 .po-doc { max-width: 960px; } .po-title { font-size: 18px; margin: 16px 0; }
 @media print {
@@ -337,3 +338,11 @@ ol.plain.rev-list { list-style: none; margin: 0; padding: 0 0 0 22px; position: 
 .po-tot { max-width: 420px; margin-left: auto; }
 .po-sign > div { border-top: 1px solid var(--border); padding-top: 8px; }
 #sp-prop { flex-wrap: wrap; } #sp-prop select { min-width: 0; max-width: 100%; }
+
+/* Phase 5 · supplier portal & admin console */
+ul.plain:has(> li.row-acts), ul.plain.rows { list-style: none; padding-left: 0; }
+ul.plain.rows > li { padding: 8px 0; margin: 0; border-top: 1px solid var(--divider); } ul.plain.rows > li:first-child { border-top: 0; padding-top: 0; }
+ul.plain.qlinks { list-style: none; padding: 0; display: grid; gap: 6px; }
+ul.plain.qlinks li { margin: 0; } ul.plain.qlinks a { display: flex; align-items: center; justify-content: space-between; min-height: 40px; padding: 8px 12px; border: 1px solid var(--border); border-radius: 8px; text-decoration: none; color: var(--ink); font-weight: 500; }
+ul.plain.qlinks a::after { content: "›"; color: var(--muted); font-size: 18px; } ul.plain.qlinks a:hover { border-color: var(--primary); color: var(--primary); }
+@media (max-width: 600px) { .steps { flex-wrap: wrap; row-gap: 4px; overflow-x: visible; } }

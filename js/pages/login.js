@@ -33,7 +33,7 @@
         <button class="btn btn-gmail" type="submit">${gIcon}Continue with Gmail</button>
       </form>`;
     const invite = `<form class="stack" data-lg="invite" novalidate>
-        <p class="muted small" style="margin:0">Suppliers invited by email: enter the Gmail address the invitation was sent to and the code from the email. Invitations are valid for 7 days.</p>
+        <p class="muted small m-0">Suppliers invited by email: enter the Gmail address the invitation was sent to and the code from the email. Invitations are valid for 7 days.</p>
         <div class="field"><label for="iv-email">Invited Gmail</label><input id="iv-email" type="email" value="kho.phumy@gmail.com"></div>
         <div class="field"><label for="iv-code">Invitation code</label><input id="iv-code" value="PL-INV-7Q4K" class="mono"></div>
         ${st.inviteErr ? `<div class="alert alert-danger" role="alert">${esc(st.inviteErr)}</div>` : ''}
@@ -55,7 +55,7 @@
           </div>
           ${st.mode === 'gmail' ? gmail : invite}
           <label class="consent"><input type="checkbox" id="lg-consent"${st.consent ? ' checked' : ''}> <span>I agree that [YOUR COMPANY] processes my name and Gmail address to provide ProcureLink, as described in the <button type="button" class="linkish" data-lg="privacy">Privacy notice v2.1</button> (Luật BVDLCN 91/2025/QH15).</span></label>
-          <p class="muted small" style="margin:0">Admins and approvers must have Google 2-step verification. Sessions end after 30 minutes idle.</p>
+          <p class="muted small m-0">Admins and approvers must have Google 2-step verification. Sessions end after 30 minutes idle.</p>
           <div class="login-f small"><button type="button" class="linkish" data-lg="privacy">Privacy</button><button type="button" class="linkish" data-lg="info" data-msg="Terms of use: [YOUR COMPANY] procurement terms v1.3">Terms</button><button type="button" class="linkish" data-lg="info" data-msg="Help: contact the System Admin, Phạm Thu Trang">Help</button></div>
         </main>
         ${st.privacy ? privacy() : ''}
