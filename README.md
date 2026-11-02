@@ -34,3 +34,20 @@ Demo URL: `https://<owner>.github.io/<repo>/` — sign in with any role on the l
 | Admin console (F-99..F-108) | `#/admin/users`, `#/admin/access`, `#/admin/matrix`, `#/materials`, `#/admin/categories`, `#/admin/templates`, `#/admin/numbering`, `#/admin/tolerances`, `#/admin/integrations`, `#/admin/rules`, `#/admin/sod`, `#/admin/audit` |
 
 Supplier and admin actions write to the shared `window.DATA`, so they show up on the procurement screens. Examples: bids, Q&A and addendum acks appear on the tender; PO confirmations draw contract releases; ASNs, date-change requests (→ My approvals) and NCR responses appear on the PO; e-invoices land in Invoices; certificate renewals go to Certificates review; bank changes go to My approvals; tolerances, delegation and the approval matrix drive Invoices and Approvals; and everything is written to the audit log.
+
+## Docker
+
+```bash
+docker build -t procurelink .
+docker run -p 3000:3000 procurelink     # http://localhost:3000
+```
+
+## Deploy on Railway
+
+`railway.json` tells Railway to build the `Dockerfile`; the server reads Railway's `PORT`.
+
+1. railway.com → **New Project → Deploy from GitHub repo** → pick `davidtran0125-wq/E-Procurement`.
+2. Service → **Settings → Networking → Generate Domain** to get a public URL.
+3. Every push to `main` redeploys automatically.
+
+CLI alternative: `npm i -g @railway/cli && railway login && railway init && railway up`.
