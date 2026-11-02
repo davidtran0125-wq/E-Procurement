@@ -209,8 +209,19 @@
       try { found.p.mount(document.getElementById('main'), params, found.sub); }
       catch (e) { console.error(e); const m = document.getElementById('main'); if (m) m.insertAdjacentHTML('afterbegin', errorState(t('shell.crash', { route }))); }
     }
+    subnavHint();
     window.scrollTo(0, 0);
   }
+  // RB1-09: sub-nav that overflows (mobile) gets edge fades; the active tab is scrolled into view
+  function subnavHint() {
+    document.querySelectorAll('.subnav').forEach((n) => {
+      const upd = () => { n.classList.toggle('more-r', n.scrollLeft + n.clientWidth < n.scrollWidth - 2); n.classList.toggle('more-l', n.scrollLeft > 2); };
+      const on = n.querySelector('[aria-current=page]');
+      if (on && n.scrollWidth > n.clientWidth) n.scrollLeft = Math.max(0, on.offsetLeft - (n.clientWidth - on.offsetWidth) / 2);
+      upd(); n.addEventListener('scroll', upd, { passive: true });
+    });
+  }
+  window.addEventListener('resize', () => subnavHint());
 
   /* Mobile drawer */
   function setMenu(open) {
@@ -229,7 +240,11 @@
     if (!el) return;
     const a = el.dataset.act;
     if (a === 'switch') { ls.del('pl.role'); ls.del('pl.user'); state.role = null; state.user = null; location.hash = '#/login'; }
-    else if (a === 'lang') { state.lang = state.lang === 'vi' ? 'en' : 'vi'; ls.set('pl.lang', state.lang); render(); const b = document.querySelector('[data-act=lang]'); b && b.focus(); }
+    else if (a === 'lang') {
+      // RB1-01: keep unsaved form input across the re-render
+      const snap = [...document.querySelectorAll('#main input[id], #main select[id], #main textarea[id]')].filter((x) => x.type !== 'file').map((x) => [x.id, x.type === 'checkbox' || x.type === 'radio' ? x.checked : x.value, x.type]);
+      state.lang = state.lang === 'vi' ? 'en' : 'vi'; ls.set('pl.lang', state.lang); render();
+      snap.forEach(([id, v, ty]) => { const x = document.getElementById(id); if (!x) return; if (ty === 'checkbox' || ty === 'radio') x.checked = v; else x.value = v; }); const b = document.querySelector('[data-act=lang]'); b && b.focus(); }
     else if (a === 'menu') setMenu(!document.getElementById('side').classList.contains('open'));
     else if (a === 'menu-close') setMenu(false);
     else if (a === 'skip') { e.preventDefault(); const m = document.getElementById('main'); m && m.focus(); }

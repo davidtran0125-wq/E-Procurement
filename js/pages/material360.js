@@ -125,7 +125,7 @@
       if (src) {
         const tn = D().docs.find((x) => x.id === src.next); const po = pos.find((x) => /TND/.test(x.title) && x.title.includes(tn.id)) || pos[pos.length - 1]; const grn = grns[grns.length - 1];
         if (po) {
-          chain = block(t('m3.chain'), `<ol class="chain">${[[src.id, 'PR', src.title], [tn.id, t('m3.ch.tender'), t('m3.ch.awarded', { v: vname(tn.award) })], [po.id, 'PO', `${po.date} · ${po.qty || ''} · ${vnd(po.value)}`], [grn ? grn.id : '—', t('m3.ch.delivery'), grn ? grn.title : '']].map(([i, l, s]) => `<li><span class="small muted">${esc(l)}</span>${docLink(i)}<span class="small">${esc(s)}</span></li>`).join('')}</ol>
+          chain = block(t('m3.chain'), `<ol class="chain">${[[src.id, 'PR', src.title], [tn.id, t('m3.ch.tender'), t('m3.ch.awarded', { v: vname(tn.award) })], [po.id, 'PO', `${po.date} · ${po.qty || ''} · ${vnd(po.value)}`], [grn ? grn.id : '—', t('m3.ch.delivery'), grn ? App.tv(grn.title) : '']].map(([i, l, s]) => `<li><span class="small muted">${esc(l)}</span>${docLink(i)}<span class="small">${esc(s)}</span></li>`).join('')}</ol>
             ${saving ? `<div class="alert alert-success">${esc(t('m3.ch.saving', { s: vnd(saving), b: vnd(16450000), a: vnd(15200000), u: m.uom }))}</div>` : ''}`);
         }
       }

@@ -447,7 +447,8 @@ window.DATA = {
 
 /* ---------- Phase 4: purchase orders & goods receipt (F-61..F-69), invoices & matching (F-70..F-75), price history (F-76..F-80), reports (F-81..F-86) ---------- */
 (function (D) {
-  D.company = { name: '[YOUR COMPANY]', mst: '[YOUR MST]', address: '[YOUR ADDRESS]' };
+  // Buyer legal details: fill in to show them on login, privacy notice and invoice checks (empty = the line is hidden). RB1-06
+  D.company = { name: '', mst: '', address: '', dpoEmail: '' };
   D.poStats = { total: 128 };
   D.tolerance = { price: 0.5, qty: 2 };
   D.fx = { USD: 25420, EUR: 27610, src: 'Vietcombank selling rate', at: '02/11/2026' };

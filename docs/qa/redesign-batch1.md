@@ -92,3 +92,17 @@ Checked and OK (not findings):
 | F-37 | Review supplier upload | `#/certificates/review?id=` | ✓ |
 | F-38 | Block on expired mandatory certificate | `#/certificates/blocks` | ✓ |
 | F-39 | 90-day expiry timeline | `#/certificates/expiring` | ✓ |
+
+## Fix status (Agent 1)
+
+| ID | Status | Fix |
+|---|---|---|
+| RB1-01 | Fixed | `js/app.js` lang toggle snapshots every `#main` input/select/textarea (value or checked) before `render()` and restores it after. |
+| RB1-02 | Fixed | Login/invite errors stored as keys (`'lg.e.x'` or `['lg.e.role', {name, role, roles}]`), translated in `render()`. |
+| RB1-03 | Fixed | `gdtLookup()` returns `code: 'active' \| 'inactive'`; MST box and both toasts use `vd.gdt.active/inactive`; `mstVerified` from the code. |
+| RB1-04 | Fixed | Material 360° purchase chain prints `tv(grn.title)`. |
+| RB1-05 | Fixed | `vatFor(material, start)`: 8% materials expect 10% for contracts starting after 31/12/2026; the blank form defaults to it (no VAT error on a blank form). |
+| RB1-06 | Fixed | `DATA.company = { name, mst, address, dpoEmail }` kept but empty. Consent line, privacy intro and Terms toast use neutral wording until `name` is set (then `{co}` variants); the privacy Contact row and invoice buyer-name line are hidden while empty. No raw `[YOUR COMPANY]` placeholder is user-facing. |
+| RB1-07 | Fixed | Probation → "Theo dõi"; `vd.toProbation` → "Duyệt → Theo dõi". |
+| RB1-08 | Fixed | Pattern `(.*) (portal)` → `$1 (cổng NCC)`; vendor settings bank `by` rendered via `tv()` (PO confirmations in batch 2). |
+| RB1-09 | Fixed | Overflowing `.subnav` gets edge fades (`.more-r` / `.more-l` mask) updated on scroll/resize, and the active tab is scrolled into view. Vendor list column minimums cut to 1100px (fits at 1440 without inner scroll). |

@@ -66,7 +66,9 @@
 
   /* ---------- New contract (L-05 step 1) ---------- */
   const vatLabel = (v) => (+v === 8 ? t('ct.vat8') : v + '%');
-  const blank = () => ({ ctype: 'Framework', vendor: 'V-1002', start: '01/01/2027', end: '31/12/2027', ceiling: '', vat: String((App.material('CON-24102') || { vat: 10 }).vat), owner: me(), mat: 'CON-24102', commit: '', price: '' });
+  // RB1-05: the 8% reduction ends 31/12/2026; contracts starting later use the standard 10%
+  const vatFor = (m, start) => (m && m.vat === 8 && validDate(start) && App.dt(start) > App.dt('31/12/2026') ? 10 : m ? m.vat : 10);
+  const blank = () => ({ ctype: 'Framework', vendor: 'V-1002', start: '01/01/2027', end: '31/12/2027', ceiling: '', vat: String(vatFor(App.material('CON-24102'), '01/01/2027')), owner: me(), mat: 'CON-24102', commit: '', price: '' });
   function newForm() {
     const f = st.form || (st.form = blank()); const e = st.errs;
     return block(t('ct.form'), `<form id="ct-new" novalidate class="stack"><div class="alert alert-info">${esc(t('ct.formNote', { id: nextId() }))}</div>
@@ -94,8 +96,9 @@
     if (!(money(f.price) > 0)) e.price = 'ct.e.price';
     const m = App.material(f.mat);
     if (!e.price && !e.commit && !e.ceiling && money(f.price) * Number(f.commit.replace(',', '.')) > money(f.ceiling)) e.ceiling = 'ct.e.ceiling';
-    if (m && +f.vat !== m.vat) e.vat = ['ct.e.vatMatch', { id: m.id, v: m.vat }];
-    else if (+f.vat === 8 && validDate(f.start) && App.dt(f.start) > App.dt('31/12/2026')) e.vat = 'ct.e.vat8';
+    const expect = vatFor(m, f.start);
+    if (+f.vat === 8 && validDate(f.start) && App.dt(f.start) > App.dt('31/12/2026')) e.vat = 'ct.e.vat8';
+    else if (m && +f.vat !== expect) e.vat = ['ct.e.vatMatch', { id: m.id, v: expect }];
     if (m && !m.vendors.some((v) => v[0] === f.vendor && v[1] !== 'Blocked')) e.mat = ['ct.e.link', { v: f.vendor, m: m.id }];
     st.errs = e; if (Object.keys(e).length) { App.render(); const x = document.querySelector('#ct-new [aria-invalid=true]'); x && x.focus(); return; }
     const id = nextId(); const ceiling = money(f.ceiling);

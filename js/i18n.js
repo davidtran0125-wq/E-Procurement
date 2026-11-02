@@ -103,12 +103,13 @@
     [/^(CT-[\d-]+) expired (\S+)$/, '$1 hết hạn $2'],
     [/^Release from (CT-[\d-]+) \(Q4 price (.*)\)$/, 'Phát hành từ $1 (giá Q4 $2)'],
     [/^Release (CT-[\d-]+)(.*)$/, 'Phát hành $1$2'],
-    [/^Onboarding rejected: (.*)$/, 'Từ chối hồ sơ: $1']
+    [/^Onboarding rejected: (.*)$/, 'Từ chối hồ sơ: $1'],
+    [/^(.*) \(portal\)$/, '$1 (cổng NCC)']
   ]);
 
   /* ---------- Enumerated data values (statuses, types, labels stored in DATA) → Vietnamese ---------- */
   values({
-    Active: 'Đang hoạt động', 'Pending approval': 'Chờ duyệt', Draft: 'Nháp', Blocked: 'Bị chặn', Preferred: 'Ưu tiên', Approved: 'Đã duyệt', Probation: 'Thử thách',
+    Active: 'Đang hoạt động', 'Pending approval': 'Chờ duyệt', Draft: 'Nháp', Blocked: 'Bị chặn', Preferred: 'Ưu tiên', Approved: 'Đã duyệt', Probation: 'Theo dõi',
     Low: 'Thấp', Medium: 'Trung bình', High: 'Cao', Pending: 'Đang chờ', Proposed: 'Đề xuất', Verified: 'Đã xác minh', 'Not verified': 'Chưa xác minh', 'Not checked': 'Chưa kiểm tra',
     Valid: 'Còn hiệu lực', Expiring: 'Sắp hết hạn', Expired: 'Hết hạn', 'Pending review': 'Chờ xem xét', Rejected: 'Bị từ chối', Superseded: 'Đã thay thế', 'Pending signature': 'Chờ ký',
     Submitted: 'Đã nộp', 'Not started': 'Chưa bắt đầu', Open: 'Đang mở', Closed: 'Đã đóng', Awarded: 'Đã trao thầu', Evaluation: 'Đánh giá', 'Q&A': 'Hỏi đáp', Cancelled: 'Đã hủy',

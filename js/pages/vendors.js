@@ -44,11 +44,12 @@
     'vd.proposedLinks': ['Proposed links · approved per Material ID', 'Liên kết đề xuất · duyệt theo từng mã vật tư'], 'vd.approveLink': ['Approve link', 'Duyệt liên kết'], 'vd.toAdd': ['Material ID to add', 'Mã vật tư cần thêm'], 'vd.addMat': ['Add Material ID', 'Thêm mã vật tư'],
     'vd.mstNotVer': ['MST not verified — links stay Proposed until the MST check passes.', 'MST chưa xác minh — liên kết giữ trạng thái Đề xuất đến khi kiểm tra MST đạt.'],
     'vd.ob': ['Onboarding review checklist', 'Danh mục xét duyệt hồ sơ'], 'vd.markOk': ['Mark OK', 'Đánh dấu Đạt'], 'vd.obCount': ['{a} of {b} items OK. Approve needs every item OK.', '{a}/{b} mục Đạt. Cần tất cả mục Đạt mới được duyệt.'],
-    'vd.rejReason': ['Reason for rejection', 'Lý do từ chối'], 'vd.confirmReject': ['Confirm reject', 'Xác nhận từ chối'], 'vd.toProbation': ['Approve → Probation', 'Duyệt → Thử thách'], 'vd.toActive': ['Approve → Active', 'Duyệt → Hoạt động'],
+    'vd.rejReason': ['Reason for rejection', 'Lý do từ chối'], 'vd.confirmReject': ['Confirm reject', 'Xác nhận từ chối'], 'vd.toProbation': ['Approve → Probation', 'Duyệt → Theo dõi'], 'vd.toActive': ['Approve → Active', 'Duyệt → Hoạt động'],
     'vd.statusCard': ['Status & deletion', 'Trạng thái & xóa'], 'vd.statusLbl': ['Vendor status', 'Trạng thái NCC'], 'vd.statusNote': ['Active = Approved. Blocked vendors cannot be invited or receive new POs; open POs continue.', 'Hoạt động = Đã duyệt. NCC bị chặn không được mời thầu hay nhận PO mới; PO đang mở vẫn tiếp tục.'],
     'vd.delBlocked': ['Delete is blocked: open PO {pos}. Set the vendor to Blocked instead.', 'Không thể xóa: còn PO {pos} đang mở. Hãy chuyển NCC sang Bị chặn.'],
     'vd.docs': ['Open POs & contracts', 'PO đang mở & hợp đồng'], 'vd.noDocs': ['No open POs or contracts', 'Không có PO đang mở hay hợp đồng'], 'vd.certs': ['Certificates ({n})', 'Chứng chỉ ({n})'], 'vd.expires': ['expires {d}', 'hết hạn {d}'],
     'vd.noCerts': ['No certificates on file', 'Chưa có chứng chỉ'], 'vd.certReg': ['Certificate register', 'Sổ chứng chỉ'], 'vd.notFound': ['Vendor {id} was not found.', 'Không tìm thấy NCC {id}.'], 'vd.back': ['Back to vendors', 'Về danh sách NCC'],
+    'vd.gdt.active': ['Active (operating)', 'Đang hoạt động'], 'vd.gdt.inactive': ['Ceased operating', 'Ngừng hoạt động'],
     'vd.mstInvalid': ['MST format is not valid', 'MST không đúng định dạng'], 'vd.mstResult': ['MST {mst} · {s}', 'MST {mst} · {s}'], 'vd.mstMatch': ['MST {mst} · {s} · registered name matches', 'MST {mst} · {s} · tên đăng ký khớp'],
     'vd.riskOne': ['Risk re-checked · {r} (no change)', 'Đã kiểm tra lại rủi ro · {r} (không đổi)'], 'vd.riskAll': ['Risk re-checked for {n} vendors · no level changed', 'Đã kiểm tra lại rủi ro {n} NCC · không thay đổi mức'],
     'vd.delBlockedT': ['Delete blocked: open PO', 'Không thể xóa: còn PO đang mở'], 'vd.deleted': ['{id} deleted', 'Đã xóa {id}'], 'vd.setTo': ['{id} set to {s}', 'Đã chuyển {id} sang {s}'], 'vd.proposedT': ['{m} proposed for {id} · approve per Material ID', 'Đã đề xuất {m} cho {id} · duyệt theo mã vật tư'],
@@ -87,15 +88,15 @@
   function dupOf(mst, selfId) { const n = normMst(mst); return D().vendors.find((v) => v.id !== selfId && normMst(v.mst) === n); }
   function gdtLookup(mst, name) {
     const n = normMst(mst); const known = D().vendors.find((v) => normMst(v.mst) === n);
-    if (n === '0109999999') return { mst: n, regName: 'CÔNG TY TNHH THƯƠNG MẠI HẢI ĐĂNG', address: 'Q. Cầu Giấy, Hà Nội', status: 'Ngừng hoạt động', at: D().today };
-    return { mst: n, regName: (known ? known.name : name || 'Chưa khai báo tên').toUpperCase(), address: known ? known.address : 'Theo đăng ký thuế', status: 'Đang hoạt động', at: D().today };
+    if (n === '0109999999') return { mst: n, regName: 'CÔNG TY TNHH THƯƠNG MẠI HẢI ĐĂNG', address: 'Q. Cầu Giấy, Hà Nội', status: 'Ngừng hoạt động', code: 'inactive', at: D().today };
+    return { mst: n, regName: (known ? known.name : name || 'Chưa khai báo tên').toUpperCase(), address: known ? known.address : 'Theo đăng ký thuế', status: 'Đang hoạt động', code: 'active', at: D().today };
   }
   function mstBox(f) {
     const r = st.mst;
     if (!r || r.mst !== normMst(f.mst)) return `<div id="vf-mst-box"><p class="small muted m-0">${esc(t('vd.mstIntro'))}</p></div>`;
     const mismatch = f.name && App.norm(r.regName) !== App.norm(f.name);
-    const ok = r.status === 'Đang hoạt động';
-    return `<div id="vf-mst-box" class="stack"><div class="alert ${ok ? 'alert-success' : 'alert-danger'}" role="status"><b>${esc(t('vd.gdt', { at: r.at }))}</b><br>${esc(t('vd.regName'))}: ${esc(r.regName)}<br>${esc(t('vd.address'))}: ${esc(r.address)}<br>${esc(t('vd.taxStatus'))}: <b>${esc(r.status)}</b></div>
+    const ok = r.code === 'active';
+    return `<div id="vf-mst-box" class="stack"><div class="alert ${ok ? 'alert-success' : 'alert-danger'}" role="status"><b>${esc(t('vd.gdt', { at: r.at }))}</b><br>${esc(t('vd.regName'))}: ${esc(r.regName)}<br>${esc(t('vd.address'))}: ${esc(r.address)}<br>${esc(t('vd.taxStatus'))}: <b>${esc(t('vd.gdt.' + r.code))}</b></div>
       ${mismatch ? `<div class="alert alert-warning" role="status">${esc(t('vd.mismatch'))}</div>` : ''}</div>`;
   }
 
@@ -141,7 +142,7 @@
     st.errs = validate(f, F.id); st.dup = null;
     if (!st.errs.mst) { const d = dupOf(f.mst, F.id); if (d) st.dup = d; }
     if (Object.keys(st.errs).length || st.dup) { App.render(); const x = document.querySelector('#vf [aria-invalid=true]') || document.querySelector('#vf .alert-danger'); if (x) { x.setAttribute('tabindex', '-1'); x.focus(); x.scrollIntoView({ block: 'center' }); } return; }
-    const verified = !!(st.mst && st.mst.mst === normMst(f.mst) && st.mst.status === 'Đang hoạt động');
+    const verified = !!(st.mst && st.mst.mst === normMst(f.mst) && st.mst.code === 'active');
     if (F.id) {
       const v = App.vendor(F.id); const mstChanged = normMst(v.mst) !== normMst(f.mst);
       Object.assign(v, { name: f.name, mst: fmtMst(f.mst), parent: f.parent || null, cat: f.cat, terms: f.terms, contact: f.contact, phone: f.phone, email: f.email, city: f.city });
@@ -165,16 +166,16 @@
         <label class="sr" for="vl-q">${esc(t('vd.searchLbl'))}</label><input class="inp grow" id="vl-q" data-vf="q" type="search" value="${esc(st.q)}" placeholder="${esc(t('vd.searchPh'))}">
         ${sel('cat', t('c.category'), ['Construction', 'Equipment', 'Services', 'Logistics'])}${sel('status', t('c.status'), STATUSES)}${sel('risk', t('vd.risk'), ['Low', 'Medium', 'High'])}${sel('grade', t('vd.grade'), ['A', 'B', 'C', 'D'])}</div>
       ${table([
-        { h: t('c.vendor'), r: (v) => `<a href="#/vendors/${esc(v.id)}"><span class="mono small">${esc(v.id)}</span> ${esc(v.name)}</a><div class="small muted">${esc(v.email)}</div>`, w: 'minmax(240px,2.4fr)' },
-        { h: t('c.category'), r: (v) => esc(tv(v.cat)) + `<div class="small muted">${esc(v.city)}</div>`, w: 'minmax(120px,1fr)' },
-        { h: 'MST', r: (v) => `<span class="mono small">${esc(v.mst)}</span>${v.mstVerified ? '' : `<div class="small tone-warning">${esc(t('vd.notVerified'))}</div>`}`, w: '130px' },
-        { h: t('vd.supplied'), r: (v) => { const L = links(v.id); return L.length ? `<div class="chips">${L.slice(0, 3).map((x) => mid(x.m.id)).join('')}${L.length > 3 ? `<span class="small muted">+${L.length - 3}</span>` : ''}</div>` : '<span class="muted">—</span>'; }, w: 'minmax(170px,1.5fr)' },
-        { h: t('c.score'), r: (v) => (v.score ? `${num(v.score, 2)} · ${esc(v.grade)}` : '—'), cls: 'num', w: '90px' },
-        { h: 'OTIF', r: (v) => (v.otif != null ? pct(v.otif) : '—'), cls: 'num', w: '80px' },
-        { h: t('vd.risk'), r: (v) => pill(v.risk === '—' ? 'Pending' : v.risk, rTone(v.risk)) + (v.riskReasons.length && v.risk !== 'Low' ? `<div class="small muted">${esc(tv(v.riskReasons[0]))}${v.riskReasons.length > 1 ? ` +${v.riskReasons.length - 1}` : ''}</div>` : ''), w: 'minmax(150px,1.3fr)' },
-        { h: t('c.status'), r: (v) => `<span class="pill pill-${sTone(v.status)}">${esc(sLabel(v.status))}</span>`, w: '140px' },
-        { h: t('c.actions'), r: (v) => { const o = openPos(v.id); return `<div class="row-acts start"><a class="btn btn-sm" href="#/vendors/${esc(v.id)}/edit" aria-label="${esc(t('vd.editId', { id: v.id }))}">${esc(t('c.edit'))}</a><button class="btn btn-sm btn-d" data-v="delete" data-id="${esc(v.id)}" aria-label="${esc(t('vd.delId', { id: v.id }))}"${o.length ? ` disabled title="${esc(t('vd.delBlockedTip', { po: o[0].id }))}"` : ''}>${esc(t('c.delete'))}</button></div>`; }, w: '160px' }
-      ], rows, { min: 1360, empty: t('vd.empty'), label: t('vd.title') })}
+        { h: t('c.vendor'), r: (v) => `<a href="#/vendors/${esc(v.id)}"><span class="mono small">${esc(v.id)}</span> ${esc(v.name)}</a><div class="small muted">${esc(v.email)}</div>`, w: 'minmax(200px,2.4fr)' },
+        { h: t('c.category'), r: (v) => esc(tv(v.cat)) + `<div class="small muted">${esc(v.city)}</div>`, w: 'minmax(100px,1fr)' },
+        { h: 'MST', r: (v) => `<span class="mono small">${esc(v.mst)}</span>${v.mstVerified ? '' : `<div class="small tone-warning">${esc(t('vd.notVerified'))}</div>`}`, w: '120px' },
+        { h: t('vd.supplied'), r: (v) => { const L = links(v.id); return L.length ? `<div class="chips">${L.slice(0, 3).map((x) => mid(x.m.id)).join('')}${L.length > 3 ? `<span class="small muted">+${L.length - 3}</span>` : ''}</div>` : '<span class="muted">—</span>'; }, w: 'minmax(140px,1.5fr)' },
+        { h: t('c.score'), r: (v) => (v.score ? `${num(v.score, 2)} · ${esc(v.grade)}` : '—'), cls: 'num', w: '80px' },
+        { h: 'OTIF', r: (v) => (v.otif != null ? pct(v.otif) : '—'), cls: 'num', w: '70px' },
+        { h: t('vd.risk'), r: (v) => pill(v.risk === '—' ? 'Pending' : v.risk, rTone(v.risk)) + (v.riskReasons.length && v.risk !== 'Low' ? `<div class="small muted">${esc(tv(v.riskReasons[0]))}${v.riskReasons.length > 1 ? ` +${v.riskReasons.length - 1}` : ''}</div>` : ''), w: 'minmax(120px,1.3fr)' },
+        { h: t('c.status'), r: (v) => `<span class="pill pill-${sTone(v.status)}">${esc(sLabel(v.status))}</span>`, w: '120px' },
+        { h: t('c.actions'), r: (v) => { const o = openPos(v.id); return `<div class="row-acts start"><a class="btn btn-sm" href="#/vendors/${esc(v.id)}/edit" aria-label="${esc(t('vd.editId', { id: v.id }))}">${esc(t('c.edit'))}</a><button class="btn btn-sm btn-d" data-v="delete" data-id="${esc(v.id)}" aria-label="${esc(t('vd.delId', { id: v.id }))}"${o.length ? ` disabled title="${esc(t('vd.delBlockedTip', { po: o[0].id }))}"` : ''}>${esc(t('c.delete'))}</button></div>`; }, w: '150px' }
+      ], rows, { empty: t('vd.empty'), label: t('vd.title') })}
       <p class="muted small">${esc(t('vd.showing', { n: rows.length, at: D().vendors[0] ? D().vendors[0].riskChecked : '—' }))}</p>`,
     { actions: `<button class="btn btn-sm" data-v="recheck-all">${esc(t('vd.recheck'))}</button><button class="btn btn-sm" data-act="toast" data-msg="${esc(t('vd.importMsg'))}">${esc(t('c.import'))}</button>` });
   }
@@ -218,7 +219,7 @@
     } else if (cur === 'settings') {
       const b = v.bank || {};
       const bank = block(t('vd.bank'), `<dl class="dl"><dt>${esc(t('vd.inUse'))}</dt><dd class="mono">${esc(b.now || '—')}</dd></dl>
-        ${b.pending ? `<div class="alert alert-warning" role="status"><b>${esc(t('vd.bankPending'))}</b> · ${esc(t('vd.bankPendingN', { acc: b.pending, at: b.requested, by: b.by }))}</div>` : `<p class="small muted">${esc(t('vd.noPending'))}</p>`}`,
+        ${b.pending ? `<div class="alert alert-warning" role="status"><b>${esc(t('vd.bankPending'))}</b> · ${esc(t('vd.bankPendingN', { acc: b.pending, at: b.requested, by: tv(b.by) }))}</div>` : `<p class="small muted">${esc(t('vd.noPending'))}</p>`}`,
       { span: 6, actions: b.pending ? `<a class="btn btn-sm" href="#/approvals?id=${esc(v.id)}">${esc(t('vd.openApprovals'))}</a>` : '' });
       const status = block(t('vd.statusCard'), `<div class="seg" role="group" aria-label="${esc(t('vd.statusLbl'))}">${['Preferred', 'Approved', 'Probation', 'Blocked'].map((s) => `<button data-v="status" data-id="${esc(v.id)}" data-s="${s}" aria-pressed="${v.status === s}">${esc(sLabel(s))}</button>`).join('')}</div>
         <p class="small muted">${esc(t('vd.statusNote'))}</p>
@@ -291,10 +292,10 @@
         else if (a === 'check-mst') {
           const f = readForm(root); st.form.f = f; const err = mstFormat(f.mst, f.parent); st.errs = err ? { mst: err } : {};
           if (!err) { st.mst = gdtLookup(f.mst, f.name); const d = dupOf(f.mst, st.form.id); st.dup = d || null; }
-          App.render(); App.toast(err ? t('vd.mstInvalid') : t('vd.mstResult', { mst: normMst(f.mst), s: st.mst.status }));
+          App.render(); App.toast(err ? t('vd.mstInvalid') : t('vd.mstResult', { mst: normMst(f.mst), s: t('vd.gdt.' + st.mst.code) }));
         }
         else if (!v && a !== 'recheck-all' && a !== 'del-cancel') return;
-        else if (a === 'check-mst-p') { const r = gdtLookup(v.mst, v.name); Object.assign(v, { taxStatus: r.status, mstChecked: r.at, mstVerified: r.status === 'Đang hoạt động' }); App.render(); App.toast(t('vd.mstMatch', { mst: normMst(v.mst), s: r.status })); }
+        else if (a === 'check-mst-p') { const r = gdtLookup(v.mst, v.name); Object.assign(v, { taxStatus: r.status, mstChecked: r.at, mstVerified: r.code === 'active' }); App.render(); App.toast(t('vd.mstMatch', { mst: normMst(v.mst), s: t('vd.gdt.' + r.code) })); }
         else if (a === 'recheck' || a === 'recheck-all') { (v ? [v] : D().vendors).forEach((x) => { if (x.riskChecked !== '—' || v) x.riskChecked = D().today + ' 10:30'; }); App.render(); App.toast(v ? t('vd.riskOne', { r: tv(v.risk === '—' ? 'Pending' : v.risk) }) : t('vd.riskAll', { n: D().vendors.length })); }
         else if (a === 'delete') { if (el.disabled) return; st.confirmDel = v.id; App.render(); }
         else if (a === 'del-cancel') { st.confirmDel = null; App.render(); }
