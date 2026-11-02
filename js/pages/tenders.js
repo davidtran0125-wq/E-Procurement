@@ -27,17 +27,17 @@
   /* ---------- F-40 list ---------- */
   function listPage(p) {
     if (p.q != null && p.q !== st.lastQ) { st.q = p.q; st.lastQ = p.q; st.tab = 'all'; }
-    const all = list(); const cnt = (k) => (k === 'all' ? all.length : all.filter((d) => d.status === k).length);
+    const all = list(); const inTab = (d, k) => k === 'all' || d.status === k || (k === 'Evaluation' && d.status === 'Award pending'); const cnt = (k) => all.filter((d) => inTab(d, k)).length;
     const q = st.q.trim();
     const rows = all.filter((d) => {
       const t = det(d.id) || {}; const bidders = (t.bidders || []).map((b) => b.name).join(' ');
-      return (st.tab === 'all' || d.status === st.tab) && (st.method === 'all' || t.method === st.method)
+      return inTab(d, st.tab) && (st.method === 'all' || t.method === st.method)
         && (!q || App.matches(`${d.id} ${d.title} ${d.mats.join(' ')} ${bidders} ${d.mats.map((m) => mat(m).name).join(' ')}`, q));
     }).sort((a, b) => App.dt(b.date) - App.dt(a.date));
     const closing = all.filter((d) => ['Open', 'Q&A'].includes(d.status) && App.daysTo(d.close) >= 0 && App.daysTo(d.close) <= 7);
     return `<div class="page-h"><div><h1>${esc(App.t('Tenders'))}</h1><div class="sub">RFQ, sealed-bid, two-envelope and e-auction tenders · every tender lists its Material ID lines</div></div>
       <div class="acts"><button class="btn" data-act="toast" data-msg="Exported Tenders_02-11-2026.xlsx (${rows.length} rows)">Export Excel</button><a class="btn btn-p" href="#/tenders/new">${esc(App.t('New tender'))}</a></div></div>
-      <div class="grid-k">${kpi('Active tenders', num(D().kpi.activeTenders), `${all.filter((d) => !['Awarded', 'Draft'].includes(d.status)).length} in this sample`)}${kpi('Closing ≤ 7 days', String(closing.length), closing.map((d) => d.id.slice(4)).join(', ') || 'None', closing.length ? 'warning' : '')}${kpi('In evaluation', String(cnt('Evaluation') + cnt('Award pending')), 'TND-2026-029 due 04/11/2026')}${kpi('Awarded', String(cnt('Awarded')), 'This sample · 2026')}</div>
+      <div class="grid-k">${kpi('Active tenders', num(D().kpi.activeTenders), `${all.filter((d) => !['Awarded', 'Draft'].includes(d.status)).length} in this sample`)}${kpi('Closing ≤ 7 days', String(closing.length), closing.map((d) => d.id.slice(4)).join(', ') || 'None', closing.length ? 'warning' : '')}${kpi('In evaluation', String(cnt('Evaluation')), all.filter((d) => inTab(d, 'Evaluation')).map((d) => `${d.id.slice(4)} ${d.status === 'Award pending' ? 'award pending' : d.note ? d.note.replace('Evaluation ', '') : ''}`).join(' · ') || 'None')}${kpi('Awarded', String(cnt('Awarded')), 'This sample · 2026')}</div>
       <div class="seg" role="group" aria-label="Status">${TABS.map(([k, l]) => `<button data-tn="tab" data-k="${k}" aria-pressed="${st.tab === k}">${l} (${cnt(k)})</button>`).join('')}</div>
       ${card('Tenders', `<div class="filters"><label class="sr" for="tn-q">Search tenders</label><input class="inp grow" id="tn-q" type="search" data-tnf="q" value="${esc(st.q)}" placeholder="Search ID, title, Material ID or bidder">
         <label class="sr" for="tn-m">Method</label><select class="inp" id="tn-m" data-tnf="method"><option value="all">All methods</option>${METHODS.map((m) => `<option${st.method === m ? ' selected' : ''}>${m}</option>`).join('')}</select></div>
@@ -55,7 +55,8 @@
   function newPage(p) {
     if (!st.nf) {
       const pr = p.pr || (p.mat ? '' : 'PR-2026-0436');
-      st.nf = { pr, mat: p.mat || '', qty: '', title: '', method: 'Sealed bid', envelopes: 'Single', close: '20/11/2026', time: '17:00', validity: '90', currency: 'VND', secPct: '1', delivery: '15/12/2026', wt: '40', wp: '60' };
+      const est = pr && D().prs[pr] ? D().prs[pr].lines.reduce((a, l) => a + estOf(l), 0) : Infinity;
+      st.nf = { pr, mat: p.mat || '', qty: '', title: '', method: est <= 500000000 ? 'RFQ' : 'Sealed bid', envelopes: 'Single', close: '20/11/2026', time: '17:00', validity: '90', currency: 'VND', secPct: est <= 500000000 ? '0' : '1', delivery: '15/12/2026', wt: '40', wp: '60' };
       st.nerr = {};
     }
     const f = st.nf; const e = st.nerr;
@@ -66,7 +67,7 @@
     return `<div class="page-h"><div><div class="crumbs small muted"><a href="#/tenders">Tenders</a> / New</div><h1>${esc(App.t('New tender'))}</h1><div class="sub">Lines are copied from the PR (Material ID and quantity) · the number TND-2026-NNN is issued on save</div></div></div>
       ${card('Tender setup', `<form id="tn-new" class="stack" novalidate>
         ${e._ ? `<div class="alert alert-danger" role="alert">${esc(e._)}</div>` : ''}
-        <div class="form-grid">${S.field('tn', e, 'pr', 'Source PR', f.pr, { options: [['', f.mat ? `No PR · Material ID ${f.mat}` : '— choose —']].concat(prs.map((d) => [d.id, `${d.id} · ${d.title}`])), hint: 'Approved PRs that need a tender (value > 500tr, no active contract)' })}
+        <div class="form-grid">${S.field('tn', e, 'pr', 'Source PR', f.pr, { options: [['', f.mat ? `No PR · Material ID ${f.mat}` : '— choose —']].concat(prs.map((d) => [d.id, `${d.id} · ${d.title}`])), hint: 'Approved PRs without an active contract' })}
           ${!f.pr ? S.field('tn', e, 'qty', `Quantity${f.mat ? ' (' + mat(f.mat).uom + ')' : ''}`, f.qty, { req: true, mode: 'decimal' }) : ''}
           ${S.field('tn', e, 'title', 'Title', f.title, { req: true, ph: 'e.g. Tủ điện MSB – Nhà xưởng C2' })}
           ${S.field('tn', e, 'method', 'Method', f.method, { options: METHODS })}
@@ -108,7 +109,7 @@
   }
 
   /* ---------- Detail blocks ---------- */
-  const progress = (i) => `<ol class="steps" aria-label="Tender progress">${STEPS.map((s, k) => `<li class="${k < i ? 'done' : k === i ? 'cur' : ''}"${k === i ? ' aria-current="step"' : ''}><span class="st-n" aria-hidden="true">${k < i ? '✓' : k + 1}</span><span class="st-l">${s}</span>${k < i ? '<span class="sr"> (done)</span>' : ''}</li>`).join('')}</ol>`;
+  const progress = (i, all) => `<ol class="steps" aria-label="Tender progress">${STEPS.map((s, k) => { const dn = k < i || all; const cu = k === i && !all; return `<li class="${dn ? 'done' : cu ? 'cur' : ''}"${cu ? ' aria-current="step"' : ''}><span class="st-n" aria-hidden="true">${dn ? '✓' : k + 1}</span><span class="st-l">${s}</span>${dn ? '<span class="sr"> (done)</span>' : ''}</li>`; }).join('')}</ol>`;
 
   function linesCard(doc, t) {
     return card(`Lines by Material ID (${t.lines.length})`, table([
@@ -170,13 +171,21 @@
       rows = doc.status === 'Draft' ? [] : ids.slice(0, Math.max(doc.invited, 0) || ids.length).map((vid, i) => ({ vid, name: App.vendor(vid).name, status: i < doc.bids ? 'Submitted' : 'Invited' }));
     }
     const elig = [...new Set(t.lines.flatMap((l) => mat(l.mat).vendors.filter((v) => v[1] !== 'Blocked').map((v) => v[0])))];
-    return card(`Invited vendors (${doc.status === 'Draft' ? 0 : doc.invited})`, doc.status === 'Draft'
+    rows.forEach(certWarn.bind(null, t));
+    return card(`Invited vendors (${doc.status === 'Draft' ? 0 : rows.length})`, doc.status === 'Draft'
       ? `${App.emptyState('Not invited yet', `${elig.length} vendors are approved for these Material IDs: ${elig.map((v) => App.vshort(App.vendor(v))).join(', ') || 'none'}. Blocked vendor – Material ID pairs are excluded.`, '<button class="btn btn-p btn-sm" data-tn="invite">Invite vendors (Gmail + portal)</button>')}`
-      : `<ul class="plain">${rows.map((b) => `<li class="row-acts between"><span>${b.vid ? `<a href="#/vendors/${esc(b.vid)}"><span class="mono small">${esc(b.vid)}</span> ${esc(vname(b))}</a>` : esc(b.name)}</span><span>${b.warn && /blocked/i.test(b.warn) ? pill('Certificate block', 'danger') + ' ' : ''}${pill(b.status || 'Submitted', (b.status || 'Submitted') === 'Submitted' ? 'success' : 'neutral')}</span></li>`).join('')}</ul>`);
+      : `<ul class="plain">${rows.map((b) => `<li class="row-acts between"><span>${b.vid ? `<a href="#/vendors/${esc(b.vid)}"><span class="mono small">${esc(b.vid)}</span> ${esc(vname(b))}</a>` : esc(b.name)}</span><span>${b.warn && /blocked/i.test(b.warn) ? pill('Certificate block', 'danger') + ' ' : ''}${pill(b.status || 'Submitted', (b.status || 'Submitted') === 'Submitted' ? 'success' : 'neutral')}</span></li>`).join('')}${rows.length < doc.invited ? `<li class="small muted">+${doc.invited - rows.length} invited outside the approved list (by exception)</li>` : ''}</ul>`);
   }
 
   /* F-41 sealed bids (R-05) */
+  /* P3-17: certificate block derived from the Material ID vendor links (follows CERT approvals) */
+  function certWarn(t, b) {
+    if (!b.vid) return;
+    const blk = t.lines.map((l) => l.mat).find((m) => (mat(m).vendors || []).some((v) => v[0] === b.vid && v[1] === 'Blocked'));
+    if (blk) b.warn = 'Certificate block — ' + blk; else if (b.warn && /block/i.test(b.warn)) delete b.warn;
+  }
   function sealedCard(doc, t) {
+    t.bidders.forEach(certWarn.bind(null, t));
     const sub = t.bidders.filter((b) => b.status === 'Submitted').length; const isClosed = closed(doc);
     return card(`Bids · sealed · ${sub} of ${t.bidders.length} bids received`, `<div class="alert alert-info" role="status"><b>Sealed until ${esc(closeAt(doc, t))}.</b> Prices are hidden from Procurement until the tender closes and two committee members open the bids.</div>
       ${table([
@@ -332,12 +341,13 @@
     const evalBlocks = t.bidders && t.bidders[0] && t.bidders[0].tech ? openingCard(t) + techCard(t) + matrixCard(t) + awardCard(doc, t) : '';
     const sealed = t.bidders && doc.sealed ? sealedCard(doc, t) : '';
     const upKey = 'tnf'; t.files = t.files || [];
-    const left = [linesCard(doc, t), sealed, evalBlocks, t.auction ? auctionCard(t) : '', qaCard(t), S.files(upKey, t.files, t.lines.map((l) => l.mat), st.up, ['Specification / drawing', 'BOQ', 'Addendum', 'Bid opening minutes', 'Other'])].join('');
+    const awardSimple = !evalBlocks && t.award && t.award.status === 'Approved' ? card('Award', `<dl class="dl"><dt>Awarded to</dt><dd><a href="#/vendors/${esc(t.award.vendor)}">${esc(App.vendor(t.award.vendor).name)}</a></dd><dt>Value</dt><dd>${vnd(t.award.value)} excl. VAT</dd></dl><div class="row-acts"><a class="btn btn-p" href="#/po?tender=${esc(doc.id)}">Create PO</a></div>`) : '';
+    const left = [linesCard(doc, t), sealed, evalBlocks, awardSimple, t.auction ? auctionCard(t) : '', qaCard(t), S.files(upKey, t.files, t.lines.map((l) => l.mat), st.up, ['Specification / drawing', 'BOQ', 'Addendum', 'Bid opening minutes', 'Other'])].join('');
     const right = [settingsCard(doc, t), t.fx ? fxCard(t) : '', committeeCard(t), sealed ? '' : invitedCard(doc, t)].join('');
     let n = 0; const secs = [];
     const leftA = left.replace(/<section class="card"><div class="card-h"><h2>([^<]*)<\/h2>/g, (m0, h) => { const id = 'tn-s' + (++n); secs.push([id, h.replace(/&amp;/g, '&').split(' · ')[0].replace(/ \(.*$/, '')]); return `<section class="card" id="${id}" tabindex="-1"><div class="card-h"><h2>${h}</h2>`; });
     const nav = secs.length > 2 ? `<nav class="sec-nav" aria-label="Tender sections">${secs.map(([id, l]) => `<button type="button" data-sec="${id}">${esc(l)}</button>`).join('')}</nav>` : '';
-    return `${head}${alerts}${progress(step)}${kpis}${nav}<div class="grid-2"><div class="stack">${leftA}</div><div class="stack">${right}</div></div>`;
+    return `${head}${alerts}${progress(step, doc.status === 'Awarded')}${kpis}${nav}<div class="grid-2"><div class="stack">${leftA}</div><div class="stack">${right}</div></div>`;
   }
 
   App.page('tenders', {
@@ -354,13 +364,14 @@
       root.addEventListener('input', (e) => {
         if (e.target.dataset.tnf === 'q') { st.q = e.target.value; const pos = e.target.selectionStart; App.render(); const i = document.getElementById('tn-q'); i.focus(); i.setSelectionRange(pos, pos); }
       });
+      root.addEventListener('mousedown', (e) => { if (e.target.closest('button[type=submit]')) st.hold = true; });
       root.addEventListener('change', (e) => {
         if (e.target.dataset.tnf === 'method') { st.method = e.target.value; App.render(); }
-        if (e.target.closest('#tn-new') && ['pr', 'secPct', 'delivery', 'qty'].includes(e.target.name)) { Object.assign(st.nf, S.read(root, '#tn-new')); const id = e.target.id; App.render(); const x = document.getElementById(id); x && x.focus(); }
+        if (e.target.closest('#tn-new') && ['pr', 'secPct', 'delivery', 'qty'].includes(e.target.name)) { Object.assign(st.nf, S.read(root, '#tn-new')); if (st.hold) { st.hold = false; return; } const id = e.target.id; App.render(); const x = document.getElementById(id); x && x.focus(); }
         if (e.target.dataset.aw != null) { st.aw.pick[+e.target.dataset.aw] = e.target.value; st.aw.why = (root.querySelector('#aw-why') || {}).value || st.aw.why; const id = e.target.id; App.render(); const x = document.getElementById(id); x && x.focus(); }
       });
       root.addEventListener('submit', (e) => {
-        const id = e.target.id; if (!['tn-new', 'tn-set', 'tn-aw', 'tn-qa', 'tnf-up'].includes(id)) return; e.preventDefault();
+        const id = e.target.id; if (!['tn-new', 'tn-set', 'tn-aw', 'tn-qa', 'tnf-up'].includes(id)) return; e.preventDefault(); st.hold = false;
         const doc = list().find((x) => x.id === st.cur); const t = doc && det(doc.id);
         if (id === 'tn-new') saveNew(root);
         else if (id === 'tn-set') saveSettings(root, t);

@@ -13,7 +13,7 @@
   const hoursLeft = (a) => (ts(a.sla) - ts(NOW)) / 36e5;
   const slaText = (a) => { const h = hoursLeft(a); if (h < 0) return ['Overdue ' + Math.round(-h) + ' h', 'danger']; if (h < 24) return [`Due in ${Math.floor(h)} h ${Math.round((h % 1) * 60)} min`, 'warning']; return [`Due in ${Math.floor(h / 24)} d ${Math.round(h % 24)} h`, 'neutral']; };
   const stepOf = (a) => { const m = /Step (\d+) of (\d+)/.exec(a.step || ''); return m ? [+m[1], +m[2]] : [1, 1]; };
-  const blocked = (a) => a.sod && !a.override;
+  const blocked = (a) => a.sod && (!a.override || a.by === S.me());
   const eligible = (a) => a.value != null && a.value < D().bulkLimit && !blocked(a);
   const onBehalf = (a) => (S.assignee(a) !== S.me() && App.state.role !== 'admin' ? S.assignee(a) : null);
   const chipPrice = (id) => { const m = App.material(id); return m ? `${mid(id)} <span class="small muted">last ${m.last ? vnd(m.last) : '—'} · 90-day ${m.avg90 ? vnd(m.avg90) : '—'}</span>` : mid(id); };
@@ -65,7 +65,7 @@
     const chainHtml = chain.length ? `<h3 class="h-sub">Approval chain</h3><ol class="chain">${chain.map(([who, s, at, c]) => `<li${s === 'Waiting' ? ' class="on"' : ''}><b>${esc(who)}</b>${pill(s, s === 'Approved' || s === 'Submitted' || s === 'Raised' ? 'success' : s === 'Waiting' ? 'info' : /Blocked/.test(s) ? 'danger' : 'neutral')}<span class="small muted">${esc(at)}</span>${c ? `<span class="small">“${esc(c)}”</span>` : ''}</li>`).join('')}</ol>` : '';
     const nx = nextName(a); const [i, n] = stepOf(a);
     const sod = blocked(a) ? `<div class="alert alert-danger" role="alert"><b>Blocked — SoD.</b> You raised this change order, so you cannot approve it. It is routed to Đỗ Hoàng Nam. Only an Admin can override, and the override is logged.</div>
-      ${App.state.role === 'admin' ? `<form id="ap-ovr" class="stack" novalidate><div class="field"><label for="ap-ovr-r">Override reason (Admin) *</label><textarea id="ap-ovr-r"${st.oerr ? ' aria-invalid="true" aria-describedby="ap-ovr-e"' : ''}>${esc(st.ovr || '')}</textarea>${st.oerr ? `<span class="err" id="ap-ovr-e" role="alert">${esc(st.oerr)}</span>` : ''}</div><div class="row-acts"><button type="submit" class="btn btn-d btn-sm">Override SoD</button></div></form>` : ''}` : a.override ? `<div class="alert alert-warning" role="status">SoD overridden by ${esc(a.override.by)} · ${esc(a.override.at)}: “${esc(a.override.reason)}” (audit logged)</div>` : '';
+      ${App.state.role === 'admin' && a.by !== S.me() ? `<form id="ap-ovr" class="stack" novalidate><div class="field"><label for="ap-ovr-r">Override reason (Admin) *</label><textarea id="ap-ovr-r"${st.oerr ? ' aria-invalid="true" aria-describedby="ap-ovr-e"' : ''}>${esc(st.ovr || '')}</textarea>${st.oerr ? `<span class="err" id="ap-ovr-e" role="alert">${esc(st.oerr)}</span>` : ''}</div><div class="row-acts"><button type="submit" class="btn btn-d btn-sm">Override SoD</button></div></form>` : ''}` : a.override ? `<div class="alert alert-warning" role="status">SoD overridden by ${esc(a.override.by)} · ${esc(a.override.at)}: “${esc(a.override.reason)}” (audit logged)</div>` : '';
     const ob = onBehalf(a);
     const decide = `<form id="ap-form" class="stack decide-panel" novalidate aria-labelledby="ap-dec-h"><h3 id="ap-dec-h" class="h-sub mt-0">Your decision</h3><div class="field"><label for="ap-c">Comment</label><textarea id="ap-c" aria-describedby="ap-c-h${st.cerr ? ' ap-c-e' : ''}"${st.cerr ? ' aria-invalid="true"' : ''}>${esc(st.comment)}</textarea><span class="hint" id="ap-c-h">Optional to approve · required (at least 10 characters) to reject or return.</span>${st.cerr ? `<span class="err" id="ap-c-e" role="alert">${esc(st.cerr)}</span>` : ''}</div>
       <p class="small mt-0">Approving as <b>${esc(S.me())}</b>${ob ? ` on behalf of <b>${esc(ob)}</b>` : ''} · step ${i} of ${n} · next: ${i < n && nx ? esc(nx) : 'final approval'}</p>
@@ -115,6 +115,7 @@
     D().approvalHistory.push({ id: a.id, type: a.type, title: a.title, decision: d, by: me, onBehalf: ob, at: NOW, comment });
     const w = chain.find((r) => r[1] === 'Waiting'); if (w) { w[1] = d; w[2] = NOW + (ob ? ` · ${me} on behalf of ${ob}` : ''); w[3] = comment; }
     const doc = S.docOf(a.id);
+    D().notifications.filter((x) => x.doc === a.id).forEach((x) => { x.read = true; });
     if (d === 'Approved' && i < n) {
       const nx = chain.find((r) => r[1] === 'Next'); if (nx) { nx[1] = 'Waiting'; nx[2] = 'Since ' + NOW; }
       a.step = `Step ${i + 1} of ${n}`; a.assignee = nextName(a) || (nx ? nx[0].split(' · ')[0] : 'Đỗ Hoàng Nam');
@@ -124,7 +125,10 @@
     D().approvals.splice(D().approvals.indexOf(a), 1);
     if (a.type === 'Award recommendation') {
       const t = D().tenders[a.id];
-      if (d === 'Approved') { Object.assign(t.award, { status: 'Approved', approver: me, at: NOW }); doc.status = 'Awarded'; t.step = 6; }
+      if (d === 'Approved') {
+        Object.assign(t.award, { status: 'Approved', approver: me, at: NOW }); doc.status = 'Awarded'; t.step = 6; doc.note = 'Awarded ' + NOW.slice(0, 10);
+        if (t.bidders) t.lines.forEach((l, k) => { const b = t.bidders.find((x) => x.vid === t.award.pick[k]); const m = App.material(l.mat); if (b && m) { m.last = b.prices[k]; m.lastPo = a.id; m.lastVendor = b.vid; } });
+      }
       else { t.award = null; doc.status = 'Evaluation'; }
     } else if (doc && doc.type === 'PR') doc.status = d === 'Approved' ? 'Approved' : d;
     return `${a.id} ${d.toLowerCase()}${ob ? ' on behalf of ' + ob : ''}`;
@@ -156,6 +160,7 @@
         if (e.target.id === 'ap-form') e.preventDefault();
         if (e.target.id === 'ap-ovr') {
           e.preventDefault(); const a = D().approvals.find((x) => x.id === st.sel); const r = (st.ovr || '').trim();
+          if (a.by === S.me()) { st.oerr = 'You raised this item — another Admin must override.'; App.render(); return; }
           if (r.length < 10) { st.oerr = 'Give a reason of at least 10 characters.'; App.render(); document.getElementById('ap-ovr-r').focus(); return; }
           a.override = { by: S.me(), at: NOW, reason: r }; (D().sodLog = D().sodLog || []).push({ id: a.id, by: S.me(), at: NOW, reason: r }); st.ovr = null; st.oerr = ''; App.render(); App.toast(`SoD overridden on ${a.id} · audit logged`);
         }

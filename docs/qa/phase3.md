@@ -109,4 +109,25 @@ Not a defect: "Create PO" goes to `#/po?tender=…`, which is "Not built yet" (P
 
 ## Fix status (Agent 1)
 
-_Pending._
+All 17 findings fixed. Re-tested in headless Chromium (Playwright, `file://`), 1440/390 px, procurement + admin: no console errors, no horizontal scroll on phase 1–3 routes.
+
+| ID | Status | Fix / re-test |
+|---|---|---|
+| P3-01 | Fixed | `blocked()` also holds the raiser even after an override; the override form is rendered only for an Admin who did not raise the item, and the handler rejects a self-override. Re-test: Nguyễn Minh Anh (Admin workspace) sees no override form on PO-2026-0877 Rev.2; Approve stays disabled. |
+| P3-02 | Fixed | Submit sets "Awaiting approval", pushes the PR approval item (step 1 of n, SLA +2 days) and the approval chain. Re-test: PR-0452 appears in `DATA.approvals` with its chain. |
+| P3-03 | Fixed | Navigation re-renders when the hash is unchanged. Re-test: PR-0452 submit shows the read-only view. |
+| P3-04 | Fixed | `mousedown` on submit/save sets `st.hold`; the blur `change` handler stores the values but skips the re-render (PR and New tender). Re-test: qty 49→50 + Save draft saves on first click; `#/tenders/new?mat=CON-24102` qty 300 + Save creates TND-2026-036 on first click. |
+| P3-05 | Fixed | `route()` marks repeated approvers "skipped (already approved earlier step)"; step numbering counts active steps only (PR-0452: 2 steps). |
+| P3-06 | Fixed | PR-2026-0440 value 3.450.000.000 ₫. |
+| P3-07 | Fixed | PR-0438 line 10 × 8.600.000 = 86.000.000 ₫; approval "Step 1 of 1", chain Dept head (Kho A acting). |
+| P3-08 | Fixed | Title uses listed rows; "+n invited outside the approved list (by exception)". |
+| P3-09 | Fixed | Awarded TND-024/027 show an Award card (vendor, value, Create PO); stepper all done. |
+| P3-10 | Fixed | Decisions mark the item's notifications read; award sets `note = 'Awarded …'`; N-805 text changed; "In evaluation" KPI note computed from data. |
+| P3-11 | Fixed | Award approval writes awarded price/vendor/tender to the Material ID (CON-24330 → 1.270.000 ₫ / TND-2026-029). |
+| P3-12 | Fixed | Over-budget-only error focuses and scrolls to `#pr-override`. |
+| P3-13 | Fixed | Returned PRs open in the editor with the return comment shown; resubmit pushes a fresh approval. |
+| P3-14 | Fixed | Hint "Approved PRs without an active contract"; ≤ 500tr defaults to RFQ / 0% security. |
+| P3-15 | Fixed | Evaluation tab and count include "Award pending". |
+| P3-16 | Fixed | Editor copies `pr.files`. |
+| P3-17 | Fixed | Static warn removed; derived from the Material ID vendor link status for every tender line (shows "Certificate block — CON-24015" until CERT-0109 is approved). |
+
