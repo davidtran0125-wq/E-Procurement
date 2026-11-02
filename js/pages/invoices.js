@@ -7,7 +7,7 @@
   const { esc, num, pct, vnd, mid, pill, table, kpi, card } = App;
   const S = App.src;
   const D = () => window.DATA;
-  const NOW = '02/11/2026 10:30';
+  const NOW = '02/11/2026 10:30'; const now = () => (App.now ? App.now() : NOW);
   const STAGES = ['Submitted', 'Validated', 'Matched', 'Ready for payment', 'Paid'];
   const TABS = [['all', 'All'], ['match', 'To match'], ['exc', 'Exceptions'], ['ready', 'Ready for payment'], ['blocked', 'Blocked']];
   const st = { tab: 'all', q: '', cur: null, map: {} };
@@ -54,12 +54,22 @@
   const totals = (v) => { const by = {}; v.lines.forEach((l) => { const r = l[0] ? mat(l[0]).vat : 8; by[r] = (by[r] || 0) + l[2] * l[3]; }); const net = Object.values(by).reduce((a, x) => a + x, 0); const vat = Object.entries(by).reduce((a, [r, x]) => a + x * r / 100, 0); return { by, net, vat, gross: net + vat }; };
   const vb = (t, ok) => `<span class="var ${ok ? 'var-ok' : 'var-bad'}">${t}<span class="sr">${ok ? ' within tolerance' : ' outside tolerance'}</span></span>`;
   const sg = (x) => `${x > 0 ? '+' : x < 0 ? '−' : '±'}${pct(Math.abs(x))}`;
+  /* P5-01 / P5-05 · (re)derive status from the current checks and tolerances: portal invoices auto-match when every line passes,
+     otherwise go to the exception queue assigned to the PO buyer; open price exceptions re-match after a tolerance change. */
+  function rematch(d) {
+    const v = D().invoices[d.id]; if (!v || !legalOk(d, v)) return; const M = match(d, v); const ok = M.length && M.every((r) => r.res === 'Matched');
+    const inAp = D().approvals.some((a) => a.id === d.id);
+    if (v.stage < 2 && /^Submitted/.test(d.status)) {
+      if (ok) { v.stage = 2; d.status = 'Matched'; }
+      else { const pe = M.find((r) => r.res === 'Price mismatch'); d.status = 'Exception · ' + (pe ? 'price ' + sg(pe.pd) : 'qty'); v.stage = 1; v.hold = 'On hold'; v.assigned = (D().pos[v.po] || {}).buyer || 'Nguyễn Minh Anh'; v.resolveBy = App.addDays(D().today, 3); }
+    } else if (/^Exception · price/.test(d.status) && !inAp && ok) { d.status = 'Matched'; v.stage = 2; v.hold = null; v.resolveBy = null; }
+  }
   const banner = () => `<div class="alert alert-info" role="status">Tolerances: <b>price ±${num(D().tolerance.price, 1)}%</b> vs PO · <b>quantity ±${D().tolerance.qty}%</b> vs GRN accepted qty for weight/volume units (tấn, m³), exact for count units · SRV- uses 2-way match with the service entry sheet. ${App.state.role === 'admin' ? '<a href="#/admin/rules">Edit in Admin</a>' : 'Edited in Admin.'}</div>`;
 
   function listPage(p) {
     if (p.q != null && p.q !== st.lastQ) { st.q = p.q; st.lastQ = p.q; st.tab = 'all'; }
     if (p.tab && p.tab !== st.lastTab) { st.tab = p.tab; st.lastTab = p.tab; }
-    const all = list(); const cnt = (k) => (k === 'all' ? all.length : all.filter((d) => tabOf(d) === k).length); const q = st.q.trim(); const X = D().invoiceStats;
+    const all = list(); all.forEach(rematch); const cnt = (k) => (k === 'all' ? all.length : all.filter((d) => tabOf(d) === k).length); const q = st.q.trim(); const X = D().invoiceStats;
     const rows = all.filter((d) => { const v = D().invoices[d.id]; return (st.tab === 'all' || tabOf(d) === st.tab) && (!q || App.matches(`${d.id} ${d.title} ${v.kh} ${v.no} ${v.po} ${v.grn} ${d.mats.join(' ')} ${(App.vendor(d.vendor) || {}).name} ${(App.vendor(d.vendor) || {}).mst}`, q)); }).sort((a, b) => App.dt(b.date) - App.dt(a.date));
     return `<div class="page-h"><div><h1>${esc(App.t('Invoices & matching'))}</h1><div class="sub">E-invoices (NĐ 123/2020, TT 78/2021) from the supplier portal and hoadon@ inbox · legal check, then 3-way match per Material ID line</div></div>
       <div class="acts"><button class="btn" data-act="toast" data-msg="hoadon@ inbox fetched · no new e-invoices since 08:00">Fetch e-invoice inbox</button><button class="btn" data-act="toast" data-msg="Choose the XML and PDF of the e-invoice (both required)">Upload XML + PDF</button></div></div>
@@ -79,6 +89,7 @@
   }
 
   function detail(d) {
+    rematch(d);
     const v = D().invoices[d.id]; const ven = App.vendor(d.vendor); const C = checks(d, v); const lok = legalOk(d, v); const M = lok ? match(d, v) : []; const tt = totals(v);
     const stage = Math.min(v.stage, 4);
     const steps = `<ol class="steps" aria-label="Invoice status">${STAGES.map((s, k) => { const dn = k < stage || (k === stage && k === 4); const cu = k === stage && !dn; return `<li class="${dn ? 'done' : cu ? 'cur' : ''}"${cu ? ' aria-current="step"' : ''}><span class="st-n" aria-hidden="true">${dn ? '✓' : k + 1}</span><span class="st-l">${s}${cu && v.hold ? ' · on hold' : ''}</span>${dn ? '<span class="sr"> (done)</span>' : ''}</li>`; }).join('')}</ol>`;
@@ -151,8 +162,8 @@
           D().approvalChains[d.id] = [[`${by} · Buyer`, 'Raised', NOW, 'Accept price variance'], [`${ap} · ${role}`, 'Waiting', 'SLA 2 working days · SoD: raiser cannot approve', '']]; App.render(); App.toast(`${d.id} sent to My approvals (${ap}, not the raiser)`);
         }
         else if (k === 'hold') { d.status = 'On hold'; v.hold = 'On hold'; v.assigned = v.assigned || S.me(); App.render(); }
-        else if (k === 'ready') { d.status = 'Ready for payment'; v.stage = 3; App.render(); App.toast(`${d.id} ready for payment · due ${due(d)}`); }
-        else if (k === 'export') { v.exported = NOW; App.render(); App.toast(`${d.id} exported to accounting · Material ID → item code, V-code → vendor code`); }
+        else if (k === 'ready') { d.status = 'Ready for payment'; v.stage = 3; S.audit('Invoices', 'Marked ready for payment', d.id); App.render(); App.toast(`${d.id} ready for payment · due ${due(d)}`); }
+        else if (k === 'export') { v.exported = now(); S.audit('Invoices', 'Exported to accounting', d.id); App.render(); App.toast(`${d.id} exported to accounting · Material ID → item code, V-code → vendor code`); }
       });
     }
   });

@@ -36,11 +36,12 @@
   /* F-54: route by value excl. VAT + extra steps */
   function route(pr, lines) {
     const tot = totals(lines).net; const b = D().budgets[pr.cc]; const avail = b ? b.budget - b.invoiced - b.committed : Infinity;
+    const B1 = D().approvalBands[0][0], B2 = D().approvalBands[1][0], CR = D().approvalRules[0], CX = CR.above; const capOn = CR.on !== false, budOn = D().approvalRules[1].on !== false;
     const steps = [['Dept head', pr.dept]];
-    if (tot > 200000000) steps.push(['Procurement Lead', pr.requester === 'Nguyễn Minh Anh' ? 'Đỗ Hoàng Nam (SoD: requester is the Procurement Lead)' : 'Nguyễn Minh Anh']);
-    const capex = lines.some((l) => /^EQP-/.test(l.mat)) && tot > 1000000000;
-    if (tot > 2000000000 || capex) steps.push(['Finance Director', 'Đỗ Hoàng Nam' + (tot <= 2000000000 && capex ? ' · capex rule EQP- > 1 tỷ' : '')]);
-    if (tot > avail) steps.push(['Budget override', 'Đỗ Hoàng Nam (Finance Director)']);
+    if (tot > B1) steps.push(['Procurement Lead', pr.requester === 'Nguyễn Minh Anh' ? 'Đỗ Hoàng Nam (SoD: requester is the Procurement Lead)' : 'Nguyễn Minh Anh']);
+    const capex = capOn && lines.some((l) => /^EQP-/.test(l.mat)) && tot > CX;
+    if (tot > B2 || capex) steps.push(['Finance Director', 'Đỗ Hoàng Nam' + (tot <= B2 && capex ? ' · capex rule EQP- > ' + App.ty(CX) : '')]);
+    if (budOn && tot > avail) steps.push(['Budget override', 'Đỗ Hoàng Nam (Finance Director)']);
     const seen = new Set(); steps.forEach((s) => { const n = s[1].split(' (')[0].split(' ·')[0]; if (seen.has(n)) { s[1] += ' — skipped (already approved earlier step)'; s.skip = true; } seen.add(n); });
     const active = steps.filter((s) => !s.skip);
     return { steps, active, n: active.length, tot, over: tot > avail };
@@ -104,7 +105,7 @@
         <dt class="tot">${left < 0 ? '' : '<span class="sw sb-rest" aria-hidden="true"></span>'}After this PR</dt><dd class="tot"><b class="${left < 0 ? 'tone-danger' : ''}">${left < 0 ? '−' : ''}${vnd(Math.abs(left))}</b> (${pct(left / b.budget * 100)})</dd></dl>
       ${left < 0 ? `<div class="alert alert-danger" role="alert">Over budget by ${vnd(-left)}. A <b>Budget override</b> step for the Finance Director is added to the route.</div>${S.field('pr', e, 'override', 'Override justification', f.override, { area: true, req: true, hint: 'Sent to the Finance Director with the PR' })}` : '<p class="small muted">Available = Budget − Invoiced − Committed.</p>'}`) : '';
     const routeCard = card('Approval route preview', `<ol class="chain">${R.steps.map((x) => `<li><span class="small muted">${x.skip ? 'Skipped' : `Step ${R.active.indexOf(x) + 1} of ${R.n}`}</span><b>${esc(x[0])}</b><span class="small">${esc(x[1])}</span>${x.skip ? '' : '<span class="small muted">SLA 2 working days</span>'}</li>`).join('')}</ol>
-      <ul class="plain small"><li${R.tot <= 200000000 ? ' class="tone-success"' : ''}>≤ 200.000.000 ₫ — Dept head</li><li>≤ 2.000.000.000 ₫ — + Procurement Lead</li><li>> 2.000.000.000 ₫ — + Finance Director</li><li>EQP- capex above 1 tỷ ₫ adds the Finance Director · over budget adds Budget override</li></ul>
+      <ul class="plain small"><li${R.tot <= D().approvalBands[0][0] ? ' class="tone-success"' : ''}>≤ ${vnd(D().approvalBands[0][0])} — Dept head</li><li>≤ ${vnd(D().approvalBands[1][0])} — + Procurement Lead</li><li>> ${vnd(D().approvalBands[1][0])} — + Finance Director</li><li>${D().approvalRules[0].on !== false ? `EQP- capex above ${App.ty(D().approvalRules[0].above)} adds the Finance Director · ` : ''}over budget adds Budget override (Admin › Approval matrix)</li></ul>
       <p class="small muted">Route for ${vnd(R.tot)} excl. VAT. SoD: the requester cannot approve their own PR; an approver who already approved a step is skipped.</p>`);
     const prMats = [...new Set(lines.filter((l) => mat(l.mat)).map((l) => l.mat))];
     const form = card(`Request · ${id}`, `<form id="pr-form" class="stack" novalidate>

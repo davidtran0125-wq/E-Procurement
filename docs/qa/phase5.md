@@ -112,3 +112,26 @@ No code files were edited. These data decisions are accepted and consistent: PO-
 | R-23 | COULD | PASS | USD/EUR with rate source (TND-032). |
 | R-24 | COULD | PASS | Saving types, Finance validation. |
 | R-25 | COULD | PASS WITH FIXES | Consent at sign-in and bid, export/delete personal data, notice versions. P5-06, P5-07. |
+
+## Fix status (Agent 1)
+
+All findings fixed as specified. Re-tested with Playwright headless Chromium (served by `server.js`), 21/21 checks pass, 0 console errors; `npm test` passes (23 assets, 29 pages).
+
+| ID | Status | Fix |
+|---|---|---|
+| P5-01 | Fixed | invoices.js `rematch()`: a portal invoice whose legal checks and lines pass goes to Matched (stage 2); otherwise `Exception · price ±x%` / `qty`, stage 1, on hold, assigned to the PO buyer, resolve by +3 days. INV-2026-0325 → Matched → Ready for payment → Exported; supplier list follows. Ready / Export are audited (type Invoices). |
+| P5-02 | Fixed | supplier.js `invoicedQtyGrn` counts replacements and drops the invoice they replace; GRN-2026-1490 no longer offered. |
+| P5-03 | Fixed | pr.js route + band legend and po.js route / text / step count read `approvalBands` and `approvalRules[0].above`; capex and budget rules skipped when `on === false`. |
+| P5-04 | Fixed | approvals.js `sodMode()`; Warn → no block, "SoD warning" pill and warning banner; approval written to the SoD override log and audit (Overrides). |
+| P5-05 | Fixed | `rematch()` in list and detail: an `Exception · price…` without an approval in flight goes to Matched when all lines pass (INV-2026-0320 at ±2%). |
+| P5-06 | Fixed | login.js records acceptance of the current notice (missing or "Re-acceptance pending"), `privacy.accepted++`, audit Data privacy. Profile shows the accepted version, or "v2.2 not accepted yet" with an Accept button. Login notice link shows the current version. |
+| P5-07 | Fixed | "Luật BVDLCN 91/2025/QH15" in supplier.js (2) and admin.js (2). |
+| P5-08 | Fixed | Audit entries for NCR response, date-change request, ASN, e-invoice submission, profile save, MST check, Material ID proposal, certificate upload, privacy acceptance; "Invoices" added to the audit type filter. |
+| P5-09 | Fixed | `App.now()` demo clock (02/11/2026 from 10:31) in sourcing.js, used by `audit`, the supplier portal, admin Retry and invoice export. |
+| P5-10 | Labelled | Access idle/re-auth, outside-tolerance behaviour and rule flags, notification rules/digest, category owner/match type: "Configuration only in this demo — enforced by the backend". |
+| P5-11 | Fixed | Mã CQT = "00" + 32 hex hashed from the invoice number (e.g. 008148D6DD13B5D6623959AADA308D7005). |
+| P5-12 | Fixed | po.js NCR row: "Supplier response 02/11/2026 10:3x: Return and credit note — …". |
+| P5-13 | Fixed | Catalogue F-91 and flow step 5: "hiệu lực 90 ngày". |
+
+**End-to-end re-test:** sign-in (UI) → PR approval → TND-031 sealed / TND-024 award → supplier addendum ack → supplier confirms PO-0889 → GRN-2026-1540 20 tấn → supplier e-invoice INV-2026-0325 (parsed, submitted) → auto 3-way match Matched → Ready for payment → Export → supplier sees Ready for payment. Then tolerance 2% (INV-0320 Matched), SoD Warn (no block), matrix 100tr / 1 tỷ (PR legend), privacy v2.2 publish → profile pending → sign-in records v2.2.
+**Regression:** 47 routes × 1440/390 (procurement, supplier, admin) = 94 renders, no horizontal scroll, no console errors, no unexpected "not found" (the GDT "Mã CQT not found" text on Integrations is seeded data).

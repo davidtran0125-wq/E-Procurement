@@ -9,8 +9,7 @@
   const { esc, num, pct, vnd, pill, table, kpi, card } = App;
   const S = App.src;
   const D = () => window.DATA;
-  let tick = 30;
-  const clock = () => { tick += 1; const h = 10 + Math.floor(tick / 60), m = tick % 60; return `${D().today} ${String(h).padStart(2, '0')}:${String(m).padStart(2, '0')}`; };
+  const clock = () => App.now();
   const NOWD = new Date(2026, 10, 2, 10, 30);
   const VID = () => (App.state.user && App.state.user.vendor) || 'V-1001';
   const V = () => App.vendor(VID());
@@ -125,7 +124,7 @@
     const commit = `<fieldset class="fs"${e.commit ? ' aria-describedby="sb-commit-e"' : ''}><legend>Commitments</legend>
       <label class="chk"><input type="checkbox" name="c1" value="1"${f.c1 || b.status === 'Submitted' ? ' checked' : ''}${dis}> My bid is valid for ${t.validity} days after closing</label>
       <label class="chk"><input type="checkbox" name="c2" value="1"${f.c2 || b.status === 'Submitted' ? ' checked' : ''}${dis}> My bid follows the tender documents and every addendum</label>
-      <label class="chk"><input type="checkbox" name="consent" value="1"${f.consent ? ' checked' : ''}${dis}> I agree that ProcureLink processes the personal data in this bid under privacy notice ${esc(D().privacy.current)} (Nghị định 13/2023)</label>
+      <label class="chk"><input type="checkbox" name="consent" value="1"${f.consent ? ' checked' : ''}${dis}> I agree that ProcureLink processes the personal data in this bid under privacy notice ${esc(D().privacy.current)} (Luật BVDLCN 91/2025/QH15)</label>
       ${e.commit ? `<span class="err" id="sb-commit-e" role="alert">${esc(e.commit)}</span>` : ''}</fieldset>`;
     const acts = closed ? '' : `<button type="button" class="btn" data-sp="draft">Save draft</button>${b.status === 'Submitted' ? '<button type="button" class="btn btn-d" data-sp="withdraw">Withdraw bid</button>' : ''}<button type="submit" class="btn btn-p">${b.status === 'Submitted' ? 'Submit revised bid' : 'Submit sealed bid'}</button>`;
     const form = card(`My bid${b.status === 'Draft' ? ' · draft' : ''}`, `<form id="sp-bid" class="stack" novalidate>${e._ ? `<div class="alert alert-danger" role="alert">${esc(e._)}</div>` : ''}
@@ -267,13 +266,17 @@
   }
 
   /* ---------- F-95 invoices ---------- */
-  const invoicedQtyGrn = (gid) => Object.values(D().invoices).filter((v) => v.grn === gid && v.type !== 'Replacement').reduce((a, v) => a + v.lines.reduce((s, x) => s + (x[0] ? x[2] : 0), 0), 0);
+  /* P5-02 · replacements count; the invoice they replace does not */
+  const invoicedQtyGrn = (gid) => { const all = Object.values(D().invoices); const replaced = new Set(all.filter((v) => v.type === 'Replacement' && v.orig).map((v) => v.orig.split(' (')[0]));
+    return all.filter((v) => v.grn === gid && !replaced.has(v.kh + ' · ' + v.no)).reduce((a, v) => a + v.lines.reduce((s, x) => s + (x[0] ? x[2] : 0), 0), 0); };
   const billable = () => myGrns().filter((g) => !D().grns[g.id].ses).map((g) => ({ g, acc: g.lines.reduce((a, x) => a + x[3], 0) - invoicedQtyGrn(g.id) })).filter((x) => x.acc > 0);
+  /* P5-11 · 34-char Mã CQT: '00' + 32 hex derived from the invoice number */
+  const cqtOf = (no) => { let h = ''; let x = 2166136261; for (let i = 0; i < 4; i++) { for (const c of no + i) { x ^= c.charCodeAt(0); x = Math.imul(x, 16777619) >>> 0; } h += x.toString(16).toUpperCase().padStart(8, '0'); } return '00' + h.slice(0, 32); };
   function parsed(f) {
     const g = D().grns[f.grn]; const p = App.po.det(g.po); const gl = g.lines[0]; const l = p.lines[gl[0]]; const m = mat(l.mat);
     const qty = f.type === 'Original' ? billable().find((x) => x.g.id === f.grn).acc : gl[3];
     const no = String(1250 + Object.keys(D().invoices).length).padStart(8, '0');
-    return { mau: '1', kh: '1C26TMP', no, date: D().today, mst: V().mst, cqt: '00' + (f.xml.length * 7919 + 1e9).toString(16).toUpperCase().padEnd(32, 'A').slice(0, 32), sig: 'Valid · Công ty TNHH Thép Minh Phát', line: [l.mat, m.name, qty, l.price, 0], vat: m.vat, net: qty * l.price, po: g.po, grn: f.grn, li: gl[0] };
+    return { mau: '1', kh: '1C26TMP', no, date: D().today, mst: V().mst, cqt: cqtOf(no), sig: 'Valid · Công ty TNHH Thép Minh Phát', line: [l.mat, m.name, qty, l.price, 0], vat: m.vat, net: qty * l.price, po: g.po, grn: f.grn, li: gl[0] };
   }
   function invoices() {
     const rows = myInv(); const f = st.inv; const e = st.ierr; const bl = billable();
@@ -310,6 +313,7 @@
     D().invoices[id] = { po: px.po, grn: px.grn, mau: px.mau, kh: px.kh, no: px.no, cqt: px.cqt, src: 'Portal', type: f.type, orig: o ? `${o.kh} · ${o.no} (${f.orig})` : undefined, lines: [px.line], stage: 0, files: [f.xml, f.pdf] };
     D().docs.push({ id, type: 'INV', title: `${mat(px.line[0]).name} – ${px.grn}`, date: D().today, status: 'Submitted · to match', mats: [px.line[0]], vendor: VID(), value: px.net });
     if (D().invoiceStats) D().invoiceStats.total++;
+    S.audit('Invoices', id + ' submitted via portal', id);
     notify(`${id} submitted by ${App.vshort(V())} via portal · ${px.grn} · ${vnd(px.net)} excl. VAT`, id, '#/invoices/' + id, [px.line[0]]);
     st.inv = null; App.render(); App.toast(`${id} submitted · ${px.kh} ${px.no} · status Submitted`);
   }
@@ -373,7 +377,7 @@
       ${card('Material IDs offered', `<ul class="plain">${offered.map((m) => `<li class="row-acts between"><span>${mtag(m.id)} ${esc(m.name)}</span>${pill(m.vendors.find((x) => x[0] === VID())[1], 'success')}</li>`).join('')}${(v.proposed || []).map((id) => `<li class="row-acts between"><span>${mtag(id)} ${esc(mat(id).name)}</span>${pill('Proposed · awaiting buyer approval', 'neutral')}</li>`).join('')}</ul>
         ${usable.length ? `<form id="sp-prop" class="row-acts start mt" novalidate><label class="sr" for="spp-prop">Material ID to offer</label><select class="inp grow w-full" id="spp-prop" name="prop">${usable.map((m) => `<option value="${esc(m.id)}">${esc(m.id)} · ${esc(m.name)}</option>`).join('')}</select><button type="submit" class="btn btn-sm">Propose</button></form>` : ''}`)}</div>
       <div class="stack">${card(`Onboarding checklist (${done} / ${ck.length})`, `<ul class="plain">${ck.map(([x, s]) => `<li class="row-acts between"><span>${esc(x)}</span>${pill(s, s === 'Done' ? 'success' : 'warning')}</li>`).join('')}</ul>`)}
-      ${card('Privacy & consent', `<p class="mt-0">Privacy notice <b>${esc(D().privacy.current)}</b> accepted ${esc(u.consent || '—')} by ${esc(S.me())}.</p><p class="small muted">Under Nghị định 13/2023 you can ask for a copy of your personal data or withdraw consent; withdrawing ends portal access for this user.</p>`, `<button class="btn btn-sm" data-act="toast" data-msg="Consent settings: request sent to the ProcureLink admin (R-25)">Manage consent</button>`)}</div></div>`;
+      ${card('Privacy & consent', `${u.consentVer === 'Re-acceptance pending' ? `<div class="alert alert-warning" role="status">${esc(D().privacy.current)} not accepted yet — accept to keep using the portal. <button class="btn btn-sm" data-sp="consent-accept">Accept ${esc(D().privacy.current)}</button></div>` : `<p class="mt-0">Privacy notice <b>${esc(u.consentVer || 'v2.1')}</b> accepted ${esc(u.consent || '—')} by ${esc(S.me())}.</p>`}<p class="small muted">Under Luật BVDLCN 91/2025/QH15 you can ask for a copy of your personal data or withdraw consent; withdrawing ends portal access for this user.</p>`, `<button class="btn btn-sm" data-act="toast" data-msg="Consent settings: request sent to the ProcureLink admin (R-25)">Manage consent</button>`)}</div></div>`;
   }
 
   /* ---------- routing ---------- */
@@ -413,7 +417,7 @@
         const q = Number(String(a.qty).replace(',', '.')); if (!(q > 0) || q > a.max * 1.1) er.qty = `Enter 1 – ${num(a.max * 1.1)}.`; if (!a.vehicle) er.vehicle = 'Enter the vehicle and driver.'; if (/^CON-240/.test(a.mat) && !/\.pdf$/i.test(a.docs || '')) er.docs = 'Attach the mill certificate (PDF).';
         st.aerr = er; if (Object.keys(er).length) { App.render(); S.focusErr('#sp-asn'); return; }
         const aid = 'ASN-2026-' + String(301 + P().asns.length).padStart(4, '0'); const slot = App.po.det(a.po).lines[a.li].sched[a.si]; slot[5] = { id: aid, ship: a.ship, qty: q, vehicle: a.vehicle, docs: a.docs };
-        P().asns.push({ id: aid, po: a.po, mat: a.mat, ship: a.ship, qty: q }); notify(`${aid} · ${a.po} ships ${num(q)} ${mat(a.mat).uom} ${a.mat} on ${a.ship}`, a.po, '#/po/' + a.po, [a.mat]); st.asn = null; App.render(); App.toast(`${aid} sent to the buyer`); }
+        P().asns.push({ id: aid, po: a.po, mat: a.mat, ship: a.ship, qty: q }); notify(`${aid} · ${a.po} ships ${num(q)} ${mat(a.mat).uom} ${a.mat} on ${a.ship}`, a.po, '#/po/' + a.po, [a.mat]); S.audit('Orders', `ASN sent · ${aid}`, a.po); st.asn = null; App.render(); App.toast(`${aid} sent to the buyer`); }
       else if (f.id === 'sp-chg') { const x = S.read(root, '#sp-chg'); const c = Object.assign(st.chg, x); const er = {};
         if (!S.validDate(c.to)) er.to = 'Use dd/mm/yyyy.'; else if (App.daysTo(c.to) <= 0) er.to = 'Choose a date after today.'; else if (c.to === c.due) er.to = 'Same as the current date.'; if ((c.reason || '').length < 10) er.reason = 'Give a reason of at least 10 characters.';
         st.cerr = er; if (Object.keys(er).length) { App.render(); S.focusErr('#sp-chg'); return; }
@@ -421,27 +425,27 @@
         const req = { id: rid, po: c.po, li: c.li, si: c.si, from: c.due, to: c.to, reason: c.reason, status: 'Pending buyer acceptance', at: clock() }; p.lines[c.li].sched[c.si][6] = req;
         D().approvals.push({ id: rid, type: 'Delivery date change', title: `${App.vshort(V())} asks ${c.mat} ${c.due} → ${c.to}`, mats: [c.mat], value: null, by: S.me() + ' (supplier)', step: 'Step 1 of 1', sla: App.addDays(D().today, 1) + ' 17:00', assignee: p.buyer, req, note: c.reason });
         D().approvalChains[rid] = [[`${S.me()} · Supplier`, 'Requested', req.at, c.reason], [`${p.buyer} · Buyer`, 'Waiting', 'SLA 1 working day', '']];
-        notify(`${App.vshort(V())} requests delivery ${c.due} → ${c.to} on ${c.po}`, c.po, '#/approvals?id=' + encodeURIComponent(rid), d.mats); st.chg = null; App.render(); App.toast(`Request sent to ${p.buyer}`); }
+        notify(`${App.vshort(V())} requests delivery ${c.due} → ${c.to} on ${c.po}`, c.po, '#/approvals?id=' + encodeURIComponent(rid), d.mats); S.audit('Orders', 'Delivery date change requested → ' + c.to, c.po); st.chg = null; App.render(); App.toast(`Request sent to ${p.buyer}`); }
       else if (f.id === 'sp-ncr') { const x = S.read(root, '#sp-ncr'); const r = Object.assign(st.ncr, x); const er = {};
         if ((r.comment || '').length < 10) er.comment = 'Write a comment of at least 10 characters.'; if (r.opt === 'Offer a discount' && !(Number(String(r.disc).replace(',', '.')) > 0 && Number(String(r.disc).replace(',', '.')) <= 30)) er.disc = 'Enter a discount of 1–30%.';
         st.nerr = er; if (Object.keys(er).length) { App.render(); S.focusErr('#sp-ncr'); return; }
-        const n = D().ncrs[r.id]; const at = clock(); n.response = { opt: r.opt, disc: r.opt === 'Offer a discount' ? Number(String(r.disc).replace(',', '.')) : null, comment: r.comment, at }; n.status = 'Supplier responded'; n.supplier = `Supplier responded ${at}: ${r.opt}${n.response.disc ? ' ' + n.response.disc + '%' : ''} — ${r.comment}`;
-        const nd = S.docOf(r.id); if (nd) nd.status = 'Supplier responded'; notify(`${r.id}: ${App.vshort(V())} responded — ${r.opt}`, n.po, '#/po/' + n.po, [n.mat]); st.ncr = null; App.render(); App.toast(`Response to ${r.id} sent to the buyer`); }
+        const n = D().ncrs[r.id]; const at = clock(); n.response = { opt: r.opt, disc: r.opt === 'Offer a discount' ? Number(String(r.disc).replace(',', '.')) : null, comment: r.comment, at }; n.status = 'Supplier responded'; n.supplier = `${at}: ${r.opt}${n.response.disc ? ' ' + n.response.disc + '%' : ''} — ${r.comment}`;
+        S.audit('Orders', 'NCR response · ' + r.opt, r.id); const nd = S.docOf(r.id); if (nd) nd.status = 'Supplier responded'; notify(`${r.id}: ${App.vshort(V())} responded — ${r.opt}`, n.po, '#/po/' + n.po, [n.mat]); st.ncr = null; App.render(); App.toast(`Response to ${r.id} sent to the buyer`); }
       else if (f.id === 'sp-inv') submitInv(root);
       else if (f.id === 'sp-cert') { const x = S.read(root, '#sp-cert'); const c = Object.assign(st.cert, x); const er = {};
         ['type', 'no', 'issuer'].forEach((k) => { if (!c[k]) er[k] = 'Required.'; }); if (!S.validDate(c.expiry)) er.expiry = 'Use dd/mm/yyyy.'; else if (App.daysTo(c.expiry) <= 0) er.expiry = 'Must be in the future.'; if (!/\.pdf$/i.test(c.file || '')) er.file = 'PDF only.';
         st.terr = er; if (Object.keys(er).length) { App.render(); S.focusErr('#sp-cert'); return; }
         const cid = 'CERT-' + String(Math.max(...D().certificates.map((y) => +y.id.slice(5))) + 1).padStart(4, '0');
         D().certificates.push({ id: cid, type: c.type, no: c.no, vendor: VID(), mats: c.mats, issuer: c.issuer, issued: D().today, expiry: c.expiry, status: 'Pending review', uploaded: `${S.me()} · ${D().today} (supplier)`, file: c.file, replaces: c.replaces || undefined });
-        if (D().certStats) D().certStats.pending++; notify(`${c.type} renewal uploaded by ${App.vshort(V())} — review ${cid}`, VID(), '#/certificates', c.mats); st.cert = null; App.render(); App.toast(`${cid} uploaded · pending buyer review`); }
+        if (D().certStats) D().certStats.pending++; notify(`${c.type} renewal uploaded by ${App.vshort(V())} — review ${cid}`, VID(), '#/certificates', c.mats); S.audit('Settings', 'Certificate uploaded · ' + c.type, VID()); st.cert = null; App.render(); App.toast(`${cid} uploaded · pending buyer review`); }
       else if (f.id === 'sp-bank') { const x = S.read(root, '#sp-bank'); const k = Object.assign(st.bank, x); const er = {};
         if (!k.bank) er.bank = 'Enter the bank.'; if (!/^\d{6,19}$/.test((k.acct || '').replace(/\s/g, ''))) er.acct = '6–19 digits.'; if (App.norm(k.holder) !== App.norm(V().name)) er.holder = 'The account holder must equal the company name.'; if (!/\.pdf$/i.test(k.letter || '')) er.letter = 'PDF only.';
         st.kerr = er; if (Object.keys(er).length) { App.render(); S.focusErr('#sp-bank'); return; }
         const v = V(); const acct = `${k.bank} ···· ${k.acct.replace(/\s/g, '').slice(-4)}`; v.bank = Object.assign(v.bank || {}, { pending: acct, requested: clock(), by: S.me() + ' (portal)' });
         D().approvals = D().approvals.filter((a) => !(a.type === 'Vendor change' && a.id === v.id)); D().approvals.push({ id: v.id, type: 'Vendor change', title: `${App.vshort(v)} · new account ${acct}`, mats: [], value: null, by: S.me(), step: 'Step 1 of 2', sla: App.addDays(D().today, 1) + ' 17:00', assignee: 'Đỗ Hoàng Nam' });
         S.audit('Settings', `Bank account change requested · ${acct} (pending Finance verification)`, v.id); st.bank = null; App.render(); App.toast(`${acct} pending Finance verification`); }
-      else if (f.id === 'sp-prof') { const x = S.read(root, '#sp-prof'); const v = V(); Object.assign(v, { phone: x.phone, address: x.address }); P().legalRep = x.rep; App.render(); App.toast('Profile saved'); }
-      else if (f.id === 'sp-prop') { const x = S.read(root, '#sp-prop'); const v = V(); v.proposed = v.proposed || []; v.proposed.push(x.prop); notify(`${App.vshort(v)} proposes to supply ${x.prop}`, v.id, '#/vendors/' + v.id, [x.prop]); App.render(); App.toast(`${x.prop} proposed · awaiting buyer approval`); }
+      else if (f.id === 'sp-prof') { const x = S.read(root, '#sp-prof'); const v = V(); Object.assign(v, { phone: x.phone, address: x.address }); P().legalRep = x.rep; S.audit('Settings', 'Company profile saved', VID()); App.render(); App.toast('Profile saved'); }
+      else if (f.id === 'sp-prop') { const x = S.read(root, '#sp-prop'); const v = V(); v.proposed = v.proposed || []; v.proposed.push(x.prop); S.audit('Settings', 'Material ID proposed · ' + x.prop, VID()); notify(`${App.vshort(v)} proposes to supply ${x.prop}`, v.id, '#/vendors/' + v.id, [x.prop]); App.render(); App.toast(`${x.prop} proposed · awaiting buyer approval`); }
     });
     root.addEventListener('click', (e) => {
       const b = e.target.closest('[data-sp], [data-files]'); if (!b) return; const { id } = ctx(); const a = b.dataset.sp;
@@ -463,6 +467,7 @@
       else if (a === 'ncr-open') { st.ncr = { id: b.dataset.id, opt: 'Replace', disc: '', comment: '' }; st.nerr = {}; App.render(); focus('#spn-opt'); }
       else if (a === 'ncr-cancel') { st.ncr = null; App.render(); }
       else if (a === 'inv-open') { const bl = billable(); st.inv = { grn: bl[0].g.id, type: 'Original', orig: '', xml: '', pdf: '', parsed: null }; st.ierr = {}; App.render(); focus('#spi-grn'); }
+      else if (a === 'consent-accept') { const u = App.state.user; u.consent = D().today; u.consentVer = D().privacy.current; D().privacy.accepted = (D().privacy.accepted || 0) + 1; S.audit('Data privacy', 'Privacy notice ' + u.consentVer + ' accepted', u.email); App.render(); App.toast(`Privacy notice ${u.consentVer} accepted`); }
       else if (a === 'inv-cancel') { st.inv = null; App.render(); }
       else if (a === 'inv-parse') { readInv(root); const f = st.inv; st.ierr = {}; if (!/\.xml$/i.test(f.xml || '')) { st.ierr.xml = 'Attach the signed XML (.xml) to read it.'; App.render(); S.focusErr('#sp-inv'); return; } f.parsed = parsed(f); App.render(); App.toast('XML read · seller signature valid'); }
       else if (a === 'cert-open') { const old = b.dataset.id && D().certificates.find((x) => x.id === b.dataset.id); st.cert = old ? { replaces: old.id, type: old.type, no: '', issuer: old.issuer, expiry: '', file: '', mats: old.mats } : { replaces: '', type: '', no: '', issuer: '', expiry: '', file: '', mats: D().materials.filter((m) => m.vendors.some((x) => x[0] === VID())).map((m) => m.id).slice(0, 3) }; st.terr = {}; App.render(); focus('#spt-no'); }
@@ -471,7 +476,7 @@
       else if (a === 'bank-cancel') { st.bank = null; App.render(); }
       else if (a === 'mst') { const x = (document.getElementById('spp-mst').value || '').replace(/[\s.]/g, ''); st.mst = { v: document.getElementById('spp-mst').value };
         if (!/^\d{10}(-\d{3})?$/.test(x)) st.mst.err = 'MST must be 10 digits, or 10 digits + "-" + 3 for a branch.'; else if (x.slice(0, 10) !== V().mst.replace(/\s/g, '')) st.mst.err = 'This MST belongs to another company in the GDT register. Contact your buyer to change the legal entity.'; else st.mst.ok = `${V().name} · ${V().taxStatus || 'Đang hoạt động'}`;
-        if (st.mst.ok) { V().mstChecked = D().today; } App.render(); focus('#spp-mst'); }
+        if (st.mst.ok) { V().mstChecked = D().today; } S.audit('Settings', 'MST checked · ' + (st.mst.ok ? 'valid' : 'rejected'), VID()); App.render(); focus('#spp-mst'); }
     });
   }
   App.page('supplier', { title: 'Supplier portal', roles: ['supplier'], render, mount });

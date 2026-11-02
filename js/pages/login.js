@@ -54,7 +54,7 @@
             <button role="tab" data-lg="mode" data-mode="invite" aria-selected="${st.mode === 'invite'}">I have an invitation</button>
           </div>
           ${st.mode === 'gmail' ? gmail : invite}
-          <label class="consent"><input type="checkbox" id="lg-consent"${st.consent ? ' checked' : ''}> <span>I agree that [YOUR COMPANY] processes my name and Gmail address to provide ProcureLink, as described in the <button type="button" class="linkish" data-lg="privacy">Privacy notice v2.1</button> (Luật BVDLCN 91/2025/QH15).</span></label>
+          <label class="consent"><input type="checkbox" id="lg-consent"${st.consent ? ' checked' : ''}> <span>I agree that [YOUR COMPANY] processes my name and Gmail address to provide ProcureLink, as described in the <button type="button" class="linkish" data-lg="privacy">Privacy notice ${window.DATA.privacy.current}</button> (Luật BVDLCN 91/2025/QH15).</span></label>
           <p class="muted small m-0">Admins and approvers must have Google 2-step verification. Sessions end after 30 minutes idle.</p>
           <div class="login-f small"><button type="button" class="linkish" data-lg="privacy">Privacy</button><button type="button" class="linkish" data-lg="info" data-msg="Terms of use: [YOUR COMPANY] procurement terms v1.3">Terms</button><button type="button" class="linkish" data-lg="info" data-msg="Help: contact the System Admin, Phạm Thu Trang">Help</button></div>
         </main>
@@ -89,7 +89,7 @@
         else if (!u.roles.includes(st.role)) st.err = `${u.name} has no ${st.role} role. Assigned: ${u.roles.join(', ')}.`;
         else if (u.status !== 'Active') st.err = 'This account is not active yet. Use "I have an invitation".';
         else if (!st.consent) st.err = 'Please accept the privacy notice to continue.';
-        else { st.err = ''; App.login(st.role, u); return; }
+        else { st.err = ''; App.login(st.role, u); recordConsent(u); return; }
         rerender();
       } else {
         const email = root.querySelector('#iv-email').value.trim().toLowerCase();
@@ -97,11 +97,16 @@
         const u = U.find((x) => x.email === email && x.inviteCode === code);
         if (!u) st.inviteErr = 'No open invitation matches this Gmail and code.';
         else if (!st.consent) st.inviteErr = 'Please accept the privacy notice to activate your account.';
-        else { u.status = 'Active'; u.consent = window.DATA.today; st.inviteErr = ''; App.login('supplier', u); App.toast(`Invitation accepted · ${u.vendor} account activated`); return; }
+        else { u.status = 'Active'; u.consentVer = null; st.inviteErr = ''; App.login('supplier', u); recordConsent(u); App.toast(`Invitation accepted · ${u.vendor} account activated`); return; }
         rerender();
       }
     };
   }
 
+  /* P5-06 · sign-in with the consent box ticked records acceptance of the current notice when it was missing or a re-acceptance is pending */
+  function recordConsent(u) {
+    const D = window.DATA; if (u.consentVer && u.consentVer !== 'Re-acceptance pending') return;
+    u.consent = D.today; u.consentVer = D.privacy.current; D.privacy.accepted = (D.privacy.accepted || 0) + 1; App.src.audit('Data privacy', 'Privacy notice ' + u.consentVer + ' accepted', u.email);
+  }
   App.page('login', { title: 'Sign in', render, mount });
 })();

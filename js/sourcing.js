@@ -68,7 +68,10 @@
     })).filter(Boolean);
   }
   /* Audit log writer (F-108): every admin setting change, supplier bid action and override lands here */
-  const audit = (type, action, ref) => { (D().audit = D().audit || []).unshift({ at: D().today + ' ' + new Date().toTimeString().slice(0, 5), user: me() + (App.state.user && App.state.user.vendor ? ` (${App.state.user.vendor})` : ''), type, action, ref: ref || '' }); if (D().auditStats) D().auditStats.total++; };
+  /* P5-09 · one demo clock (02/11/2026 from 10:31, one minute per event) for audit, notifications and supplier actions */
+  let tick = 30;
+  App.now = () => { tick += 1; const h = 10 + Math.floor(tick / 60), m = tick % 60; return `${D().today} ${String(h).padStart(2, '0')}:${String(m).padStart(2, '0')}`; };
+  const audit = (type, action, ref) => { (D().audit = D().audit || []).unshift({ at: App.now(), user: me() + (App.state.user && App.state.user.vendor ? ` (${App.state.user.vendor})` : ''), type, action, ref: ref || '' }); if (D().auditStats) D().auditStats.total++; };
   App.src = { me, offContract, audit, vatLabel, validDate, money, read, field, focusErr, docOf, prLink, tndLink, files, upload, nextVer, assignee, myQueue, dlgActive, delegable,
     bar: (p, tone) => `<div class="bar" role="img" aria-label="${esc(num(p, 0))}%"><span class="${tone || ''}" style="width:${Math.max(0, Math.min(100, p)).toFixed(1)}%"></span></div>` };
 })();

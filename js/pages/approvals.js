@@ -13,7 +13,10 @@
   const hoursLeft = (a) => (ts(a.sla) - ts(NOW)) / 36e5;
   const slaText = (a) => { const h = hoursLeft(a); if (h < 0) return ['Overdue ' + Math.round(-h) + ' h', 'danger']; if (h < 24) return [`Due in ${Math.floor(h)} h ${Math.round((h % 1) * 60)} min`, 'warning']; return [`Due in ${Math.floor(h / 24)} d ${Math.round(h % 24)} h`, 'neutral']; };
   const stepOf = (a) => { const m = /Step (\d+) of (\d+)/.exec(a.step || ''); return m ? [+m[1], +m[2]] : [1, 1]; };
-  const blocked = (a) => a.sod && (!a.override || a.by === S.me());
+  /* P5-04 · SoD mode from Admin › SoD rules: Warn lets the item through with a logged warning */
+  const sodMode = () => ((D().sodRules.find((r) => /^Requester ≠ approver/.test(r[0])) || [])[1]);
+  const sodWarn = (a) => a.sod && sodMode() === 'Warn';
+  const blocked = (a) => a.sod && sodMode() !== 'Warn' && (!a.override || a.by === S.me());
   const eligible = (a) => a.value != null && a.value < D().bulkLimit && !blocked(a);
   const onBehalf = (a) => (S.assignee(a) !== S.me() && App.state.role !== 'admin' ? S.assignee(a) : null);
   const chipPrice = (id) => { const m = App.material(id); return m ? `${mid(id)} <span class="small muted">last ${m.last ? vnd(m.last) : '—'} · 90-day ${m.avg90 ? vnd(m.avg90) : '—'}</span>` : mid(id); };
@@ -24,7 +27,7 @@
       const [sl, tone] = slaText(a); const sel = st.sel === a.id; const ok = eligible(a);
       return `<li class="ap-item${sel ? ' sel' : ''}">
         <label class="chk ap-pick"><input type="checkbox" data-ap-pick="${esc(a.id)}"${st.picked.includes(a.id) ? ' checked' : ''}${ok ? '' : ' disabled'} aria-label="Select ${esc(a.id)}${ok ? '' : ' (not eligible for bulk approve)'}"></label>
-        <div class="ap-main"><div class="ap-top"><button class="linkish mono" data-ap="open" data-id="${esc(a.id)}"${sel ? ' aria-current="true"' : ''}>${esc(a.id)}</button> ${blocked(a) ? pill('Blocked — SoD', 'danger') : ''}${onBehalf(a) ? ' ' + pill('On behalf of ' + onBehalf(a), 'info') : ''}</div>
+        <div class="ap-main"><div class="ap-top"><button class="linkish mono" data-ap="open" data-id="${esc(a.id)}"${sel ? ' aria-current="true"' : ''}>${esc(a.id)}</button> ${blocked(a) ? pill('Blocked — SoD', 'danger') : sodWarn(a) ? pill('SoD warning', 'warning') : ''}${onBehalf(a) ? ' ' + pill('On behalf of ' + onBehalf(a), 'info') : ''}</div>
           <div class="ap-title">${esc(a.title)}</div><div class="small muted">${esc(a.type)} · ${esc(a.by)} · step ${esc(a.step.replace('Step ', ''))}</div>${a.mats.length ? `<div class="chips">${a.mats.map(chipPrice).join('')}</div>` : ''}</div>
         <div class="ap-side"><div class="num"><b>${a.value != null ? vnd(a.value) : '—'}</b></div>${pill(sl, tone)}<div class="small muted">SLA ${esc(a.sla)}</div><button class="btn btn-sm${sel ? ' btn-p' : ''}" data-ap="open" data-id="${esc(a.id)}" aria-label="Review ${esc(a.id)}">${sel ? 'Reviewing' : 'Review'}</button></div></li>`;
     }).join('');
@@ -64,7 +67,7 @@
     const budget = b ? `<h3 class="h-sub">Budget impact</h3><dl class="dl"><dt>Budget line</dt><dd>${esc(b.name)}</dd><dt>Available</dt><dd>${vnd(avail)}</dd><dt>This item</dt><dd>−${vnd(a.value)}</dd><dt>After approval</dt><dd><b>${vnd(avail - a.value)}</b></dd></dl>` : '';
     const chainHtml = chain.length ? `<h3 class="h-sub">Approval chain</h3><ol class="chain">${chain.map(([who, s, at, c]) => `<li${s === 'Waiting' ? ' class="on"' : ''}><b>${esc(who)}</b>${pill(s, s === 'Approved' || s === 'Submitted' || s === 'Raised' ? 'success' : s === 'Waiting' ? 'info' : /Blocked/.test(s) ? 'danger' : 'neutral')}<span class="small muted">${esc(at)}</span>${c ? `<span class="small">“${esc(c)}”</span>` : ''}</li>`).join('')}</ol>` : '';
     const nx = nextName(a); const [i, n] = stepOf(a);
-    const sod = blocked(a) ? `<div class="alert alert-danger" role="alert"><b>Blocked — SoD.</b> You raised this change order, so you cannot approve it. It is routed to Đỗ Hoàng Nam. Only an Admin can override, and the override is logged.</div>
+    const sod = sodWarn(a) ? '<div class="alert alert-warning" role="status"><b>SoD warning</b> — you raised this item; approval is logged as an override (SoD rule set to Warn in Admin).</div>' : blocked(a) ? `<div class="alert alert-danger" role="alert"><b>Blocked — SoD.</b> You raised this change order, so you cannot approve it. It is routed to Đỗ Hoàng Nam. Only an Admin can override, and the override is logged.</div>
       ${App.state.role === 'admin' && a.by !== S.me() ? `<form id="ap-ovr" class="stack" novalidate><div class="field"><label for="ap-ovr-r">Override reason (Admin) *</label><textarea id="ap-ovr-r"${st.oerr ? ' aria-invalid="true" aria-describedby="ap-ovr-e"' : ''}>${esc(st.ovr || '')}</textarea>${st.oerr ? `<span class="err" id="ap-ovr-e" role="alert">${esc(st.oerr)}</span>` : ''}</div><div class="row-acts"><button type="submit" class="btn btn-d btn-sm">Override SoD</button></div></form>` : ''}` : a.override ? `<div class="alert alert-warning" role="status">SoD overridden by ${esc(a.override.by)} · ${esc(a.override.at)}: “${esc(a.override.reason)}” (audit logged)</div>` : '';
     const ob = onBehalf(a);
     const decide = `<form id="ap-form" class="stack decide-panel" novalidate aria-labelledby="ap-dec-h"><h3 id="ap-dec-h" class="h-sub mt-0">Your decision</h3><div class="field"><label for="ap-c">Comment</label><textarea id="ap-c" aria-describedby="ap-c-h${st.cerr ? ' ap-c-e' : ''}"${st.cerr ? ' aria-invalid="true"' : ''}>${esc(st.comment)}</textarea><span class="hint" id="ap-c-h">Optional to approve · required (at least 10 characters) to reject or return.</span>${st.cerr ? `<span class="err" id="ap-c-e" role="alert">${esc(st.cerr)}</span>` : ''}</div>
@@ -174,6 +177,7 @@
           const a = D().approvals.find((x) => x.id === st.sel); if (!a) return; const d = b.dataset.d; const c = (st.comment || '').trim();
           if (d !== 'Approved' && c.length < 10) { st.cerr = `A comment of at least 10 characters is required to ${d === 'Rejected' ? 'reject' : 'return'}.`; App.render(); document.getElementById('ap-c').focus(); return; }
           if (d === 'Approved' && blocked(a)) return;
+          if (d === 'Approved' && sodWarn(a)) { (D().sodLog = D().sodLog || []).push({ id: a.id, by: S.me(), at: App.now(), reason: 'SoD Warn mode · approved with warning' }); S.audit('Overrides', 'SoD warning acknowledged · approved', a.id); }
           const msg = decideOne(a, d, c); st.comment = ''; st.cerr = ''; st.sel = null; st.picked = st.picked.filter((x) => x !== a.id); App.render(); App.toast(msg);
         }
         else if (k === 'bulk') {

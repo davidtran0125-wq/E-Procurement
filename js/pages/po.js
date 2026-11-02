@@ -154,7 +154,7 @@
     const refOpts = f.src === 'pr' ? prOpts : f.src === 'tender' ? awardedTenders().map((d) => [d.id, `${d.id} · ${d.title}`]).concat(awardedTenders().some((d) => d.id === f.ref) || !f.ref ? [] : [[f.ref, `${f.ref} — award not approved (not selectable)`, true]]) : activeCts().map((c) => [c.id, `${c.id} · ${(S.docOf(c.id) || {}).title}`]);
     const vendOpts = f.src === 'pr' ? [...new Set(f.lines.flatMap((l) => approvedVendors(l.mat)))].concat(D().vendors.filter((x) => x.risk === 'High').map((x) => x.id)) : f.vendors || [f.vendor];
     const blockedFor = f.lines.filter((l) => mat(l.mat).vendors.some((x) => x[0] === f.vendor && x[1] === 'Blocked')).map((l) => l.mat);
-    const route = tt.net > 2000000000 ? ['Procurement Lead', 'Finance Director'] : ['Procurement Lead'];
+    const route = tt.net > D().approvalBands[1][0] ? ['Procurement Lead', 'Finance Director'] : ['Procurement Lead'];
     const lineRows = f.lines.map((l, i) => { const m = mat(l.mat); const err = e['l' + i];
       return `<div class="tr po-cols" role="row"><div class="td" role="cell">${mid(l.mat)}<div class="small">${esc(m.name)}</div>${err ? `<div class="err small" id="pn-e${i}" role="alert">${esc(err)}</div>` : ''}</div>
         <div class="td num" role="cell"><label class="sr" for="pn-q${i}">Quantity line ${i + 1}</label><input class="inp inp-num w-full" id="pn-q${i}" data-pn="qty" data-i="${i}" inputmode="decimal" value="${esc(l.qty)}"${err ? ` aria-invalid="true" aria-describedby="pn-e${i}"` : ''}> <span class="small muted">${esc(m.uom)}</span>${l.left != null ? `<div class="small muted">Contract left ${num(l.left)}</div>` : ''}</div>
@@ -176,7 +176,7 @@
       <dl class="dl mt">${Object.entries(tt.by).sort((a, b) => b[0] - a[0]).map(([r, x]) => `<dt>VAT ${esc(S.vatLabel(r))} on</dt><dd>${vnd(x)} + VAT ${vnd(x * r / 100)}</dd>`).join('')}<dt>Total excl. VAT</dt><dd><b>${vnd(tt.net)}</b></dd><dt>Total incl. VAT</dt><dd><b>${vnd(tt.gross)}</b></dd></dl>
       <div class="row-acts"><a class="btn" href="#/po">Cancel</a><button type="button" class="btn" data-po="save-draft"${f.err ? ' disabled' : ''}>Save draft</button><button type="submit" class="btn btn-p"${f.err ? ' disabled aria-disabled="true"' : ''}>Submit for approval</button></div></form>`);
     const side = card('Approval route', `<ol class="chain">${route.map((r, i) => `<li><span class="small muted">Step ${i + 1} of ${route.length}</span><b>${r}</b><span class="small">${r === 'Procurement Lead' ? (S.me() === 'Nguyễn Minh Anh' ? 'Đỗ Hoàng Nam (SoD: you are the buyer)' : 'Nguyễn Minh Anh') : 'Đỗ Hoàng Nam'}</span></li>`).join('')}</ol>
-      <p class="small muted">${vnd(tt.net)} excl. VAT · ${tt.net > 2000000000 ? '> 2 tỷ adds the Finance Director' : '≤ 2 tỷ ₫: Procurement Lead'}. Dept head approval is carried from the PR. After approval: Send to supplier (Gmail + portal), confirmation within 48 h.</p>`)
+      <p class="small muted">${vnd(tt.net)} excl. VAT · ${tt.net > D().approvalBands[1][0] ? '> ' + App.ty(D().approvalBands[1][0]) + ' adds the Finance Director' : '≤ ' + App.ty(D().approvalBands[1][0]) + ': Procurement Lead'}. Dept head approval is carried from the PR. After approval: Send to supplier (Gmail + portal), confirmation within 48 h.</p>`)
       + card('Price check', `<p class="small mt-0">Each line is compared with the last PO price and the 90-day average of its Material ID (excl. VAT). A difference above ±${D().priceAlertThreshold}% raises a price alert.</p>`);
     return `<div class="page-h"><div><div class="crumbs small muted"><a href="#/po">Purchase orders</a> / ${f.id ? esc(f.id) : 'New'}</div><h1>${f.id ? `Create PO · draft <span class="mono">${esc(f.id)}</span>` : 'Create PO'}</h1><div class="sub">Lines inherit Material ID, VAT and reference price from the source · buyer ${esc(S.me())}</div></div></div>
       <div class="grid-2"><div class="stack">${form}</div><div class="stack">${side}</div></div>`;
@@ -208,7 +208,7 @@
     if (!d) { d = { id, type: 'PO', title, date: D().today, status: 'Draft', mats: [], vendor: f.vendor, qty: '', price: 0, value: 0 }; D().docs.push(d); }
     Object.assign(d, { vendor: f.vendor, mats: [...new Set(lines.map((l) => l.mat))], qty: `${num(lines[0].qty)} ${m0.uom}`, price: lines[0].price, value: net });
     if (submit) {
-      d.status = 'Pending approval'; const lead = S.me() === 'Nguyễn Minh Anh' ? 'Đỗ Hoàng Nam' : 'Nguyễn Minh Anh'; const n = net > 2000000000 ? 2 : 1;
+      d.status = 'Pending approval'; const lead = S.me() === 'Nguyễn Minh Anh' ? 'Đỗ Hoàng Nam' : 'Nguyễn Minh Anh'; const n = net > D().approvalBands[1][0] ? 2 : 1;
       D().approvals = D().approvals.filter((a) => a.id !== id);
       D().approvals.push({ id, type: 'PO approval', title: d.title, mats: d.mats, value: net, by: S.me(), step: 'Step 1 of ' + n, sla: App.addDays(D().today, 2) + ' 17:00', assignee: lead });
       D().approvalChains[id] = [[`${S.me()} · Buyer`, 'Submitted', NOW, ''], [`${lead} · Procurement Lead`, 'Waiting', 'SLA 2 working days', '']].concat(n > 1 ? [['Đỗ Hoàng Nam · Finance Director', 'Next', '', '']] : []);
@@ -296,7 +296,7 @@
   function ncrCard(id) {
     const list = ncrsOf(id); if (!list.length) return '';
     return card(`Non-conformance (${list.length})`, `<ul class="plain ncr-list">${list.map((n) => `<li class="row-acts between"><span><b class="mono">${esc(n.id)}</b> ${mid(n.mat)} ${pill(n.status, n.status === 'Closed' ? 'success' : 'warning')}
-      <div class="small">${num(n.qty)} ${esc(mat(n.mat).uom)} · ${esc(n.action)}${n.discount ? ` ${num(n.discount)}%` : ''} · ${esc(n.grn)} · raised ${esc(n.raised)} by ${esc(n.by)}</div><div class="small muted">Supplier: ${esc(n.supplier)}</div>
+      <div class="small">${num(n.qty)} ${esc(mat(n.mat).uom)} · ${esc(n.action)}${n.discount ? ` ${num(n.discount)}%` : ''} · ${esc(n.grn)} · raised ${esc(n.raised)} by ${esc(n.by)}</div><div class="small muted">${/^Supplier/.test(n.supplier || '') ? esc(n.supplier) : 'Supplier response ' + esc(n.supplier)}</div>
       ${n.status !== 'Closed' ? `<div class="small tone-warning">Open NCR blocks invoice matching for ${num(n.qty)} ${esc(mat(n.mat).uom)}; the quantity stays open on the PO.</div>` : ''}</span>
       ${n.status !== 'Closed' ? `<button class="btn btn-sm" data-po="ncr-close" data-id="${esc(n.id)}">Close NCR</button>` : ''}</li>`).join('')}</ul>`);
   }
