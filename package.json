@@ -1,9 +1,15 @@
 {
   "name": "e-procurement",
   "version": "1.0.0",
+  "description": "ProcureLink e-procurement web app (static SPA with mock data, served by Node.js)",
   "private": true,
+  "license": "UNLICENSED",
+  "main": "server.js",
   "scripts": {
+    "start": "node server.js",
+    "dev": "node server.js",
     "build": "echo \"Static site: no build step required\"",
-    "test": "echo \"No automated tests configured\""
-  }
+    "test": "node scripts/smoke-test.js"
+  },
+  "engines": { "node": ">=18" }
 }
