@@ -149,15 +149,15 @@
         <label class="chk"><input type="checkbox" data-mf="single"${st.single ? ' checked' : ''}> ${esc(t('mt.singleOnly'))}</label></div>
       ${table([
         { h: t('c.mid'), r: (m) => mid(m.id), w: '120px' },
-        { h: t('c.description'), r: (m) => `${esc(m.name)}<div class="small muted" lang="en">${esc(m.en)}</div>`, w: 'minmax(200px,2.2fr)' },
+        { h: t('c.description'), r: (m) => `${esc(m.name)}<div class="small muted" lang="en">${esc(m.en)}</div>`, w: 'minmax(180px,2.2fr)' },
         { h: t('mt.c.catGroup'), r: (m) => `${esc(t('cat.' + m.cat))}<div class="small muted">${esc(m.group)}</div>` },
-        { h: t('c.uom'), k: 'uom', w: '80px' },
-        { h: 'VAT', r: (m) => `${esc(m.vat === 'KCT' ? 'KCT' : m.vat + '%')}${m.vat === 8 ? `<div class="small muted">${esc(t('mt.c.reduced'))}</div>` : ''}${m.vatConfirmed ? '' : `<div class="small tone-warning">${esc(t('mt.c.finPending'))}</div>`}`, w: '110px' },
-        { h: t('c.lastPrice'), r: (m) => (m.last ? vnd(m.last) + `<div class="small muted mono">${esc(m.lastPo)}</div>` : '<span class="muted">—</span>'), cls: 'num', w: '150px' },
-        { h: t('c.vendors'), r: (m) => { const n = eligibleVendors(m).length; return `${n}${m.status === 'Active' && n === 1 ? ' ' + pill(t('mt.k.single'), 'warning') : ''}`; }, w: '130px' },
-        { h: t('mt.c.contracts'), r: (m) => (m.contracts.length ? m.contracts.map((c) => `<a class="mono small" href="#/contracts/${esc(c)}">${esc(c)}</a>`).join('<br>') : '<span class="muted">—</span>'), w: '120px' },
-        { h: t('c.status'), r: (m) => pill(m.status, statusTone(m.status)) + (m.step ? `<div class="small muted">${esc(tv(m.step))}</div>` : ''), w: '140px' }
-      ], rows, { min: 1180, empty: t('mt.empty'), label: t('mt.title') })}
+        { h: t('c.uom'), k: 'uom', w: '90px' },
+        { h: 'VAT', r: (m) => `${esc(m.vat === 'KCT' ? 'KCT' : m.vat + '%')}${m.vat === 8 ? `<div class="small muted">${esc(t('mt.c.reduced'))}</div>` : ''}${m.vatConfirmed ? '' : `<div class="small tone-warning">${esc(t('mt.c.finPending'))}</div>`}`, w: '100px' },
+        { h: t('c.lastPrice'), r: (m) => (m.last ? vnd(m.last) + `<div class="small muted mono">${esc(m.lastPo)}</div>` : '<span class="muted">—</span>'), cls: 'num', w: '140px' },
+        { h: t('c.vendors'), r: (m) => { const n = eligibleVendors(m).length; return `${n}${m.status === 'Active' && n === 1 ? ' ' + pill(t('mt.k.single'), 'warning') : ''}`; }, w: '110px' },
+        { h: t('mt.c.contracts'), r: (m) => (m.contracts.length ? m.contracts.map((c) => `<a class="mono small" href="#/contracts/${esc(c)}">${esc(c)}</a>`).join('<br>') : '<span class="muted">—</span>'), w: '110px' },
+        { h: t('c.status'), r: (m) => pill(m.status, statusTone(m.status)) + (m.step ? `<div class="small muted">${esc(tv(m.step))}</div>` : ''), w: '130px' }
+      ], rows, { empty: t('mt.empty'), label: t('mt.title') })}
       <p class="muted small">${esc(t('mt.showing', { n: rows.length, total: num(D().materialStats.total) }))}</p>`,
     { actions: `<button class="btn btn-sm" data-act="toast" data-msg="${esc(t('mt.importMsg'))}">${esc(t('c.import'))}</button><button class="btn btn-sm" data-act="toast" data-msg="${esc(t('c.exported', { n: rows.length }))}">${esc(t('c.export'))}</button>` });
   }

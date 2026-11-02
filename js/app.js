@@ -30,7 +30,9 @@
   /* Generic table: cols = [{h, k | r(row), cls, w}], rows = array */
   function table(cols, rows, opts = {}) {
     const tpl = cols.map((c) => c.w || 'minmax(110px,1fr)').join(' ');
-    const min = opts.min || Math.max(600, cols.length * 130);
+    // Min width = sum of each column's minimum (px from w, minmax() min, else 110) + cell gaps, so tables fit when the block is wide enough.
+    const colMin = (w) => { const m = /^(?:minmax\()?(\d+)px/.exec(w || ''); return m ? +m[1] : 110; };
+    const min = opts.min || Math.max(480, cols.reduce((a, c) => a + colMin(c.w), 0));
     const head = cols.map((c) => `<div class="th ${c.cls || ''}" role="columnheader">${esc(c.h)}</div>`).join('');
     const body = rows.length
       ? rows.map((r, i) => `<div class="tr" role="row" style="grid-template-columns:${tpl}">${cols.map((c) => `<div class="td ${c.cls || ''}" role="cell">${c.r ? c.r(r, i) : esc(r[c.k])}</div>`).join('')}</div>`).join('')

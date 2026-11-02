@@ -25,6 +25,9 @@ Rule: the main tab of a module shows only its core (KPI row + main list/primary 
 - Type: 12 · 13 · 14 · 16 · 22 (`--fs-xs..--fs-xl`). Block title 16, KPI value 22.
 - Buttons: `.btn` 40px, `.btn-sm` 36px, `.btn-p` primary, `.btn-d` destructive. Pills: `App.pill(text, tone)` 12px.
 - Tables: `App.table(cols, rows, {min, empty, label})`; numbers `cls: 'num'`; wide tables scroll inside `.tbl-wrap` — the page never scrolls horizontally.
+  Omit `min`: it is computed from the columns' minimum widths (`'120px'`, `'minmax(180px,2fr)'`, default 110). Keep a main list ≤ ~1100px of minimums so it fits at 1440 without inner scroll; give short-coded columns fixed px.
+- Mobile (≤900px): odd KPI count → last tile spans the row; filters and `.seg` fill rows evenly; header buttons share the row. `.seg` labels never wrap.
+- One primary action per row/header; secondary row actions are quiet (`.nacts` ghost style).
 - Forms: `App.field(id, label, value, {options, req, hint, err, ph, area, mode, type})`.
 
 ## 4. Robustness

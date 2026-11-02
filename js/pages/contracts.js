@@ -116,14 +116,14 @@
       ${sel('ctype', t('c.type'), TYPES)}${sel('status', t('c.status'), [...new Set(C.map(statusOf))])}${sel('owner', t('c.owner'), [...new Set(C.map((c) => c.owner))])}</div>
       ${table([
         { h: t('ct.c.contract'), r: (c) => `<a class="mono" href="#/contracts/${esc(c.id)}">${esc(c.id)}</a><div class="small muted">${esc(tv(c.ctype))}</div>`, w: '130px' },
-        { h: t('c.vendor'), r: (c) => `<a href="#/vendors/${esc(c.vendor)}">${esc(vname(c.vendor))}</a><div class="small muted">${esc(tv((doc(c.id) || {}).title || ''))}</div>`, w: 'minmax(200px,2fr)' },
+        { h: t('c.vendor'), r: (c) => `<a href="#/vendors/${esc(c.vendor)}">${esc(vname(c.vendor))}</a><div class="small muted">${esc(tv((doc(c.id) || {}).title || ''))}</div>`, w: 'minmax(180px,2fr)' },
         { h: t('c.mids'), r: (c) => `<div class="chips">${c.lines.map((l) => mid(l.mat)).join('')}</div>`, w: 'minmax(130px,1.2fr)' },
         { h: t('ct.c.period'), r: (c) => { const d = App.daysTo(c.end); return `${esc(c.start)} – ${esc(c.end)}<div class="small ${d < 0 ? 'tone-danger' : d <= 60 ? 'tone-warning' : 'muted'}">${esc(d < 0 ? t('ct.expiredAgo', { n: -d }) : t('ct.left', { n: d }))}</div>`; }, w: 'minmax(170px,1.3fr)' },
         { h: t('ct.c.ceiling'), r: (c) => ty(c.ceiling), cls: 'num', w: '110px' },
         { h: t('ct.c.used'), r: (c) => `${bar(used(c), c.minPct && used(c) < c.minPct)}<div class="small">${pct(used(c), 0)}</div>`, w: '110px' },
         { h: t('c.owner'), k: 'owner', w: 'minmax(120px,1fr)' },
-        { h: t('c.status'), r: (c) => pill(statusOf(c), sTone(statusOf(c))), w: '150px' }
-      ], rows, { min: 1180, empty: t('ct.empty'), label: t('ct.title') })}
+        { h: t('c.status'), r: (c) => pill(statusOf(c), sTone(statusOf(c))), w: '130px' }
+      ], rows, { empty: t('ct.empty'), label: t('ct.title') })}
       <p class="small muted">${esc(t('ct.showing', { n: rows.length, total: D().contractStats.total }))}</p>`, { actions: `<button class="btn btn-sm" data-act="toast" data-msg="${esc(t('c.exported', { n: rows.length }))}">${esc(t('c.export'))}</button>` });
   }
   function offContract() {

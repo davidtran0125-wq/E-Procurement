@@ -402,3 +402,29 @@ ul.plain.qlinks a::after { content: "›"; color: var(--muted); font-size: 18px;
 @media (max-width: 900px) { .page-h .acts { width: 100%; } .acts .field.inline { flex: 1 1 160px; } .acts .field.inline .inp { width: 100%; } #m360-id { max-width: 100%; flex: 1 1 100%; } }
 .rule-list { display: grid; gap: var(--s2); } .rule-list li { margin: 0; }
 .split-2 { display: grid; gap: var(--s4); grid-template-columns: repeat(2, minmax(0, 1fr)); } @media (max-width: 900px) { .split-2 { grid-template-columns: minmax(0, 1fr); } }
+/* ---- Redesign batch 1 · UI review (Agent 3) ---- */
+/* Segmented controls never wrap a label onto two lines (VI labels are longer) */
+.seg button { white-space: nowrap; padding: 0 var(--s3); }
+/* Block header: pills keep their own height; actions stay right-aligned */
+.blk-h > .pill, .blk-h .pill { align-self: center; }
+.blk-h h2 { margin-right: auto; }
+/* Secondary row actions are quiet so one primary action per row stands out */
+.nacts .btn:not(.btn-p) { border-color: transparent; color: var(--ink2); }
+.nacts .btn:not(.btn-p):hover { border-color: var(--input); }
+/* Material 360 linked tiles: even 5-column rows (10 tiles = 2 full rows) */
+.tiles { grid-template-columns: repeat(5, minmax(0, 1fr)); }
+@media (max-width: 1200px) { .tiles { grid-template-columns: repeat(3, minmax(0, 1fr)); } }
+@media (max-width: 600px) { .tiles { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+/* Sidebar: subtle group separators */
+.nav-g + .nav-g { border-top: 1px solid var(--divider); }
+.nav-gt { padding-top: 10px; }
+@media (max-width: 900px) {
+  /* Odd KPI count: last tile spans the row so the grid stays even */
+  .kpis > .kpi:last-child:nth-child(odd) { grid-column: 1 / -1; min-height: 0; }
+  /* Filters fill rows evenly instead of ragged wrapping */
+  .blk-b > .filters > * { flex: 1 1 150px; min-width: 0; }
+  .blk-b > .filters > .chk { flex: 1 1 100%; }
+  /* Header actions: full-width equal buttons */
+  .page-h .acts > .btn { flex: 1 1 0; justify-content: center; }
+}
+@media (max-width: 900px) { .blk-b > .filters > .seg { flex: 1 1 100%; } .blk-b > .filters > .seg button { flex: 1; } }

@@ -59,14 +59,14 @@
       ${sel('type', t('c.type'), [...new Set(C.map((c) => c.type))])}${sel('holder', t('ce.holder'), [...new Set(C.map((c) => c.vendor))].map((id) => [id, `${id} · ${vname(id)}`]))}${sel('status', t('c.status'), ['Valid', 'Expiring', 'Expired', 'Pending review', 'Superseded', 'Rejected'])}
       <label class="chk"><input type="checkbox" data-cf="mand"${st.mand ? ' checked' : ''}> ${esc(t('ce.mandOnly'))}</label></div>
       ${table([
-        { h: t('ce.c.cert'), r: (c) => `<b>${esc(tv(c.type))}</b><div class="small muted mono">${esc(c.no)}</div>`, w: 'minmax(190px,1.8fr)' },
+        { h: t('ce.c.cert'), r: (c) => `<b>${esc(tv(c.type))}</b><div class="small muted mono">${esc(c.no)}</div>`, w: 'minmax(170px,1.8fr)' },
         { h: t('ce.holder'), r: (c) => `<a href="#/vendors/${esc(c.vendor)}"><span class="mono small">${esc(c.vendor)}</span> ${esc(vname(c.vendor))}</a>`, w: 'minmax(150px,1.3fr)' },
         { h: t('ce.c.scope'), r: (c) => `<div class="chips">${c.mats.map(mid).join('')}</div>${requiredFor(c).length ? `<div class="small">${esc(t('ce.mandFor', { m: requiredFor(c).join(', ') }))}</div>` : `<div class="small muted">${esc(t('ce.notMand'))}</div>`}`, w: 'minmax(190px,1.7fr)' },
         { h: t('ce.c.issuer'), r: (c) => esc(c.issuer), w: 'minmax(140px,1.2fr)' },
         { h: t('ce.c.expiry'), r: (c) => `${esc(c.expiry)}<div>${daysNote(c)}</div>`, w: '140px' },
         { h: t('ce.c.verified'), r: (c) => (c.verified ? `<span class="small">${esc(c.verified)}</span>` : c.uploaded ? `<span class="small muted">${esc(t('ce.uploadedAt', { v: c.uploaded }))}</span>` : '—'), w: 'minmax(150px,1.3fr)' },
         { h: t('c.status'), r: (c) => pill(statusOf(c), sTone(statusOf(c))) + (statusOf(c) === 'Pending review' ? `<div><a class="small" href="#/certificates/review?id=${esc(c.id)}">${esc(t('ce.review'))}</a></div>` : ''), w: '150px' }
-      ], rows, { min: 1200, empty: t('ce.empty'), label: t('ce.register') })}
+      ], rows, { empty: t('ce.empty'), label: t('ce.register') })}
       <p class="small muted">${esc(t('ce.showing', { n: rows.length, total: num(Object.values(D().certStats).reduce((a, x) => a + x, 0)) }))}</p>`,
     { actions: `<button class="btn btn-sm" data-act="toast" data-msg="${esc(t('c.exported', { n: rows.length }))}">${esc(t('c.export'))}</button>` });
   }
