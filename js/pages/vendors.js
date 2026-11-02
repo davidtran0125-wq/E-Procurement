@@ -90,7 +90,7 @@
     const F = st.form; const f = readForm(root); F.f = f;
     st.errs = validate(f, F.id); st.dup = null;
     if (!st.errs.mst) { const d = dupOf(f.mst, F.id); if (d) st.dup = d; }
-    if (Object.keys(st.errs).length || st.dup) { App.render(); const er = document.querySelector('#vf [role=alert]'); er && er.scrollIntoView({ block: 'center' }); return; }
+    if (Object.keys(st.errs).length || st.dup) { App.render(); const x = document.querySelector('#vf [aria-invalid=true]') || document.querySelector('#vf .alert-danger'); if (x) { x.setAttribute('tabindex', '-1'); x.focus(); x.scrollIntoView({ block: 'center' }); } return; }
     const verified = !!(st.mst && st.mst.mst === normMst(f.mst) && st.mst.status === 'Đang hoạt động');
     if (F.id) {
       const v = App.vendor(F.id); const mstChanged = normMst(v.mst) !== normMst(f.mst);
@@ -186,9 +186,10 @@
     title: 'Vendors', ws: 'procurement', roles: ['procurement', 'admin'],
     render(p, sub) {
       const id = sub || p.id;
+      const key = id || 'list'; if (st.cur !== key) { st.cur = key; st.form = null; st.errs = {}; st.mst = null; st.dup = null; st.confirmDel = null; st.rejecting = false; st.reject = ''; }
       if (id) { const v = App.vendor(id); return v ? profile(v) : App.errorState(`Vendor ${id} was not found.`, ' <a href="#/vendors">Back to vendors</a>'); }
       const V = D().vendors;
-      return `<div class="page-h"><div><h1>Vendors</h1><div class="sub">Vendor master · MST-verified, risk-rated and linked to the Material IDs they supply</div></div>
+      return `<div class="page-h"><div><h1>${esc(App.t('Vendors'))}</h1><div class="sub">Vendor master · MST-verified, risk-rated and linked to the Material IDs they supply</div></div>
         <div class="acts"><button class="btn btn-p" data-v="new">New vendor</button></div></div>
         <div class="grid-k">${kpi('Vendors', '142', 'All categories')}${kpi('Active', '118', `${V.filter((v) => /Preferred|Approved/.test(v.status)).length} in this sample`, 'success')}${kpi('Pending approval', '6', `${V.filter((v) => v.status === 'Pending approval').length} in this sample`, 'warning')}${kpi('High risk', String(V.filter((v) => v.risk === 'High').length), V.filter((v) => v.risk === 'High').map((v) => App.vshort(v)).join(', ') || 'None', 'danger')}</div>
         ${st.form ? formCard() : ''}${delConfirm()}${list()}`;

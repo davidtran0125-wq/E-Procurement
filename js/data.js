@@ -136,9 +136,9 @@ window.DATA = {
     { id: 'GRN-2026-1518', type: 'GRN', title: 'Xi măng PCB40 · 55 tấn accepted', date: '24/10/2026', status: 'Accepted with NCR', mats: ['CON-24102'], vendor: 'V-1002' },
     { id: 'GRN-2026-1532', type: 'GRN', title: 'Thép D16 · 50 tấn on time & in full', date: '28/10/2026', status: 'Accepted', mats: ['CON-24015'], vendor: 'V-1001' },
     { id: 'CT-2025-007', type: 'CT', title: 'Fixed price – Xi măng An Khang 2025–2026', date: '01/10/2025', status: 'Expired', mats: ['CON-24102'], vendor: 'V-1002', note: 'Expired 30/09/2026' },
-    { id: 'CT-2025-019', type: 'CT', title: 'Rate card Logistics Sao Việt', date: '01/01/2026', status: 'Expiring', mats: ['LOG-61012'], vendor: 'V-1006', note: 'Expires 31/12/2026' },
+    { id: 'CT-2025-019', type: 'CT', title: 'Rate card Logistics Sao Việt', date: '01/01/2025', status: 'Expiring', mats: ['LOG-61012'], vendor: 'V-1006', note: 'Expires 31/12/2026' },
     { id: 'CT-2026-008', type: 'CT', title: 'Framework – Thép Minh Phát 2026', date: '01/01/2026', status: 'Expiring', mats: ['CON-24015', 'CON-24020'], vendor: 'V-1001', note: '1.200 tấn commitment · 640 tấn released · 01/01–31/12/2026' },
-    { id: 'CT-2026-011', type: 'CT', title: 'HVAC maintenance SLA – Hưng Long', date: '01/01/2026', status: 'Active', mats: ['SRV-52003'], vendor: 'V-1005' },
+    { id: 'CT-2026-011', type: 'CT', title: 'HVAC maintenance SLA – Hưng Long', date: '01/04/2026', status: 'Active', mats: ['SRV-52003'], vendor: 'V-1005' },
     { id: 'CT-2026-014', type: 'CT', title: 'Generator maintenance – Đại Phong', date: '28/10/2026', status: 'Pending signature', mats: ['EQP-31007'], vendor: 'V-1003', value: 240000000 },
     { id: 'INV-2026-0314', type: 'INV', title: 'Thuê kho bãi tháng 9', date: '05/10/2026', status: 'Ready for payment', mats: ['LOG-61045'], vendor: 'V-1006', value: 105000000 },
     { id: 'INV-2026-0318', type: 'INV', title: 'Thép D16 – PO-2026-0858', date: '20/10/2026', status: 'Matched', mats: ['CON-24015'], vendor: 'V-1001', value: 703237500 },
@@ -244,12 +244,12 @@ window.DATA = {
   /* Contracts (F-30..F-35). Lines are per Material ID; released qty per line. Security = performance security (R-09). Docs = typed, versioned (R-19). */
   D.contracts = [
     { id: 'CT-2026-008', ctype: 'Framework', vendor: 'V-1001', start: '01/01/2026', end: '31/12/2026', ceiling: 19500000000, vat: 10, owner: 'Nguyễn Minh Anh', esign: 'E-signed v3 · 05/01/2026', minPct: 80, forecast: 860,
-      lines: [{ mat: 'CON-24015', commit: 900, released: 505, q3: 16450000, q4: 15627500 }, { mat: 'CON-24020', commit: 300, released: 135, q3: 16160000, q4: 15352000 }],
+      lines: [{ mat: 'CON-24015', commit: 900, released: 505, q3: 16450000, q4: 15627500 }, { mat: 'CON-24020', commit: 300, released: 135, q3: 15110000, q4: 14354500 }],
       adjust: 'Steel price index clause: max ±5% per quarter. Q4 index −6,8% → −5,0% applied by Phụ lục 01 (01/10/2026). PO price may not exceed the current contract price.',
       terms: [['Payment', '30 days after invoice'], ['Late delivery penalty', '0,1% per day, max 8%'], ['Warranty', 'Replace defective lot within 7 days'], ['Incoterms', 'DAP site (Nhà xưởng C2 / Kho B)']],
       security: { amount: 975000000, bank: 'Vietcombank – CN Sài Gòn', ref: 'BL-VCB-2026-00418', expiry: '31/01/2027' },
       releases: [['PO-2026-0118', 'CON-24015', 60, 16450000, '20/01/2026'], ['PO-2026-0204', 'CON-24015', 50, 16450000, '18/02/2026'], ['PO-2026-0297', 'CON-24015', 55, 16450000, '16/03/2026'], ['PO-2026-0365', 'CON-24015', 50, 16450000, '10/04/2026'],
-        ['PO-2026-0442', 'CON-24015', 60, 16450000, '08/05/2026'], ['PO-2026-0531', 'CON-24015', 45, 16450000, '05/06/2026'], ['PO-2026-0590', 'CON-24020', 135, 16160000, '22/06/2026'], ['PO-2026-0618', 'CON-24015', 50, 16450000, '06/07/2026'],
+        ['PO-2026-0442', 'CON-24015', 60, 16450000, '08/05/2026'], ['PO-2026-0531', 'CON-24015', 45, 16450000, '05/06/2026'], ['PO-2026-0590', 'CON-24020', 135, 15110000, '22/06/2026'], ['PO-2026-0618', 'CON-24015', 50, 16450000, '06/07/2026'],
         ['PO-2026-0705', 'CON-24015', 45, 16450000, '10/08/2026'], ['PO-2026-0802', 'CON-24015', 45, 16450000, '15/09/2026'], ['PO-2026-0858', 'CON-24015', 45, 15627500, '14/10/2026']],
       files: [{ type: 'Signed contract', name: 'CT-2026-008_signed.pdf', ver: 'v3', by: 'Nguyễn Minh Anh', date: '05/01/2026', mats: ['CON-24015', 'CON-24020'], tag: 'Signed' },
         { type: 'Phụ lục (amendment)', name: 'CT-2026-008_PL01_index.pdf', ver: 'v1', by: 'Nguyễn Minh Anh', date: '01/10/2026', mats: ['CON-24015', 'CON-24020'], tag: 'Signed' },
@@ -258,7 +258,7 @@ window.DATA = {
     { id: 'CT-2025-019', ctype: 'Rate card', vendor: 'V-1006', start: '01/01/2025', end: '31/12/2026', ceiling: 4800000000, vat: 8, owner: 'Trần Bảo Ngọc', esign: 'E-signed v2 · 28/12/2025', minPct: 0, forecast: null,
       lines: [{ mat: 'LOG-61012', commit: 260, released: 214, q3: 18500000, q4: 18500000 }], adjust: 'Fuel surcharge reviewed quarterly, max ±3%.',
       terms: [['Payment', '30 days after invoice'], ['Late delivery penalty', '500.000 ₫ per trip per day'], ['Incoterms', 'Door to door']],
-      security: { amount: 240000000, bank: 'BIDV – CN Gia Định', ref: 'BL-BIDV-2025-1172', expiry: '20/11/2026' },
+      security: { amount: 240000000, bank: 'BIDV – CN Gia Định', ref: 'BL-BIDV-2025-1172', expiry: '20/11/2026', note: 'Extension requested 28/10/2026' }, histNote: '+ 202 trips released before 2026 (history)',
       releases: [['PO-2026-0874', 'LOG-61012', 12, 18500000, '20/10/2026']],
       files: [{ type: 'Signed contract', name: 'CT-2025-019_rate_card_v2.pdf', ver: 'v2', by: 'Trần Bảo Ngọc', date: '28/12/2025', mats: ['LOG-61012'], tag: 'Signed' }] },
     { id: 'CT-2026-011', ctype: 'Service SLA', vendor: 'V-1005', start: '01/04/2026', end: '31/03/2027', ceiling: 576000000, vat: 8, owner: 'Trần Bảo Ngọc', esign: 'E-signed v1 · 25/03/2026', minPct: 0, forecast: null,
@@ -280,7 +280,7 @@ window.DATA = {
       releases: [], files: [{ type: 'Signed contract', name: 'CT-2025-007_signed.pdf', ver: 'v1', by: 'Nguyễn Minh Anh', date: '28/09/2025', mats: ['CON-24102'], tag: 'Signed' }] }
   ];
   /* Universe counters for the contract register (sample loaded) */
-  D.contractStats = { total: 17, active: 12, value: 48.6 };
+  D.contractStats = { total: 17, active: 12, value: 48.6, avgUse: 58 };
 
   /* Certificates (F-36..F-39). mats = scope by Material ID. Mandatory = required by a Material ID in scope (F-13). */
   D.certificates = [
@@ -316,7 +316,7 @@ window.DATA = {
   D.grades = [['A', 4.2, 'Preferred'], ['B', 3.5, 'Approved'], ['C', 3.0, 'Probation'], ['D', 0, 'Blocked']];
   /* scores in template order; null = not entered yet. basis = evidence line. */
   D.scorecards = [
-    { vendor: 'V-1001', tpl: 'TPL-CON', period: 'Q3/2026', status: 'Submitted', scores: [4.5, 4.6, 4.2, 4.0, 4.0, 3.6], by: 'Nguyễn Minh Anh', at: '15/10/2026', prev: 4.24, basis: '18 POs · 5 Material IDs',
+    { vendor: 'V-1001', tpl: 'TPL-CON', period: 'Q3/2026', status: 'Submitted', scores: [4.5, 4.6, 4.2, 4.0, 4.0, 3.6], by: 'Nguyễn Minh Anh', at: '15/10/2026', prev: 4.24, basis: '18 POs · 3 Material IDs',
       evidence: ['NCR rate 2 / 18 POs · 99,2% accepted qty', 'OTIF 95,8% by accepted qty (23 / 24)', 'CON-24015 −5,3% vs 90-day average', 'Avg. tender response 1,6 days', '', ''], comment: 'Ổn định, giao đúng hạn; cần cải thiện hồ sơ CQ lô 2 (NCR-2026-017).' },
     { vendor: 'V-1002', tpl: 'TPL-CON', period: 'Q3/2026', status: 'Submitted', scores: [3.8, 4.1, 4.2, 4.0, 4.0, 3.5], by: 'Nguyễn Minh Anh', at: '18/10/2026', prev: 3.92, basis: '14 POs · 3 Material IDs',
       evidence: ['NCR rate 1 / 14 POs · 97,9% accepted qty', 'OTIF 91,2% by accepted qty', 'CON-24102 +6,4% vs 90-day average', 'Avg. tender response 2,0 days', '', ''], comment: 'Chất lượng bao bì cần cải thiện (NCR-2026-014).' },

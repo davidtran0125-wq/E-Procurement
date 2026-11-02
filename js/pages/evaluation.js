@@ -8,7 +8,8 @@
   const tpl = (id) => D().evalTemplates.find((t) => t.id === id);
   const sTone = (s) => ({ Submitted: 'success', Draft: 'warning', 'Not started': 'neutral' }[s] || 'neutral');
   const gradeOf = (x) => (x == null ? null : D().grades.find((g) => Math.round(x * 100) / 100 >= g[1]));
-  const total = (t, scores) => t.criteria.reduce((a, c, i) => a + (scores[i] != null && scores[i] !== '' ? +scores[i] : 0) * c.w / 100, 0);
+  const total = (t, scores, w = t.criteria.map((c) => c.w)) => t.criteria.reduce((a, c, i) => a + (scores[i] != null && scores[i] !== '' ? +scores[i] : 0) * w[i] / 100, 0);
+  const wOf = (sc, t) => sc.weights || t.criteria.map((c) => c.w);
   const complete = (scores) => scores.every((x) => x != null && x !== '');
   const isAuto = (c) => c.src.startsWith('Auto');
   const tplFor = (v) => (/Equipment/.test(v.cat) ? 'TPL-EQP' : /Services|Logistics/.test(v.cat) ? 'TPL-SRV' : 'TPL-CON');
@@ -30,7 +31,7 @@
     return card(`Progress · ${st.period}`, `<p class="small muted mt-0">${cnt('Submitted')} submitted · ${cnt('Draft')} draft · ${cnt('Not started')} not started${cur ? ' · due 15/11/2026' : ''}</p>` + table([
       { h: 'Vendor', r: (s) => `<a href="#/vendors/${esc(s.vendor)}"><span class="mono small">${esc(s.vendor)}</span> ${esc(App.vshort(App.vendor(s.vendor)))}</a>`, w: 'minmax(170px,2fr)' },
       { h: 'Template', r: (s) => esc(tpl(s.tpl).name), w: 'minmax(130px,1.4fr)' },
-      { h: 'Score', r: (s) => { const x = s.fixed != null ? s.fixed : s.status === 'Not started' ? null : total(tpl(s.tpl), s.scores); return x == null ? '—' : `${num(x, 2)} · ${gradeOf(x)[0]}`; }, cls: 'num', w: '100px' },
+      { h: 'Score', r: (s) => { const x = s.fixed != null ? s.fixed : s.status === 'Not started' ? null : total(tpl(s.tpl), s.scores, wOf(s, tpl(s.tpl))); if (x == null) return '—'; if (s.fixed == null && !complete(s.scores)) return `${num(x, 2)} <span class="small muted">(incomplete)</span>`; return `${num(x, 2)} · ${gradeOf(x)[0]}`; }, cls: 'num', w: '100px' },
       { h: 'Status', r: (s) => pill(s.status, sTone(s.status)), w: '120px' },
       { h: '', r: (s) => `<button class="btn btn-sm" data-ev="open" data-id="${esc(s.vendor)}">${s.status === 'Submitted' ? 'View' : s.status === 'Draft' ? 'Continue' : 'Evaluate'}</button>`, w: '100px' }
     ], rows, { min: 640, empty: 'No scorecards in this period', label: 'Scorecard progress' }));
@@ -49,14 +50,14 @@
     if (!sc) return card(`Scorecard · ${v.id}`, App.emptyState(`${v.name} has no scorecard in ${st.period}`, 'Start one: auto criteria are filled from POs, GRNs (accepted qty), NCRs and bids.', `<button class="btn btn-p btn-sm" data-ev="start" data-id="${esc(v.id)}">Start scorecard</button>`));
     const t = tpl(sc.tpl); const locked = sc.status === 'Submitted';
     if (!st.draft || st.draftFor !== v.id) { st.draft = sc.scores.slice(); st.comment = sc.comment; st.draftFor = v.id; }
-    const tot = total(t, st.draft); const g = gradeOf(tot);
+    const W = wOf(sc, t); const tot = total(t, st.draft, W); const g = gradeOf(tot);
     return card(`Scorecard · ${v.name}`, `<p class="small muted mt-0"><span class="mono">${esc(v.id)}</span> · ${esc(t.name)} template · ${esc(st.period)} · basis: ${esc(sc.basis)} · evaluator ${esc(sc.by)} ${pill(sc.status, sTone(sc.status))}</p>
       <form id="ev-form" novalidate class="stack">${table([
         { h: 'Criterion', r: (c) => `<b>${esc(c.name)}</b><div class="small muted">${esc(c.src)}</div>`, w: 'minmax(200px,2fr)' },
-        { h: 'Weight', r: (c) => num(c.w) + '%', cls: 'num', w: '80px' },
+        { h: 'Weight', r: (c) => num(W[t.criteria.indexOf(c)]) + '%', cls: 'num', w: '80px' },
         { h: 'Basis', r: (c) => esc(sc.evidence[t.criteria.indexOf(c)] || (isAuto(c) ? '' : 'Evaluator judgement')), w: 'minmax(200px,2fr)' },
         { h: 'Score (0–5)', r: (c) => scoreInput(c, t.criteria.indexOf(c), sc, locked), w: '130px' },
-        { h: 'Weighted', r: (c) => { const x = st.draft[t.criteria.indexOf(c)]; return `<span data-ev-w="${t.criteria.indexOf(c)}">${x == null || x === '' ? '—' : num(+x * c.w / 100, 3)}</span>`; }, cls: 'num', w: '100px' }
+        { h: 'Weighted', r: (c) => { const x = st.draft[t.criteria.indexOf(c)]; return `<span data-ev-w="${t.criteria.indexOf(c)}">${x == null || x === '' ? '—' : num(+x * W[t.criteria.indexOf(c)] / 100, 3)}</span>`; }, cls: 'num', w: '100px' }
       ], t.criteria, { min: 860, label: 'Scorecard criteria' })}
         <div class="alert ${complete(st.draft) ? (g[0] === 'A' ? 'alert-success' : g[0] === 'B' ? 'alert-info' : 'alert-warning') : 'alert-info'}" id="ev-total" role="status" aria-live="polite">${totalText(tot, g, sc)}</div>
         <div class="field"><label for="ev-comment">Evaluator comment${locked ? '' : ' *'}</label><textarea id="ev-comment"${locked ? ' disabled' : ''}${st.errs.comment ? ' aria-invalid="true" aria-describedby="ev-c-e"' : ''}>${esc(st.comment)}</textarea>${st.errs.comment ? `<span class="err" id="ev-c-e" role="alert">${esc(st.errs.comment)}</span>` : ''}</div>
@@ -101,11 +102,11 @@
 
   function render(p, admin) {
     if (p.vendor && p.vendor !== st.lastParam) { st.vendor = p.vendor; st.lastParam = p.vendor; st.tab = 'scorecards'; st.draft = null; }
-    if (admin) st.tab = 'templates';
+    if (admin) { st.tab = 'templates'; st.fromAdmin = true; } else if (st.fromAdmin) { st.tab = 'scorecards'; st.fromAdmin = false; }
     const sc = D().scorecards;
     const tabs = [['scorecards', 'Scorecards'], ['templates', 'Criteria templates'], ['history', 'History']];
     const body = st.tab === 'templates' ? templates() : st.tab === 'history' ? history() : `<div class="grid-2"><div class="stack">${scorecard()}</div><div class="stack">${progress()}</div></div>`;
-    return `<div class="page-h"><div><h1>${admin ? 'Evaluation templates' : 'Vendor evaluation'}</h1><div class="sub">Weighted scorecards per period · auto criteria from GRN accepted qty, NCRs, prices by Material ID and bids</div></div>
+    return `<div class="page-h"><div><h1>${esc(App.t(admin ? 'Evaluation templates' : 'Vendor evaluation'))}</h1><div class="sub">Weighted scorecards per period · auto criteria from GRN accepted qty, NCRs, prices by Material ID and bids</div></div>
       <div class="acts"><label class="sr" for="ev-period">Period</label><select class="inp" id="ev-period" data-evf="period">${['Q3/2026', 'Q2/2026', 'Q1/2026'].map((x) => `<option${x === st.period ? ' selected' : ''}>${x}</option>`).join('')}</select><button class="btn btn-p" data-ev="new-period">Start new period</button></div></div>
       <div class="grid-k">${kpi('Submitted', String(sc.filter((s) => s.status === 'Submitted').length), `of ${sc.length} · Q3/2026`, 'success')}${kpi('Draft', String(sc.filter((s) => s.status === 'Draft').length), 'In progress', 'warning')}${kpi('Not started', String(sc.filter((s) => s.status === 'Not started').length), 'Due 15/11/2026')}${kpi('Average score', num(D().vendors.filter((v) => v.score).reduce((a, v, _, A) => a + v.score / A.length, 0), 2), 'Scored vendors')}</div>
       ${admin ? '' : `<div class="seg" role="group" aria-label="View">${tabs.map(([k, l]) => `<button data-ev="tab" data-k="${k}" aria-pressed="${st.tab === k}">${l}</button>`).join('')}</div>`}
@@ -118,8 +119,8 @@
       if (i != null) {
         st.draft[+i] = e.target.value === '' ? null : e.target.value;
         const sc = D().scorecards.find((s) => s.vendor === st.vendor && s.period === st.period); const t = tpl(sc.tpl);
-        const w = root.querySelector(`[data-ev-w="${i}"]`); if (w) w.textContent = e.target.value === '' ? '—' : num(+e.target.value * t.criteria[+i].w / 100, 3);
-        const tot = total(t, st.draft); const box = root.querySelector('#ev-total'); if (box) box.innerHTML = totalText(tot, gradeOf(tot), sc);
+        const w = root.querySelector(`[data-ev-w="${i}"]`); if (w) w.textContent = e.target.value === '' ? '—' : num(+e.target.value * wOf(sc, t)[+i] / 100, 3);
+        const tot = total(t, st.draft, wOf(sc, t)); const box = root.querySelector('#ev-total'); if (box) box.innerHTML = totalText(tot, gradeOf(tot), sc);
       }
       if (e.target.id === 'ev-comment') st.comment = e.target.value;
       if (e.target.dataset.tc) { readTpl(root); const sum = st.tdraft.reduce((a, c) => a + (+c.w || 0), 0); const b = root.querySelector('#tc-sum'); b.className = 'alert mt ' + (sum === 100 ? 'alert-success' : 'alert-warning'); b.textContent = `Total weight ${num(sum)}%${sum === 100 ? '' : ' · must be 100% to save'}`; }
@@ -135,7 +136,7 @@
       if (submit && (st.comment || '').trim().length < 10) st.errs.comment = 'Add a comment of at least 10 characters.';
       if (Object.keys(st.errs).length) { App.render(); const er = document.querySelector('#ev-form [aria-invalid=true]'); er && er.focus(); return; }
       sc.scores = st.draft.map((x) => (x == null || x === '' ? null : +x)); sc.comment = st.comment;
-      if (submit) { const tot = Math.round(total(t, sc.scores) * 100) / 100; const v = App.vendor(sc.vendor); sc.status = 'Submitted'; sc.at = D().today; sc.by = me(); v.score = tot; v.grade = gradeOf(tot)[0]; App.render(); App.toast(`${v.id} scorecard submitted · ${num(tot, 2)} · grade ${v.grade}`); }
+      if (submit) { sc.weights = t.criteria.map((c) => c.w); const tot = Math.round(total(t, sc.scores, sc.weights) * 100) / 100; const v = App.vendor(sc.vendor); sc.status = 'Submitted'; sc.at = D().today; sc.by = me(); v.score = tot; v.grade = gradeOf(tot)[0]; App.render(); App.toast(`${v.id} scorecard submitted · ${num(tot, 2)} · grade ${v.grade}`); }
       else { sc.status = 'Draft'; App.render(); App.toast('Draft saved'); }
     };
     root.addEventListener('submit', (e) => { if (e.target.id === 'ev-form') { e.preventDefault(); commit(true); } });
@@ -153,7 +154,7 @@
         if (sum !== 100) st.terrs.push(`Total weight is ${sum}%; it must be 100%.`);
         if (st.tdraft.some((c) => !String(c.name).trim())) st.terrs.push('Every criterion needs a name.');
         if (st.tdraft.some((c) => !(+c.w > 0) || !Number.isInteger(+c.w))) st.terrs.push('Weights must be whole numbers above 0.');
-        if (!st.terrs.length) { const tp = tpl(st.tpl); if (D().scorecards.some((s) => s.tpl === tp.id && s.status !== 'Not started') && tp.criteria.length !== st.tdraft.length) st.terrs.push('Criteria cannot be added or removed while this period has scorecards in progress. Duplicate the template instead.'); }
+        if (!st.terrs.length) { const tp = tpl(st.tpl); if (D().scorecards.some((s) => s.tpl === tp.id && s.status !== 'Not started') && tp.criteria.length !== st.tdraft.length) st.terrs.push('Criteria cannot be added or removed while this period has scorecards in progress. Duplicate the template instead.'); else if (D().scorecards.some((s) => s.tpl === tp.id && s.period === 'Q3/2026' && (s.status === 'Submitted' || s.status === 'Draft')) && tp.criteria.some((c, i) => +st.tdraft[i].w !== c.w)) st.terrs.push('Weights are locked while Q3/2026 is in progress — Duplicate the template.'); }
         if (!st.terrs.length) { tpl(st.tpl).criteria = st.tdraft.map((c) => ({ ...c, w: +c.w })); App.render(); App.toast('Template saved'); } else App.render();
       }
       else if (a === 'tc-dup') { readTpl(root); const src = tpl(st.tpl); const id = src.id + '-' + (D().evalTemplates.length + 1); D().evalTemplates.push({ id, name: src.name + ' (copy)', cat: src.cat, criteria: st.tdraft.map((c) => ({ ...c })) }); st.tpl = id; App.render(); App.toast(`${src.name} duplicated`); }

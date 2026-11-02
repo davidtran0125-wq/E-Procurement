@@ -29,7 +29,8 @@
   const money = (s) => Number(String(s).replace(/[.\s₫]/g, '').replace(',', '.'));
 
   /* ---------- New contract (L-05 step 1) ---------- */
-  const blank = () => ({ ctype: 'Framework', vendor: 'V-1002', start: '01/01/2027', end: '31/12/2027', ceiling: '', vat: '8', owner: me(), mat: 'CON-24102', commit: '', price: '' });
+  const vatLabel = (v) => (+v === 8 ? '8% (reduced, until 31/12/2026)' : v + '%');
+  const blank = () => ({ ctype: 'Framework', vendor: 'V-1002', start: '01/01/2027', end: '31/12/2027', ceiling: '', vat: String((App.material('CON-24102') || { vat: 10 }).vat), owner: me(), mat: 'CON-24102', commit: '', price: '' });
   function newForm() {
     const f = st.form; const e = st.errs;
     return card('New contract', `<form id="ct-new" novalidate class="stack"><div class="alert alert-info">Number <b class="mono">${esc(nextId())}</b> is assigned on save. Signing happens in the external e-signature tool; ProcureLink stores the status and the signed file.</div>
@@ -57,6 +58,8 @@
     if (!(money(f.price) > 0)) e.price = 'Enter a unit price above 0.';
     const m = App.material(f.mat);
     if (!e.price && !e.commit && !e.ceiling && money(f.price) * Number(f.commit.replace(',', '.')) > money(f.ceiling)) e.ceiling = 'Ceiling is below committed qty × unit price.';
+    if (m && +f.vat !== m.vat) e.vat = `VAT must match ${m.id} (${m.vat}%)`;
+    else if (+f.vat === 8 && validDate(f.start) && App.dt(f.start) > App.dt('31/12/2026')) e.vat = '8% applies only until 31/12/2026';
     if (m && !m.vendors.some((v) => v[0] === f.vendor && v[1] !== 'Blocked')) e.mat = `${f.vendor} is not an approved vendor for ${m.id}. Approve the vendor – Material ID link first.`;
     st.errs = e; if (Object.keys(e).length) { App.render(); const x = document.querySelector('#ct-new [aria-invalid=true]'); x && x.focus(); return; }
     const id = nextId(); const ceiling = money(f.ceiling);
@@ -102,13 +105,13 @@
       dl < 0 ? `<div class="alert alert-danger" role="alert">Expired ${esc(c.end)} — no new releases. POs for ${c.lines.map((l) => esc(l.mat)).join(', ')} are now off-contract.</div>`
         : dl <= 60 ? `<div class="alert alert-warning" role="status">Expires ${esc(c.end)} (${dl} days). Renewal reminder sent to ${esc(c.owner)} at 60 days; another at 30 days; escalates to the Procurement Lead at 7 days.</div>` : '',
       c.minPct && c.forecast != null && c.forecast < minQty ? `<div class="alert alert-warning" role="status">Forecast ${num(c.forecast)} ${esc(u)} by ${esc(c.end)} is below the minimum ${num(minQty)} ${esc(u)} (${c.minPct}% of ${num(commit)}). Plan releases or renegotiate.</div>` : '',
-      secDays >= 0 && secDays <= 30 ? `<div class="alert alert-danger" role="alert">Performance security ${esc(sec.ref)} expires ${esc(sec.expiry)} (${secDays} days). Ask the vendor for an extension.</div>` : ''
+      secDays >= 0 && secDays <= 30 ? `<div class="alert alert-danger" role="alert">Performance security ${esc(sec.ref)} expires ${esc(sec.expiry)} (${secDays} days). ${sec.note ? esc(sec.note) + '.' : 'Ask the vendor for an extension.'}</div>` : ''
     ].join('');
     const summary = card('Summary', `<dl class="dl"><dt>Type</dt><dd>${esc(c.ctype)}</dd><dt>Vendor</dt><dd><a href="#/vendors/${esc(v.id)}">${esc(v.id)} ${esc(App.vshort(v))}</a></dd><dt>Period</dt><dd>${esc(c.start)} – ${esc(c.end)}</dd>
-      <dt>Ceiling</dt><dd>${vnd(c.ceiling)} <span class="small muted">(${ty(c.ceiling)})</span></dd><dt>VAT</dt><dd>${c.vat}%</dd><dt>Owner</dt><dd>${esc(c.owner)}</dd><dt>E-signature</dt><dd>${esc(c.esign)}</dd></dl>`);
+      <dt>Ceiling</dt><dd>${vnd(c.ceiling)} <span class="small muted">(${ty(c.ceiling)})</span></dd><dt>VAT</dt><dd>${esc(vatLabel(c.vat))}</dd><dt>Owner</dt><dd>${esc(c.owner)}</dd><dt>E-signature</dt><dd>${esc(c.esign)}</dd></dl>`);
     const consumption = card('Commitment vs released', `<p class="mt-0"><b>${num(rel)} / ${num(commit)} ${esc(u)}</b> released (${pct(rel / commit * 100, 0)})${c.minPct ? ` · minimum ${num(minQty)} ${esc(u)} = ${c.minPct}%` : ''}</p>${bar(rel / commit * 100, c.minPct && rel / commit * 100 < c.minPct)}
       <div class="stack mt">${c.lines.map((l) => `<div><div class="small">${mid(l.mat)} ${num(l.released)} / ${num(l.commit)} ${esc(uom(l))} · ${pct(l.commit ? l.released / l.commit * 100 : 0, 0)}</div>${bar(l.commit ? l.released / l.commit * 100 : 0)}</div>`).join('')}</div>
-      <p class="small muted">Released value ${relValue ? ty(relValue) : '—'} across ${c.releases.length} PO${c.releases.length === 1 ? '' : 's'} · consumption is counted per Material ID.</p>`);
+      <p class="small muted">Released value ${relValue ? ty(relValue) : '—'} across ${c.releases.length} PO${c.releases.length === 1 ? '' : 's'}${c.histNote ? ' (' + esc(c.histNote) + ')' : ''} · consumption is counted per Material ID.</p>`);
     const prices = card('Prices by Material ID', table([
       { h: 'Material ID', r: (l) => mid(l.mat), w: '120px' }, { h: 'Description', r: (l) => esc((App.material(l.mat) || {}).name || ''), w: 'minmax(160px,2fr)' },
       { h: 'Q3/2026', r: (l) => (l.q3 ? vnd(l.q3) : '—'), cls: 'num', w: '140px' }, { h: 'Q4/2026 (current)', r: (l) => (l.q4 ? vnd(l.q4) : '—'), cls: 'num', w: '150px' },
@@ -136,7 +139,7 @@
       + (st.up ? `<form id="ct-up" novalidate class="stack mt"><div class="form-grid">${field('cu', ue, 'type', 'Document type', uv.type, { options: DOC_TYPES, req: true })}${field('cu', ue, 'name', 'File name', uv.name, { req: true, ph: 'e.g. CT-2026-008_PL02.pdf', hint: 'PDF, DOCX or XLSX · same type gets the next version' })}${field('cu', ue, 'mat', 'Material ID tag', uv.mat, { options: [['', '— none —']].concat(c.lines.map((l) => [l.mat, l.mat])) })}</div>
         <div class="row-acts"><button type="button" class="btn btn-sm" data-ct="up-cancel">Cancel</button><button type="submit" class="btn btn-sm btn-p">Upload</button></div></form>` : ''),
     st.up ? '' : '<button class="btn btn-sm" data-ct="up">Upload</button>');
-    return `${head}${alerts}<div class="grid-k">${kpi('Ceiling', ty(c.ceiling), `VAT ${c.vat}% excl.`)}${kpi('Released', `${num(rel)} ${esc(u)}`, `of ${num(commit)} · ${pct(rel / commit * 100, 0)}`, c.minPct && rel / commit * 100 < c.minPct ? 'warning' : '')}${kpi('Released value', relValue ? ty(relValue) : '—', `${c.releases.length} POs`)}${kpi('Days to expiry', dl < 0 ? 'Expired' : String(dl), esc(c.end), dl < 0 ? 'danger' : dl <= 60 ? 'warning' : '')}</div>
+    return `${head}${alerts}<div class="grid-k">${kpi('Ceiling', ty(c.ceiling), `VAT ${vatLabel(c.vat)} excl.`)}${kpi('Released', `${num(rel)} ${esc(u)}`, `of ${num(commit)} · ${pct(rel / commit * 100, 0)}`, c.minPct && rel / commit * 100 < c.minPct ? 'warning' : '')}${kpi('Released value', relValue ? ty(relValue) : '—', `${c.releases.length} PO${c.releases.length === 1 ? '' : 's'}${c.histNote ? ' · ' + c.histNote : ''}`)}${kpi('Days to expiry', dl < 0 ? 'Expired' : String(dl), esc(c.end), dl < 0 ? 'danger' : dl <= 60 ? 'warning' : '')}</div>
       <div class="grid-2"><div class="stack">${consumption}${prices}${releases}${files}</div><div class="stack">${summary}${terms}</div></div>`;
   }
 
@@ -146,10 +149,10 @@
       const id = sub || p.id;
       if (id) { const c = D().contracts.find((x) => x.id === id); if (st.cur !== id) { st.cur = id; st.sec = null; st.up = null; st.secErrs = {}; st.upErrs = {}; } return c ? detail(c) : App.errorState(`Contract ${id} was not found.`, ' <a href="#/contracts">Back to contracts</a>'); }
       const C = D().contracts; const exp = C.filter((c) => { const d = App.daysTo(c.end); return d >= 0 && d <= 60; });
-      const avg = C.filter((c) => statusOf(c) !== 'Expired').reduce((a, c, _, A) => a + used(c) / A.length, 0);
-      return `<div class="page-h"><div><h1>Contracts</h1><div class="sub">Framework, fixed-price, SLA and rate-card contracts · prices and commitments per Material ID</div></div>
+      const avg = C.filter((c) => !['Expired', 'Pending signature', 'Draft'].includes(statusOf(c))).reduce((a, c, _, A) => a + used(c) / A.length, 0);
+      return `<div class="page-h"><div><h1>${esc(App.t('Contracts'))}</h1><div class="sub">Framework, fixed-price, SLA and rate-card contracts · prices and commitments per Material ID</div></div>
         <div class="acts"><button class="btn btn-p" data-ct="new">New contract</button></div></div>
-        <div class="grid-k">${kpi('Active contracts', `${D().contractStats.active} / ${D().contractStats.total}`, 'All vendors')}${kpi('Contract value', num(D().contractStats.value, 1) + ' tỷ ₫', 'Ceilings, excl. VAT')}${kpi('Expiring ≤ 60 days', String(exp.length), exp.map((c) => c.id).join(', ') || 'None', exp.length ? 'warning' : '')}${kpi('Average consumption', pct(avg, 0), 'Released ÷ committed')}</div>
+        <div class="grid-k">${kpi('Active contracts', `${D().contractStats.active} / ${D().contractStats.total}`, 'All vendors')}${kpi('Contract value', num(D().contractStats.value, 1) + ' tỷ ₫', 'Ceilings, excl. VAT')}${kpi('Expiring ≤ 60 days', String(exp.length), exp.map((c) => c.id).join(', ') || 'None', exp.length ? 'warning' : '')}${kpi('Average consumption', pct(D().contractStats.avgUse, 0), `${pct(avg, 0)} in this sample · released ÷ committed`)}</div>
         <div class="alert alert-warning" role="status"><b>Off-contract purchase</b> · ${App.docid('PO-2026-0861')} buys ${mid('CON-24102')} at ${vnd(1680000)} (+6,4% vs ${vnd(1580000)}) after <a class="mono" href="#/contracts/CT-2025-007">CT-2025-007</a> expired 30/09/2026. Renew the contract or tender the volume.</div>
         ${st.form ? newForm() : ''}${list()}`;
     },
@@ -171,7 +174,7 @@
           const x = read(root, '#ct-up'); st.up = x; const er = {};
           if (!/^[\w.\- ()]+\.(pdf|docx|xlsx)$/i.test(x.name)) er.name = 'Enter a file name ending in .pdf, .docx or .xlsx.';
           st.upErrs = er; if (Object.keys(er).length) { App.render(); document.getElementById('cu-name').focus(); return; }
-          const ver = 'v' + (c.files.filter((y) => y.type === x.type).length + 1);
+          const ver = 'v' + (Math.max(0, ...c.files.filter((y) => y.type === x.type).map((y) => +String(y.ver).slice(1) || 0)) + 1);
           c.files.push({ type: x.type, name: x.name, ver, by: me(), date: D().today, mats: x.mat ? [x.mat] : [], tag: x.type === 'Signed contract' || x.type.startsWith('Phụ lục') ? 'Signed' : 'Uploaded' });
           st.up = null; App.render(); App.toast(`${x.name} uploaded as ${x.type} ${ver}`);
         }

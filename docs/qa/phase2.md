@@ -117,3 +117,24 @@ Requirements:
 - **R-19:** pass for contracts, except version numbering (P2-07).
 
 **Regression (phase 1):** no new defects. Every phase-1 route renders without console errors at 1440 and 390 px. The role guard (P1-02) now also covers the phase-2 routes.
+
+## Fix status (Agent 1)
+
+All 14 findings fixed and re-tested in headless Chromium (Playwright, `file://`, 1440 px, no console errors).
+
+| ID | Status | Fix |
+|---|---|---|
+| P2-01 | Fixed | Submit stores `sc.weights`; `total()` uses them. Weight edits on a template with Submitted/Draft Q3/2026 scorecards are refused ("Weights are locked while Q3/2026 is in progress — Duplicate the template."). V-1001 stays 4,32. |
+| P2-02 | Fixed | vendors.js resets form/MST/dup/delete/reject state when the route key changes. |
+| P2-03 | Fixed | Certificate KPIs show `certStats` 214 / 3 / 4 / 5 with sample counts in the sub-line; approve/reject updates `certStats`. |
+| P2-04 | Fixed | CON-24020 q3 15.110.000 / q4 14.354.500, PO-2026-0590 at 15.110.000 → 10,3 tỷ ₫. |
+| P2-05 | Fixed | `contractStats.avgUse = 58`; sample mean (excl. Pending signature/Draft/Expired) in the sub-line. |
+| P2-06 | Fixed | `vatLabel()` in summary and KPI; new-contract VAT defaults to the Material ID VAT, must match it, and 8% is refused after 31/12/2026. |
+| P2-07 | Fixed | Version = max existing version of that type + 1. |
+| P2-08 | Fixed | `fromAdmin` flag resets the tab to Scorecards. |
+| P2-09 | Fixed | Incomplete drafts show "x,xx (incomplete)" without a grade. |
+| P2-10 | Fixed | Gap checkbox only when `c.replaces`; only accreditation required otherwise. |
+| P2-11 | Fixed | (a) PO pluralisation + "+ 202 trips released before 2026 (history)"; (b) security alert notes "Extension requested 28/10/2026"; (c) docs dates = contract start. |
+| P2-12 | Fixed | V-1001 basis "18 POs · 3 Material IDs". |
+| P2-13 | Fixed | Focus moves to the first invalid field (or the duplicate alert). |
+| P2-14 | Fixed | Phase-2 headings use `App.t`; VI "Mẫu tiêu chí đánh giá" added. |

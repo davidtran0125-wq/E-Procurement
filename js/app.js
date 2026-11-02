@@ -17,7 +17,7 @@
     'Purchase requests': 'Đề nghị mua hàng', 'Purchase orders': 'Đơn đặt hàng', 'Invoices & matching': 'Hóa đơn & đối chiếu', Insights: 'Phân tích', 'Price history': 'Lịch sử giá', Reports: 'Báo cáo',
     'Supplier portal': 'Cổng nhà cung cấp', 'Invitations to bid': 'Thư mời thầu', 'My quotations': 'Báo giá của tôi', Deliveries: 'Giao hàng', Invoices: 'Hóa đơn', Scorecard: 'Bảng điểm', 'Company profile': 'Hồ sơ công ty',
     'Admin console': 'Quản trị hệ thống', 'Users & roles': 'Người dùng & vai trò', 'Access policy': 'Chính sách truy cập', 'Approval matrix': 'Ma trận phê duyệt', 'Material master': 'Danh mục vật tư', Categories: 'Nhóm hàng',
-    'Evaluation templates': 'Mẫu đánh giá', 'Numbering & ID rules': 'Quy tắc đánh số', Integrations: 'Tích hợp', 'Notification rules': 'Quy tắc thông báo', 'SoD rules': 'Quy tắc SoD', 'Audit log': 'Nhật ký',
+    'Evaluation templates': 'Mẫu tiêu chí đánh giá', 'Numbering & ID rules': 'Quy tắc đánh số', Integrations: 'Tích hợp', 'Notification rules': 'Quy tắc thông báo', 'SoD rules': 'Quy tắc SoD', 'Audit log': 'Nhật ký',
     'Back to Procurement': 'Về Mua sắm', 'Switch workspace': 'Đổi không gian làm việc', 'Skip to content': 'Bỏ qua đến nội dung', Search: 'Tìm kiếm', Procurement: 'Mua sắm', Supplier: 'Nhà cung cấp', Admin: 'Quản trị',
     'Search Material ID, PR, PO, tender, vendor…  ( / )': 'Tìm mã vật tư, PR, PO, gói thầu, NCC…  ( / )', 'Open menu': 'Mở menu', 'Close menu': 'Đóng menu', Notifications: 'Thông báo', unread: 'chưa đọc', waiting: 'đang chờ',
     'Language: English. Switch to Vietnamese': 'Ngôn ngữ: Tiếng Việt. Chuyển sang tiếng Anh', 'No access': 'Không có quyền truy cập', 'Not built yet': 'Chưa xây dựng'

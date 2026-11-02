@@ -60,7 +60,7 @@
       <fieldset class="fs"><legend>Checklist</legend>
         ${auto.map(([l, ok]) => `<div class="small">${pill(ok ? 'Pass' : 'Fail', ok ? 'success' : 'danger')} ${esc(l)} <span class="muted">· auto</span></div>`).join('')}
         <label class="chk"><input type="checkbox" name="acc"${r.acc ? ' checked' : ''}> Certification body is accredited (BoA / IAF member) checked</label>
-        <label class="chk"><input type="checkbox" name="gap"${r.gap ? ' checked' : ''}> Validity gap noted (old certificate expired ${c.replaces ? esc(D().certificates.find((x) => x.id === c.replaces).expiry) : '—'})</label>
+        ${c.replaces ? `<label class="chk"><input type="checkbox" name="gap"${r.gap ? ' checked' : ''}> Validity gap noted (old certificate expired ${esc(D().certificates.find((x) => x.id === c.replaces).expiry)})</label>` : ''}
         ${e.checks ? `<span class="err" role="alert">${esc(e.checks)}</span>` : ''}</fieldset>
       <div class="form-grid">${field('rv', e, 'reason', 'Reject reason (required to reject)', r.reason, { options: [['', '— choose —']].concat(REJECT) })}${field('rv', e, 'comment', 'Comment to supplier', r.comment, { area: true })}</div>
       <div class="row-acts"><button type="button" class="btn" data-cert="rv-close">Close</button><button type="button" class="btn btn-d" data-cert="reject">Reject</button><button type="submit" class="btn btn-p">Approve & unblock</button></div>
@@ -73,10 +73,12 @@
       if (!r.no) e.no = 'Certificate number is required.'; if (!r.issuer) e.issuer = 'Certification body is required.';
       if (!validDate(r.expiry)) e.expiry = 'Use dd/mm/yyyy.'; else if (App.daysTo(r.expiry) <= 0) e.expiry = 'Expiry must be after today.';
       if (App.norm(r.holder) !== App.norm(v.name)) e.holder = `Holder must match the vendor master (${v.name}).`;
-      if (!r.acc || !r.gap) e.checks = 'Tick both manual checks before approving.';
+      if (!r.acc || (c.replaces && !r.gap)) e.checks = c.replaces ? 'Tick both manual checks before approving.' : 'Tick the accreditation check before approving.';
     } else if (!r.reason) e.reason = 'Choose a reason to reject.';
     st.rerr = e; if (Object.keys(e).length) { App.render(); const x = document.querySelector('#cert-rv [aria-invalid=true], #cert-rv .err'); x && (x.focus ? x.focus() : 0); x && x.scrollIntoView({ block: 'center' }); return; }
+    const cs = D().certStats; if (cs.pending > 0) cs.pending--;
     if (!approve) { c.status = 'Rejected'; c.rejectReason = r.reason; st.review = null; st.rv = null; App.render(); App.toast(`${c.type} rejected · ${v.contact} notified`); return; }
+    cs.valid++;
     Object.assign(c, { no: r.no, issuer: r.issuer, expiry: r.expiry, status: 'Valid', verified: `${me()} · ${D().today}` });
     const old = c.replaces && D().certificates.find((x) => x.id === c.replaces); if (old) old.status = 'Superseded';
     const unblocked = [];
@@ -123,9 +125,9 @@
       if (p.mat && st.lastM !== p.mat) { st.q = p.mat; st.lastM = p.mat; }
       if (p.id && st.lastId !== p.id) { st.lastId = p.id; const c = D().certificates.find((x) => x.id === p.id); if (c && c.status === 'Pending review') { st.review = c.id; st.rv = null; } else if (c) st.q = c.no; }
       const C = D().certificates; const n = (s) => C.filter((c) => statusOf(c) === s).length;
-      return `<div class="page-h"><div><h1>Certificates</h1><div class="sub">Vendor certificates by Material ID · mandatory ones block the vendor – Material ID pair when they expire</div></div>
+      return `<div class="page-h"><div><h1>${esc(App.t('Certificates'))}</h1><div class="sub">Vendor certificates by Material ID · mandatory ones block the vendor – Material ID pair when they expire</div></div>
         <div class="acts"><button class="btn btn-p" data-cert="up">Upload certificate</button></div></div>
-        <div class="grid-k">${kpi('Valid', num(D().certStats.valid), `${n('Valid')} in this sample`, 'success')}${kpi('Expiring ≤ 30 days', num(n('Expiring')), C.filter((c) => statusOf(c) === 'Expiring').map((c) => App.vshort(App.vendor(c.vendor))).join(', '), 'warning')}${kpi('Expired', num(n('Expired')), `${blocks().length} blocked pair${blocks().length === 1 ? '' : 's'}`, 'danger')}${kpi('Pending review', num(n('Pending review')), 'Supplier uploads')}</div>
+        <div class="grid-k">${kpi('Valid', num(D().certStats.valid), `${n('Valid')} in this sample`, 'success')}${kpi('Expiring ≤ 30 days', num(D().certStats.expiring), `${n('Expiring')} in this sample · ` + C.filter((c) => statusOf(c) === 'Expiring').map((c) => App.vshort(App.vendor(c.vendor))).join(', '), 'warning')}${kpi('Expired', num(D().certStats.expired), `${n('Expired')} in this sample · ${blocks().length} blocked pair${blocks().length === 1 ? '' : 's'}`, 'danger')}${kpi('Pending review', num(D().certStats.pending), `${n('Pending review')} in this sample · supplier uploads`)}</div>
         ${st.up ? upload() : ''}${st.review ? review() : ''}
         <div class="grid-2"><div class="stack">${register()}</div><div class="stack">${timeline()}${blockRule()}</div></div>`;
     },
