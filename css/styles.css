@@ -232,3 +232,45 @@ ul.plain > li.row-acts { padding: 6px 0; border-top: 1px solid var(--divider); }
 .tbl-900 { min-width: 900px; }
 .ap-row.sel { background: var(--primary-soft); }
 .td .chk { margin: 0; }
+
+/* ---- Phase 3 UI polish (Agent 3) ---- */
+.btn-sm { min-height: 36px; height: 36px; }
+/* Stepper: connected, numbered, current step emphasised */
+.steps { gap: 0; flex-wrap: nowrap; overflow-x: auto; max-width: 100%; min-width: 0; padding-bottom: 2px; position: relative; }
+.steps li { display: flex; align-items: center; gap: 6px; background: none; padding: 6px 10px 6px 0; border-radius: 0; color: var(--muted); white-space: nowrap; font-weight: 500; }
+.steps li + li::before { content: ""; width: 20px; height: 2px; background: var(--border); margin-right: 4px; flex: none; }
+.steps li.done + li::before { background: var(--ok); }
+.steps .st-n { width: 24px; height: 24px; border-radius: 50%; display: grid; place-items: center; font-size: 12px; font-weight: 700; background: var(--neu-bg); color: var(--ink2); flex: none; }
+.steps li.done, .steps li.cur { background: none; } .steps li.done { color: var(--ok); } .steps li.done .st-n { background: var(--ok-bg); color: var(--ok); }
+.steps li.cur { color: var(--primary); font-weight: 700; } .steps li.cur .st-n { background: var(--primary); color: #fff; }
+/* Section nav (tender detail): sticky under the top bar */
+.sec-nav { position: sticky; top: 60px; z-index: 4; display: flex; gap: 4px; overflow-x: auto; background: var(--bg); padding: 6px 0; border-bottom: 1px solid var(--border); }
+.sec-nav button { flex: none; border: 1px solid var(--border); background: var(--surface); color: var(--ink2); font: 600 12px var(--font); min-height: 36px; padding: 0 12px; border-radius: 99px; cursor: pointer; }
+.sec-nav button:hover { border-color: var(--primary); color: var(--primary); }
+.card[id^="tn-s"] { scroll-margin-top: 120px; } .card:focus { outline: none; } .card:focus-visible { outline: 2px solid var(--primary); }
+/* Comparison matrix: sticky label column, lowest cell highlighted, summary rows shaded */
+.mtx .tr > .td:first-child, .mtx .tr > .th:first-child { position: sticky; left: 0; background: var(--surface); z-index: 1; box-shadow: 1px 0 0 var(--divider); }
+.mtx .thead > .th:first-child { background: var(--thead); }
+.mtx .td.num .best { background: var(--ok-bg); border-radius: 6px; padding: 4px 6px; margin: -4px -6px; box-shadow: inset 0 0 0 1px #BFE3CB; }
+.mtx .tr:has(> .td:first-child > b) { background: var(--thead); }
+.mtx .tr:has(> .td:first-child > b) > .td:first-child { background: var(--thead); }
+.mtx .th.num { text-align: right; }
+.th.num { text-align: right; }
+/* Approvals: list / detail */
+.ap-split { display: grid; gap: 16px; grid-template-columns: minmax(0, 1fr); align-items: start; }
+@media (min-width: 1200px) { .ap-split { grid-template-columns: minmax(0, 1fr) minmax(0, 1.25fr); } .ap-split > .card:last-child { position: sticky; top: 76px; max-height: calc(100vh - 92px); overflow-y: auto; } }
+.ap-list { list-style: none; margin: 12px 0 0; padding: 0; border: 1px solid var(--border); border-radius: 8px; }
+.ap-item { display: grid; grid-template-columns: 28px minmax(0, 1fr) auto; gap: 4px 10px; padding: 12px; border-top: 1px solid var(--divider); align-items: start; }
+.ap-item:first-child { border-top: 0; } .ap-item.sel { background: var(--primary-soft); box-shadow: inset 3px 0 0 var(--primary); }
+.ap-item .chk { margin: 0; min-height: 24px; } .ap-title { font-weight: 600; overflow-wrap: anywhere; }
+.ap-top .linkish { min-height: 36px; }
+.ap-side { display: flex; flex-direction: column; align-items: flex-end; gap: 4px; text-align: right; }
+@media (max-width: 560px) { .ap-item { grid-template-columns: 28px minmax(0, 1fr); } .ap-side { grid-column: 2; align-items: flex-start; text-align: left; } }
+.decide-panel { border: 1px solid var(--border); background: var(--thead); border-radius: 8px; padding: 14px; margin-top: 16px; }
+.decide-acts .btn-p { min-width: 120px; justify-content: center; }
+/* Validation & form states */
+.field .err::before, .err.small::before { content: "! "; font-weight: 700; }
+.field textarea[aria-invalid=true], .field select[aria-invalid=true], .inp[aria-invalid=true] { border-color: var(--bad); }
+.state { border: 1px dashed var(--border); border-radius: 8px; background: var(--thead); }
+.card > .state:first-child { margin-top: 0; }
+.dl { row-gap: 8px; } @media (max-width: 480px) { .dl { grid-template-columns: minmax(0, 1fr); row-gap: 0; } .dl dd { margin-bottom: 8px; } }

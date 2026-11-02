@@ -108,7 +108,7 @@
   }
 
   /* ---------- Detail blocks ---------- */
-  const progress = (i) => `<ol class="steps" aria-label="Tender progress">${STEPS.map((s, k) => `<li class="${k < i ? 'done' : k === i ? 'cur' : ''}"${k === i ? ' aria-current="step"' : ''}>${k + 1}. ${s}</li>`).join('')}</ol>`;
+  const progress = (i) => `<ol class="steps" aria-label="Tender progress">${STEPS.map((s, k) => `<li class="${k < i ? 'done' : k === i ? 'cur' : ''}"${k === i ? ' aria-current="step"' : ''}><span class="st-n" aria-hidden="true">${k < i ? '✓' : k + 1}</span><span class="st-l">${s}</span>${k < i ? '<span class="sr"> (done)</span>' : ''}</li>`).join('')}</ol>`;
 
   function linesCard(doc, t) {
     return card(`Lines by Material ID (${t.lines.length})`, table([
@@ -253,7 +253,7 @@
       { h: 'Baseline (last PO)', r: (r) => (r.mat ? `${vnd(baseline(r))}<div class="small muted">${esc(mat(r.mat).lastPo || '1st-round avg')}</div>` : r.k === 'sub' ? vnd(t.lines.reduce((a, l) => a + baseline(l) * l.qty, 0)) : ''), cls: 'num', w: '150px' },
       ...B.map((b) => ({ h: vname(b), cls: 'num', w: 'minmax(170px,1.4fr)', r: (r) => {
         const ok = compliant(t, b); const x = rk(b);
-        if (r.mat) { const i = r.i; const lo = lowestOn(t, i); return `${vnd(b.prices[i])}<div class="small muted">${vnd(b.prices[i] * r.qty)}</div>${lo === b ? pill('Lowest', 'success') : ''}`; }
+        if (r.mat) { const i = r.i; const lo = lowestOn(t, i); return `<div class="${lo === b ? 'best' : ''}">${vnd(b.prices[i])}<div class="small muted">${vnd(b.prices[i] * r.qty)}</div>${lo === b ? pill('Lowest', 'success') : ''}</div>`; }
         if (r.k === 'sub') return `<b>${vnd(bidTotal(t, b))}</b>`;
         if (r.k === 'vat') return vnd(t.lines.reduce((a, l, i) => a + l.qty * b.prices[i] * mat(l.mat).vat / 100, 0));
         if (r.k === 'tot') return vnd(t.lines.reduce((a, l, i) => a + l.qty * b.prices[i] * (1 + mat(l.mat).vat / 100), 0));
@@ -265,7 +265,7 @@
     ];
     const rows = [...t.lines.map((l, i) => Object.assign({ i }, l)), { label: 'Subtotal excl. VAT', k: 'sub' }, { label: 'VAT', k: 'vat' }, { label: 'Total incl. VAT', k: 'tot' }, { label: `Bid security (≥ ${vnd(t.secAmount)})`, k: 'sec' }, { label: 'Weighted score', k: 'score' }, { label: 'Ranking', k: 'rank' }];
     const fail = t.bidders.filter((b) => !passed(t, b));
-    return card('Price comparison · envelope 2 · prices excl. VAT', table(cols, rows, { min: 560 + B.length * 180, label: 'Bid comparison matrix by Material ID line' })
+    return card('Price comparison · envelope 2 · prices excl. VAT', table(cols, rows, { min: 560 + B.length * 180, label: 'Bid comparison matrix by Material ID line', cls: 'mtx' })
       + `<p class="small muted">"Lowest" is per line among compliant bids. Price score = lowest total ÷ bidder total × 100; weighted = technical × ${t.weights[0]}% + price × ${t.weights[1]}%. ${fail.map((b) => esc(b.name)).join(', ')} failed the technical envelope — price envelope not opened. A bid without valid bid security is Non-compliant and not ranked.</p>`);
   }
 
@@ -334,7 +334,10 @@
     const upKey = 'tnf'; t.files = t.files || [];
     const left = [linesCard(doc, t), sealed, evalBlocks, t.auction ? auctionCard(t) : '', qaCard(t), S.files(upKey, t.files, t.lines.map((l) => l.mat), st.up, ['Specification / drawing', 'BOQ', 'Addendum', 'Bid opening minutes', 'Other'])].join('');
     const right = [settingsCard(doc, t), t.fx ? fxCard(t) : '', committeeCard(t), sealed ? '' : invitedCard(doc, t)].join('');
-    return `${head}${alerts}${progress(step)}${kpis}<div class="grid-2"><div class="stack">${left}</div><div class="stack">${right}</div></div>`;
+    let n = 0; const secs = [];
+    const leftA = left.replace(/<section class="card"><div class="card-h"><h2>([^<]*)<\/h2>/g, (m0, h) => { const id = 'tn-s' + (++n); secs.push([id, h.replace(/&amp;/g, '&').split(' · ')[0].replace(/ \(.*$/, '')]); return `<section class="card" id="${id}" tabindex="-1"><div class="card-h"><h2>${h}</h2>`; });
+    const nav = secs.length > 2 ? `<nav class="sec-nav" aria-label="Tender sections">${secs.map(([id, l]) => `<button type="button" data-sec="${id}">${esc(l)}</button>`).join('')}</nav>` : '';
+    return `${head}${alerts}${progress(step)}${kpis}${nav}<div class="grid-2"><div class="stack">${leftA}</div><div class="stack">${right}</div></div>`;
   }
 
   App.page('tenders', {
@@ -347,6 +350,7 @@
       return listPage(p);
     },
     mount(root) {
+      root.addEventListener('click', (e) => { const b = e.target.closest('[data-sec]'); if (!b) return; const x = document.getElementById(b.dataset.sec); if (x) { x.scrollIntoView({ block: 'start' }); x.focus({ preventScroll: true }); } });
       root.addEventListener('input', (e) => {
         if (e.target.dataset.tnf === 'q') { st.q = e.target.value; const pos = e.target.selectionStart; App.render(); const i = document.getElementById('tn-q'); i.focus(); i.setSelectionRange(pos, pos); }
       });

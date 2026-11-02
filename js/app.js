@@ -39,11 +39,11 @@
   function table(cols, rows, opts = {}) {
     const tpl = cols.map((c) => c.w || 'minmax(110px,1fr)').join(' ');
     const min = opts.min || Math.max(600, cols.length * 130);
-    const head = cols.map((c) => `<div class="th ${c.cls || ''}">${esc(c.h)}</div>`).join('');
+    const head = cols.map((c) => `<div class="th ${c.cls || ''}" role="columnheader">${esc(c.h)}</div>`).join('');
     const body = rows.length
       ? rows.map((r) => `<div class="tr" role="row" style="grid-template-columns:${tpl}">${cols.map((c) => `<div class="td ${c.cls || ''}" role="cell">${c.r ? c.r(r) : esc(r[c.k])}</div>`).join('')}</div>`).join('')
       : `<div class="empty">${esc(opts.empty || 'No records')}</div>`;
-    return `<div class="tbl-wrap" tabindex="0" role="region" aria-label="${esc(opts.label || 'Table')}, scrolls horizontally"><div class="tbl" role="table" style="min-width:${min}px"><div class="tr thead" role="row" style="grid-template-columns:${tpl}">${head}</div>${body}</div></div>`;
+    return `<div class="tbl-wrap${opts.cls ? ' ' + opts.cls : ''}" tabindex="0" role="region" aria-label="${esc(opts.label || 'Table')}, scrolls horizontally"><div class="tbl" role="table" style="min-width:${min}px"><div class="tr thead" role="row" style="grid-template-columns:${tpl}">${head}</div>${body}</div></div>`;
   }
 
   const kpi = (label, value, note, tone) => `<div class="card kpi"><div class="kpi-l">${esc(label)}</div><div class="kpi-v">${value}</div>${note ? `<div class="kpi-n ${tone ? 'tone-' + tone : ''}">${note}</div>` : ''}</div>`;

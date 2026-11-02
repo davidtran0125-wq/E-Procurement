@@ -40,3 +40,13 @@ Visual source of truth: `docs/04-design-brief.md` §3. Use tokens in `css/styles
 - Inline chips in text: `.chips.chips-inline`. Inputs in tables: `.inp.w-full`, `.inp.inp-num` (right-aligned numbers), `.inp.inp-score`.
 - Editable grids: define column templates as a class (e.g. `.tc-cols`) and min width (`.tbl-640`); only data-driven widths (bar fills) may stay inline.
 - Text buttons inside tables (`.tbl .linkish`) get a 36px target.
+
+## Workflow screens (Phase 3)
+- Small buttons (`.btn-sm`) are 36px high to meet the target size rule.
+- Progress: `ol.steps` renders a connected stepper — each `li` holds `.st-n` (number or check) + `.st-l`; mark `done` / `cur` (+ `aria-current="step"`) and add a `.sr` "(done)" for screen readers. Keep `.steps` `position: relative` so `.sr` text stays clipped.
+- Long detail pages (tender detail) get a sticky `nav.sec-nav` of buttons (`data-sec="<card id>"`) that scroll to and focus the card; cards get `id` + `tabindex="-1"`. Do not use `href="#…"` (the router owns the hash).
+- Comparison matrices: `App.table(..., { cls: 'mtx' })` — sticky first column, shaded summary rows (label cell in `<b>`), the lowest compliant price wrapped in `.best` plus a "Lowest" pill (never colour alone). `App.table` accepts `opts.cls` (added to `.tbl-wrap`) and headers carry `role="columnheader"`.
+- Inbox pattern: `.ap-split` (list | sticky detail at ≥1200px, stacked below) with `ul.ap-list > li.ap-item` (checkbox · main · `.ap-side` value/SLA/Review). Selected item: `.sel` + `aria-current`.
+- Decisions: wrap in `.decide-panel` with an `h3` "Your decision"; the comment always has a `.hint` explaining when it is required, the `.err` is appended to `aria-describedby`; primary action last in `.decide-acts`.
+- Validation: `.err` text is prefixed with "!" via CSS; invalid textarea/select/`.inp` get the danger border through `aria-invalid="true"`.
+- Empty states (`.state`) render as a dashed, tinted box so they read as intentional. `.dl` stacks to one column under 480px.
