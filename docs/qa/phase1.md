@@ -76,3 +76,23 @@ Requirements:
 - **R-15:** the notification panel passes. The rules are shown read-only.
 - **R-16:** single-source warning on Material 360° passes.
 - **R-25:** the Login part passes.
+
+## Fix status (Agent 1)
+
+Re-tested in headless Chromium (Playwright) from `file://` at 1440 px and 390 px on dashboard, notifications, search, materials, material360 (CON-24015, EQP-31007) and a phase-2 placeholder: no console errors or warnings, no horizontal page scroll, drawer and skip link still work.
+
+| ID | Status | What changed / re-test |
+|---|---|---|
+| P1-01 | Fixed | `App.login(role, user)` stores `pl.user`; `state.user` is restored at boot and cleared on "Switch workspace". Header and dashboard greeting use it (supplier header shows the vendor name). Re-test: quochuy.le → "Lê Quốc Huy" in header and greeting, survives reload; invitation kho.phumy → "Huỳnh Gia Bảo · Công ty TNHH Kho vận Phú Mỹ". |
+| P1-02 | Fixed | Pages declare `roles`; dashboard, notifications, search, materials and material360 are `['procurement','admin']`. Other roles are redirected to their home with a "No access" alert. The sidebar follows the role (admin sees the procurement shell on procurement pages). Global search is hidden in the supplier shell. Re-test: supplier on all five routes → `#/supplier` with notice; admin can open materials. |
+| P1-03 | Fixed | Form `change` no longer re-renders the app: only the duplicate box and the 8% hint are updated in place. A category change re-renders (new number) and restores focus to Category. Re-test: edit VN description, click HS, type → value `7214.20.10`, focus stays on HS. |
+| P1-04 | Fixed | Drafts get `DRAFT-xxxx` and do not touch `next`; only submit reserves a number. Re-test: EQP next 31521 unchanged after a draft, 31522 after submit. |
+| P1-05 | Fixed | N-788 type is `Delivery` (green pill); it no longer appears under "PO overdue". |
+| P1-06 | Fixed | OTIF note reads "pts above" when at or above target (Services: "+1,0 pts above"). |
+| P1-07 | Fixed | Delta below 0,05 renders `±0,0%` (EQP-31007). |
+| P1-08 | Fixed | `App.matches()` normalises accents, đ, case and spaces; used by global search and the materials filter. Re-test: "thep" → 17 results, "0312456789" finds the vendor, "thep cay" filters materials. |
+| P1-09 | Fixed (minimal) | EN · VI button in the header (`aria-pressed`), stored in `pl.lang`; translates sidebar groups and items, workspace label, search label/placeholder, skip link, menu/bell labels and `<html lang>`. Page content stays English for phase 1 (`<main lang="en">`). Re-test: toggles, persists on reload. |
+| P1-10 | Fixed | Tabs are built from the document types present (PRs, Tenders, POs, Deliveries, Contracts, Invoices, NCRs) plus Attachments; "All documents (n)" counts documents only and matches its rows (11/11 for CON-24015). |
+| P1-11 | Fixed | Added 9 historical PO records (Closed/Delivered, value = qty × last price) for every `lastPo` missing from `docs`. EQP-31007 shows "POs 0 open · 1 total"; PO-2026-0702 is found by search. |
+| P1-12 | Fixed | Separate `stDash` / `stNotif` filter state. Re-test: "Unread" on dashboard does not carry to `#/notifications`. |
+| P1-13 | Fixed | Category change clears the group and hints the category's groups; certificate check points use the stored text ("At GRN", "Valid on PO date", "At tender and PO date") on the form and on Material 360°, without lowercasing. |

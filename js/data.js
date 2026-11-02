@@ -147,7 +147,16 @@ window.DATA = {
     { id: 'INV-2026-0323', type: 'INV', title: 'Vật tư phụ – Trường Sơn', date: '31/10/2026', status: '1 line: No Material ID', mats: ['EQP-31501'], vendor: 'V-1004', value: 14200000 },
     { id: 'NCR-2026-009', type: 'NCR', title: 'Thép D16 · sai lệch khối lượng lô 3', date: '18/08/2026', status: 'Closed · accepted with discount', mats: ['CON-24015'], vendor: 'V-1001' },
     { id: 'NCR-2026-014', type: 'NCR', title: 'Xi măng PCB40 · 5 bao rách', date: '24/10/2026', status: 'Open', mats: ['CON-24102'], vendor: 'V-1002' },
-    { id: 'NCR-2026-017', type: 'NCR', title: 'Thép D20 · thiếu CQ lô 2', date: '31/10/2026', status: 'Awaiting supplier', mats: ['CON-24020'], vendor: 'V-1001' }
+    { id: 'NCR-2026-017', type: 'NCR', title: 'Thép D20 · thiếu CQ lô 2', date: '31/10/2026', status: 'Awaiting supplier', mats: ['CON-24020'], vendor: 'V-1001' },
+    { id: 'PO-2026-0702', type: 'PO', title: 'Máy phát điện 500kVA – Nhà máy Bình Dương', date: '18/05/2026', status: 'Closed', mats: ['EQP-31007'], vendor: 'V-1003', qty: '1 bộ', price: 1610000000, value: 1610000000 },
+    { id: 'PO-2026-0760', type: 'PO', title: 'Quạt hút công nghiệp – Kho B', date: '08/08/2026', status: 'Closed', mats: ['EQP-31501'], vendor: 'V-1004', qty: '12 cái', price: 6800000, value: 81600000 },
+    { id: 'PO-2026-0772', type: 'PO', title: 'Biến tần 55kW – Dây chuyền 2', date: '20/08/2026', status: 'Closed', mats: ['EQP-31455'], vendor: 'V-1004', qty: '2 cái', price: 74500000, value: 149000000 },
+    { id: 'PO-2026-0781', type: 'PO', title: 'Tủ điện phân phối MSB – Kho A', date: '28/08/2026', status: 'Closed', mats: ['EQP-31402'], vendor: 'V-1004', qty: '1 bộ', price: 196000000, value: 196000000 },
+    { id: 'PO-2026-0790', type: 'PO', title: 'Máy nén khí trục vít 37kW', date: '11/09/2026', status: 'Closed', mats: ['EQP-31310'], vendor: 'V-1003', qty: '1 cái', price: 265000000, value: 265000000 },
+    { id: 'PO-2026-0831', type: 'PO', title: 'Dịch vụ vệ sinh công nghiệp T10', date: '01/10/2026', status: 'Delivered', mats: ['SRV-52118'], vendor: 'V-1005', qty: '1 tháng', price: 62000000, value: 62000000 },
+    { id: 'PO-2026-0844', type: 'PO', title: 'Bê tông M250 – Kho A', date: '03/10/2026', status: 'Closed', mats: ['CON-24325'], vendor: 'V-1009', qty: '300 m³', price: 1150000, value: 345000000 },
+    { id: 'PO-2026-0855', type: 'PO', title: 'Bơm ly tâm 75kW – Trạm bơm', date: '13/10/2026', status: 'Delivered', mats: ['EQP-31244'], vendor: 'V-1003', qty: '2 cái', price: 182000000, value: 364000000 },
+    { id: 'PO-2026-0870', type: 'PO', title: 'Bảo trì hệ thống HVAC T11', date: '27/10/2026', status: 'Delivered', mats: ['SRV-52003'], vendor: 'V-1005', qty: '1 tháng', price: 48000000, value: 48000000 }
   ],
 
   /* Attachments linked by Material ID (R-19) */
@@ -187,7 +196,7 @@ window.DATA = {
     { id: 'N-805', type: 'Evaluation', text: 'TND-2026-029 technical evaluation due 04/11/2026 — your scores are missing', doc: 'TND-2026-029', mats: ['CON-24330'], at: '31/10/2026 17:30', read: false, action: 'Evaluate', href: '#/tenders' },
     { id: 'N-806', type: 'Price alert', text: 'LOG-61012 last price 18.500.000 ₫ is +8,9% vs 90-day average', doc: 'PO-2026-0874', mats: ['LOG-61012'], at: '31/10/2026 11:05', read: false, action: 'Open', href: '#/material360?id=LOG-61012' },
     { id: 'N-790', type: 'Certificate', text: 'ISO 9001 of CTCP Kim khí Bắc Sơn expired 15/10/2026 — vendor blocked for CON-24015', doc: 'V-1008', mats: ['CON-24015'], at: '30/10/2026 08:00', read: true, action: 'Open', href: '#/material360?id=CON-24015' },
-    { id: 'N-788', type: 'PO overdue', text: 'GRN-2026-1532 received 50 tấn CON-24015 on time & in full', doc: 'GRN-2026-1532', mats: ['CON-24015'], at: '28/10/2026 15:20', read: true, action: 'Open', href: '#/material360?id=CON-24015' },
+    { id: 'N-788', type: 'Delivery', text: 'GRN-2026-1532 received 50 tấn CON-24015 on time & in full', doc: 'GRN-2026-1532', mats: ['CON-24015'], at: '28/10/2026 15:20', read: true, action: 'Open', href: '#/material360?id=CON-24015' },
     { id: 'N-785', type: 'Price alert', text: 'CON-24102 last price 1.680.000 ₫ is +6,4% vs 90-day average', doc: 'PO-2026-0861', mats: ['CON-24102'], at: '16/10/2026 10:10', read: true, action: 'Open', href: '#/material360?id=CON-24102' }
   ],
 

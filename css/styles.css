@@ -199,3 +199,8 @@ svg.chart { width: 100%; height: auto; }
 .role-c:hover { border-color: var(--primary); }
 .role-c:focus-within { outline: 2px solid var(--primary); outline-offset: 2px; }
 @media (max-width: 900px) { .login-pts { display: none; } .login-l { gap: 8px; } }
+/* EN/VI language switch (P1-09) */
+.lang { white-space: nowrap; }
+.lang span { color: var(--muted); }
+.lang span.on { color: var(--ink); font-weight: 700; }
+@media (max-width: 480px) { .top-r { gap: 8px; } .lang { padding: 0 8px; } }

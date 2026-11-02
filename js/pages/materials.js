@@ -12,6 +12,8 @@
   const eligibleVendors = (m) => m.vendors.filter((v) => v[1] !== 'Blocked');
   App.vatLabel = vatLabel;
 
+  const certAt = (c) => (c.startsWith('CO') || c === 'Test report' ? 'At GRN' : c.startsWith('Hợp') ? 'Valid on PO date' : 'At tender and PO date');
+  const groupsOf = (cat) => [...new Set(D().materials.filter((m) => m.cat === cat).map((m) => m.group))];
   const blank = () => ({ cat: 'CON', group: 'Thép xây dựng', name: 'Thép cây D16 CB500-V', en: 'Rebar D16 CB500-V', uom: 'tấn', alt: '1 tấn = 54 cây', diameter: '16', grade: 'CB500-V', hs: '7214.20', lead: '7', moq: '5 tấn',
     certs: ['CO/CQ per lot', 'Hợp quy QCVN 7:2019/BKHCN'], vat: '10', vat8: 'No', attType: 'Spec sheet', attName: 'TCVN1651-2_CB500V.pdf' });
 
@@ -58,8 +60,15 @@
     const err = st.errs[name];
     const input = opts.options
       ? `<select id="nm-${name}" name="${name}">${opts.options.map((o) => { const [v, l] = Array.isArray(o) ? o : [o, o]; return `<option value="${esc(v)}"${String(f[name]) === String(v) ? ' selected' : ''}>${esc(l)}</option>`; }).join('')}</select>`
-      : `<input id="nm-${name}" name="${name}" value="${esc(f[name])}"${opts.mono ? ' class="mono"' : ''}${err ? ' aria-invalid="true"' : ''}>`;
-    return `<div class="field"><label for="nm-${name}">${esc(label)}${opts.req ? ' *' : ''}</label>${input}${opts.hint ? `<span class="hint">${esc(opts.hint)}</span>` : ''}${err ? `<span class="err" role="alert">${esc(err)}</span>` : ''}</div>`;
+      : `<input id="nm-${name}" name="${name}" value="${esc(f[name])}"${opts.placeholder ? ` placeholder="${esc(opts.placeholder)}"` : ''}${opts.mono ? ' class="mono"' : ''}${err ? ' aria-invalid="true"' : ''}>`;
+    return `<div class="field"><label for="nm-${name}">${esc(label)}${opts.req ? ' *' : ''}</label>${input}${opts.hint ? `<span class="hint" id="nm-${name}-hint">${esc(opts.hint)}</span>` : ''}${err ? `<span class="err" role="alert">${esc(err)}</span>` : ''}</div>`;
+  }
+
+  const vat8Hint = (metal) => (metal ? 'Metal products are excluded (NQ 204/2025) → 10%' : 'NQ 204/2025 · valid until 31/12/2026');
+  function dupBox(f) {
+    const dups = dupCheck(f);
+    return `<div id="nm-dup-box">${dups.length ? `<div class="alert alert-warning" role="status"><b>Possible duplicate · same group, diameter and UoM</b><ul class="plain">${dups.map((d) => `<li>${mid(d.m.id)} ${esc(d.m.name)} · <b>${d.score}% match</b></li>`).join('')}</ul>
+          <div class="field"><label for="nm-dup">Why is this not a duplicate? *</label><input id="nm-dup" name="dupReason" value="${esc(st.dupReason)}" placeholder="e.g. Grade differs: CB500-V vs CB400-V">${st.errs.dup ? `<span class="err" role="alert">${esc(st.errs.dup)}</span>` : ''}</div></div>` : '<div class="alert alert-success">No duplicates found in this group.</div>'}</div>`;
   }
 
   function requestForm() {
@@ -67,10 +76,10 @@
     const certOpts = ['CO/CQ per lot', 'Hợp quy QCVN 7:2019/BKHCN', 'ISO 9001', 'Test report'];
     return card('New Material ID request', `
       <form id="nm-form" novalidate class="stack">
-        <div class="alert alert-info">Material ID <b class="mono">${esc(nextId(f.cat))}</b> will be reserved on submit and assigned on approval. Numbers are never reused.</div>
+        <div class="alert alert-info">Material ID <b class="mono">${esc(nextId(f.cat))}</b> will be reserved on submit and assigned on approval. Drafts do not take a number. Numbers are never reused.</div>
         <div class="form-grid">
           ${field('cat', 'Category', f, { options: Object.entries(CAT).map(([k, l]) => [k, `${k} · ${l}`]), req: true })}
-          ${field('group', 'Material group', f, { req: true, hint: 'e.g. Thép xây dựng, Xi măng, Bơm' })}
+          ${field('group', 'Material group', f, { req: true, hint: 'e.g. ' + (groupsOf(f.cat).slice(0, 3).join(', ') || 'Thép xây dựng'), placeholder: groupsOf(f.cat)[0] || '' })}
           ${field('name', 'Description (VN)', f, { req: true })}
           ${field('en', 'Description (EN)', f, { req: true })}
           ${field('uom', 'Base UoM', f, { req: true })}
@@ -81,23 +90,22 @@
           ${field('lead', 'Lead time (days)', f)}
           ${field('moq', 'MOQ', f)}
         </div>
-        <fieldset class="fs"><legend>Required certificates (checked at)</legend>${certOpts.map((c) => `<label class="chk"><input type="checkbox" name="certs" value="${esc(c)}"${f.certs.includes(c) ? ' checked' : ''}> ${esc(c)} <span class="muted small">· ${c.startsWith('CO') || c === 'Test report' ? 'GRN' : c.startsWith('Hợp') ? 'PO date' : 'tender & PO date'}</span></label>`).join('')}</fieldset>
+        <fieldset class="fs"><legend>Required certificates · where each is checked</legend>${certOpts.map((c) => `<label class="chk"><input type="checkbox" name="certs" value="${esc(c)}"${f.certs.includes(c) ? ' checked' : ''}> ${esc(c)} <span class="muted small">· ${esc(certAt(c))}</span></label>`).join('')}</fieldset>
         <div class="form-grid">
           ${field('vat', 'Default VAT rate', f, { options: [['0', '0%'], ['5', '5%'], ['8', '8% (reduced, until 31/12/2026)'], ['10', '10%'], ['KCT', 'KCT (not subject)']], req: true })}
-          ${field('vat8', 'Eligible for 8% reduction', f, { options: ['No', 'Yes'], hint: metal ? 'Metal products are excluded (NQ 204/2025) → 10%' : 'NQ 204/2025 · valid until 31/12/2026' })}
+          ${field('vat8', 'Eligible for 8% reduction', f, { options: ['No', 'Yes'], hint: vat8Hint(metal) })}
           <div class="field"><span class="lbl">Confirmed by Finance</span><span>${pill('Pending · Đỗ Hoàng Nam', 'warning')}</span><span class="hint">Admin assigns the code only after Finance confirms VAT.</span></div>
         </div>
         <div class="form-grid">${field('attType', 'Attachment type', f, { options: ['Spec sheet', 'Datasheet', 'Certificate', 'Drawing'] })}${field('attName', 'File (v1)', f)}</div>
-        ${dups.length ? `<div class="alert alert-warning" role="status"><b>Possible duplicate · same group, diameter and UoM</b><ul class="plain">${dups.map((d) => `<li>${mid(d.m.id)} ${esc(d.m.name)} · <b>${d.score}% match</b></li>`).join('')}</ul>
-          <div class="field"><label for="nm-dup">Why is this not a duplicate? *</label><input id="nm-dup" name="dupReason" value="${esc(st.dupReason)}" placeholder="e.g. Grade differs: CB500-V vs CB400-V">${st.errs.dup ? `<span class="err" role="alert">${esc(st.errs.dup)}</span>` : ''}</div></div>` : '<div class="alert alert-success">No duplicates found in this group.</div>'}
+        ${dupBox(f)}
         <div class="row-acts"><button type="button" class="btn" data-mm="cancel">Cancel</button><button type="button" class="btn" data-mm="check">Run duplicate check</button><button type="button" class="btn" data-mm="draft">Save draft</button><button type="submit" class="btn btn-p">Submit for approval</button></div>
         <p class="muted small">Route: Requester → Material master owner (duplicate, spec, VAT, certificates) → Admin assigns code. SoD: the requester cannot approve their own request.</p>
       </form>`);
   }
 
   function list() {
-    const q = st.q.toLowerCase();
-    const rows = D().materials.filter((m) => (!q || [m.id, m.name, m.en, m.hs, m.group].some((x) => String(x).toLowerCase().includes(q)))
+    const q = st.q.trim();
+    const rows = D().materials.filter((m) => (!q || [m.id, m.name, m.en, m.hs, m.group].some((x) => App.matches(x, q)))
       && (st.cat === 'all' || m.cat === st.cat) && (st.group === 'all' || m.group === st.group) && (st.status === 'all' || m.status === st.status)
       && (st.vat === 'all' || String(m.vat) === st.vat) && (!st.single || (m.status === 'Active' && eligibleVendors(m).length === 1)));
     const groups = [...new Set(D().materials.map((m) => m.group))].sort();
@@ -135,7 +143,7 @@
   }
 
   App.page('materials', {
-    title: 'Material IDs',
+    title: 'Material IDs', roles: ['procurement', 'admin'],
     render() {
       const S = D().materialStats;
       const pend = D().materials.filter((m) => m.status === 'Pending approval').length;
@@ -156,8 +164,16 @@
         const form = e.target.closest('#nm-form');
         if (form && ['cat', 'group', 'uom', 'vat', 'vat8', 'diameter', 'name'].includes(e.target.name)) {
           st.f = readForm(root);
-          if (e.target.name === 'vat8' && st.f.vat8 === 'Yes' && !METAL.test(st.f.group + st.f.name)) st.f.vat = '8';
-          App.render();
+          if (e.target.name === 'vat8' && st.f.vat8 === 'Yes' && !METAL.test(st.f.group + st.f.name)) { st.f.vat = '8'; root.querySelector('#nm-vat').value = '8'; }
+          if (e.target.name === 'cat') {
+            // New category: new number and group list; clear the old group (P1-13). Full re-render, then restore focus.
+            st.f.group = '';
+            App.render(); const c = document.getElementById('nm-cat'); c && c.focus();
+            return;
+          }
+          // Update only the parts that depend on the changed field, so focus and the user's next click are kept (P1-03).
+          const box = root.querySelector('#nm-dup-box'); if (box) box.outerHTML = dupBox(st.f);
+          const h = root.querySelector('#nm-vat8-hint'); if (h) h.textContent = vat8Hint(METAL.test(st.f.group + ' ' + st.f.name));
         }
       });
       root.addEventListener('click', (e) => {
@@ -177,16 +193,21 @@
     }
   });
 
+  const me = () => (App.state.user && App.state.user.name) || 'Nguyễn Minh Anh';
   function save(status) {
-    const f = st.f; const c = D().categories.find((x) => x.code === f.cat); const id = `${f.cat}-${c.next}`; c.next += 1;
+    // Drafts never use a number (F-11, P1-04); the number is reserved only on submit.
+    const f = st.f; const c = D().categories.find((x) => x.code === f.cat);
+    let id;
+    if (status === 'Draft') id = 'DRAFT-' + Date.now().toString(36).toUpperCase();
+    else { id = `${f.cat}-${c.next}`; c.next += 1; }
     D().materials.unshift({ id, cat: f.cat, group: f.group, name: f.name, en: f.en, uom: f.uom, alt: f.alt ? [[f.alt.split('=')[1] ? f.alt.split('=')[1].trim().replace(/^[\d.,]+\s*/, '') : f.alt, f.alt]] : [], status, step: status === 'Draft' ? null : 'Step 1 of 3',
       hs: f.hs, lead: +f.lead || 0, moq: f.moq, spec: [['Diameter', f.diameter ? f.diameter + ' mm' : '—'], ['Grade', f.grade || '—']].filter((s) => s[1] !== '—'),
       vat: f.vat === 'KCT' ? 'KCT' : +f.vat, vat8: f.vat8 === 'Yes', vatConfirmed: null, last: null, lastPo: null, avg90: null, avg12: null, vendors: [], contracts: [],
-      certs: f.certs.map((x) => [x, x.startsWith('CO') || x === 'Test report' ? 'At GRN' : x.startsWith('Hợp') ? 'Valid on PO date' : 'At tender and PO date']),
-      otif: [0, 0], spendYtd: 0, owner: 'Nguyễn Minh Anh', created: D().today, dupNote: st.dupReason });
-    D().materialLog.unshift({ at: D().today + ' 10:30', mat: id, who: 'Nguyễn Minh Anh', what: status === 'Draft' ? 'Saved as draft' : 'Submitted for approval · number reserved · routed to Material master owner' });
+      certs: f.certs.map((x) => [x, certAt(x)]),
+      otif: [0, 0], spendYtd: 0, owner: me(), created: D().today, dupNote: st.dupReason });
+    D().materialLog.unshift({ at: D().today + ' 10:30', mat: id, who: me(), what: status === 'Draft' ? 'Saved as draft' : 'Submitted for approval · number reserved · routed to Material master owner' });
     D().attachments.push({ id: 'ATT-' + id, mat: id, type: f.attType, name: f.attName, ver: 'v1', date: D().today });
     st.form = false; st.f = null; st.errs = {}; st.dupReason = '';
-    App.render(); App.toast(status === 'Draft' ? `${id} saved as draft` : `${id} submitted · Step 1 of 3`);
+    App.render(); App.toast(status === 'Draft' ? `Draft saved · no number yet (${id})` : `${id} submitted · Step 1 of 3`);
   }
 })();

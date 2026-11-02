@@ -17,6 +17,7 @@
     return MONTHS.map((_, i) => (i === 11 ? m.last : Math.round(m.avg12 * (1 + Math.sin(i * 1.3 + m.id.length) * 0.012 + ((m.avg90 - m.avg12) / m.avg12) * (i / 11)))));
   }
 
+  const DOCTYPE = { PR: 'PRs', TND: 'Tenders', PO: 'POs', GRN: 'Deliveries', CT: 'Contracts', INV: 'Invoices', NCR: 'NCRs' };
   function render(p) {
     const id = p.id || 'CON-24015';
     const m = App.material(id);
@@ -42,7 +43,7 @@
 
     const kpis = `<div class="grid-k">
       ${kpi('Last price (excl. VAT)', m.last ? vnd(m.last) : '—', m.last ? `${docLink(m.lastPo)} · ${esc((App.vendor(m.lastVendor) || {}).name || '')}` : 'No purchase yet')}
-      ${kpi('90-day average', m.avg90 ? vnd(m.avg90) : '—', d90 != null ? `Last price ${d90 > 0 ? '+' : '−'}${pct(Math.abs(d90))}${Math.abs(d90) > D().priceAlertThreshold ? ' · price alert' : ''}` : '', d90 != null && Math.abs(d90) > D().priceAlertThreshold ? (d90 > 0 ? 'danger' : 'success') : '')}
+      ${kpi('90-day average', m.avg90 ? vnd(m.avg90) : '—', d90 != null ? `Last price ${Math.abs(d90) < 0.05 ? '±' : d90 > 0 ? '+' : '−'}${pct(Math.abs(d90))}${Math.abs(d90) > D().priceAlertThreshold ? ' · price alert' : ''}` : '', d90 != null && Math.abs(d90) > D().priceAlertThreshold ? (d90 > 0 ? 'danger' : 'success') : '')}
       ${kpi('12-month average', m.avg12 ? vnd(m.avg12) : '—', 'Weighted by quantity')}
       ${kpi('OTIF', otifPct != null ? pct(otifPct) : '—', m.otif[1] ? `${m.otif[0]} of ${m.otif[1]} deliveries` : 'No deliveries', otifPct != null ? (otifPct >= 95 ? 'success' : 'warning') : '')}
       ${kpi('Spend YTD', m.spendYtd ? num(m.spendYtd, 2) + ' tỷ ₫' : '—', saving ? `Saving ${vnd(saving)}` : 'excl. VAT')}
@@ -84,9 +85,9 @@
     const ctCard = card('Contracts', docTable(cts, 'No contract'), '<a class="btn btn-sm" href="#/contracts">Contracts</a>');
     const ncrCard = card('Quality · NCRs', docTable(ncrs, 'No NCR for this Material ID'));
     const docsCard = card('Linked documents', App.tabs('m360d', [
-      ['all', `All (${docs.length + atts.length})`, docTable(docs, 'No documents')],
+      ['all', `All documents (${docs.length})`, docTable(docs, 'No documents')],
+      ...['PR', 'TND', 'PO', 'GRN', 'CT', 'INV', 'NCR'].filter((k) => of(k).length).map((k) => [k.toLowerCase(), `${DOCTYPE[k]} (${of(k).length})`, docTable(of(k), 'None')]),
       ['att', `Attachments (${atts.length})`, table([{ h: 'Type', k: 'type' }, { h: 'File', r: (a) => `<span class="mono small">${esc(a.name)}</span>`, w: 'minmax(220px,2fr)' }, { h: 'Version', k: 'ver', w: '90px' }, { h: 'Uploaded', k: 'date', w: '110px' }], atts, { min: 560, empty: 'No attachments' })],
-      ['inv', `Invoices (${invs.length})`, docTable(invs, 'No invoices')]
     ]));
 
     const master = card('Master data', `<dl class="dl">
@@ -98,14 +99,14 @@
         <dt>Confirmed by Finance</dt><dd>${m.vatConfirmed ? pill('Confirmed', 'success') + ' <span class="small muted">' + esc(m.vatConfirmed) + '</span>' : pill('Pending', 'warning')}</dd>
         <dt>Owner</dt><dd>${esc(m.owner)}</dd><dt>Created</dt><dd>${esc(m.created)}</dd></dl>`, '<button class="btn btn-sm" data-act="toast" data-msg="Edit opens a change request routed to the Material master owner">Edit</button>');
     const uom = card('Alternative UoM', m.alt.length ? table([{ h: 'Alt UoM', r: (a) => esc(a[0]) }, { h: 'Conversion', r: (a) => esc(a[1]) }], m.alt, { min: 280 }) : `<div class="empty">Base UoM only (${esc(m.uom)})</div>`);
-    const certs = card('Required certificates', m.certs.length ? `<ul class="plain">${m.certs.map(([c, w]) => `<li><b>${esc(c)}</b> <span class="small muted">· checked ${esc(w.toLowerCase())}</span></li>`).join('')}</ul>` : '<div class="empty">None required</div>', '<a class="btn btn-sm" href="#/certificates">Certificate register</a>');
+    const certs = card('Required certificates', m.certs.length ? `<ul class="plain">${m.certs.map(([c, w]) => `<li><b>${esc(c)}</b> <span class="small muted">· checked: ${esc(w)}</span></li>`).join('')}</ul>` : '<div class="empty">None required</div>', '<a class="btn btn-sm" href="#/certificates">Certificate register</a>');
 
     return `${header}${kpis}${linked}
       <div class="grid-2"><div class="stack">${chain}${chart}${vendorsCard}${openCard}${ctCard}${ncrCard}${docsCard}</div><div class="stack">${master}${uom}${certs}</div></div>`;
   }
 
   App.page('material360', {
-    title: 'Material 360°', render,
+    title: 'Material 360°', roles: ['procurement', 'admin'], render,
     mount(root) { const s = root.querySelector('#m360-id'); if (s) s.onchange = () => { location.hash = '#/material360?id=' + s.value; }; }
   });
 })();

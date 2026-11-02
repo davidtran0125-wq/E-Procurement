@@ -5,11 +5,13 @@
   const D = () => window.DATA;
   const CAT = { CON: 'Construction', EQP: 'Equipment', SRV: 'Services', LOG: 'Logistics' };
   const PERIODS = { ytd: ['Year to date (01–10/2026)', 0, 10], q3: ['Q3 2026', 6, 9], oct: ['October 2026', 9, 10] };
-  const st = { period: 'ytd', cat: 'all', type: 'all', show: 'all' };
+  const st = { period: 'ytd', cat: 'all' };
+  // Separate filter state for Dashboard "Action required" and the notification centre (P1-12)
+  const stDash = { type: 'all', show: 'all' }, stNotif = { type: 'all', show: 'all' };
   const parseD = (s) => { const [d, m, y] = s.split(' ')[0].split('/').map(Number); return new Date(y, m - 1, d); };
   const TODAY = new Date(2026, 10, 2);
   const daysTo = (s) => Math.round((parseD(s) - TODAY) / 864e5);
-  const typeTone = { 'PR approval': 'info', 'PO overdue': 'danger', 'Invoice exception': 'warning', Evaluation: 'info', Tender: 'neutral', 'Price alert': 'warning', Certificate: 'danger' };
+  const typeTone = { 'PR approval': 'info', 'PO overdue': 'danger', 'Invoice exception': 'warning', Evaluation: 'info', Tender: 'neutral', 'Price alert': 'warning', Certificate: 'danger', Delivery: 'success' };
 
   /* ---- price alerts: |last − avg90| / avg90 > threshold ---- */
   function priceAlerts(cat) {
@@ -26,15 +28,15 @@
         <div>${esc(n.text)}</div>${n.mats && n.mats.length ? `<div class="chips">${n.mats.map(mid).join(' ')}</div>` : ''}</div>
       <div class="nacts"><a class="btn btn-sm${n.read ? '' : ' btn-p'}" href="${esc(n.href)}" data-nopen="${n.id}">${esc(n.action)}</a>${opts.toggle ? `<button class="btn btn-sm" data-ntoggle="${n.id}">Mark ${n.read ? 'unread' : 'read'}</button>` : ''}</div></li>`).join('')}</ul>`;
   }
-  function filterNotifs() {
+  function filterNotifs(st) {
     return D().notifications.filter((n) => (st.type === 'all' || n.type === st.type) && (st.show === 'all' || (st.show === 'unread' ? !n.read : n.read)));
   }
-  function notifFilters() {
+  function notifFilters(st) {
     const types = [...new Set(D().notifications.map((n) => n.type))];
     return `<div class="filters"><label class="sr" for="nf-type">Type</label><select class="inp" id="nf-type" data-nf="type"><option value="all">All types</option>${types.map((t) => `<option${st.type === t ? ' selected' : ''}>${esc(t)}</option>`).join('')}</select>
       <div class="seg" role="group" aria-label="Read state">${['all', 'unread', 'read'].map((k) => `<button data-nshow="${k}" aria-pressed="${st.show === k}">${k[0].toUpperCase() + k.slice(1)}</button>`).join('')}</div></div>`;
   }
-  function wireNotifs(root) {
+  function wireNotifs(root, st) {
     root.addEventListener('change', (e) => { if (e.target.dataset.nf) { st.type = e.target.value; App.render(); } });
     root.addEventListener('click', (e) => {
       const t = e.target.closest('[data-ntoggle],[data-nshow],[data-nopen],[data-nall]'); if (!t) return;
@@ -64,7 +66,7 @@
     const kpis = `<div class="grid-k">
       ${kpi('Spend ' + (st.period === 'ytd' ? 'YTD' : st.period === 'q3' ? 'Q3' : 'Oct'), num(spend, 1) + ' tỷ ₫', yoy + ' · excl. VAT')}
       ${kpi('Saving ' + (st.period === 'ytd' ? 'YTD' : st.period === 'q3' ? 'Q3' : 'Oct'), num(saving, 1) + ' tỷ ₫', `${pct(savingPct)} of sourced spend · target ${K.savingTarget}%`, savingPct >= K.savingTarget ? 'success' : 'warning')}
-      ${kpi('OTIF 90 days', pct(otif90), `Target ${K.otifTarget}% · ${num(K.otifTarget - otif90, 1)} pts below`, otif90 >= K.otifTarget ? 'success' : 'warning')}
+      ${kpi('OTIF 90 days', pct(otif90), `Target ${K.otifTarget}% · ${otif90 >= K.otifTarget ? num(otif90 - K.otifTarget, 1) + ' pts above' : num(K.otifTarget - otif90, 1) + ' pts below'}`, otif90 >= K.otifTarget ? 'success' : 'warning')}
       ${kpi('Open PRs', num(openPr), `<a href="#/approvals">${prAw} awaiting approval</a>`)}
       ${kpi('Active tenders', num(tenders.length), `${tenders.filter((t) => t.close && daysTo(t.close) >= 0 && daysTo(t.close) <= 6).length} closing this week`)}
     </div>`;
@@ -76,8 +78,8 @@
     const rows = Object.keys(K.byCat).map((c) => ({ label: CAT[c], value: spendOf(c), note: `${K.byCat[c].vendors} active vendors · ${pct((spendOf(c) / sum(Object.keys(K.byCat).map(spendOf))) * 100)}`, dim: st.cat !== 'all' && st.cat !== c })).sort((x, y) => y.value - x.value);
     const spendCard = card('Spend by category', App.chart.bars(rows, (v) => num(v, 1) + ' tỷ ₫') + `<p class="muted small">${esc(plabel)} · PO value excl. VAT</p>`);
 
-    const acts = D().notifications.filter((n) => n.type !== 'Price alert' && n.type !== 'Certificate' && (st.type === 'all' || n.type === st.type) && (st.show === 'all' || (st.show === 'unread' ? !n.read : n.read)));
-    const actionCard = card(`Action required`, notifFilters() + notifList(acts, { toggle: true }), `<span class="pill pill-danger">${unread} unread</span><button class="btn btn-sm" data-nall>Mark all read</button>`);
+    const acts = D().notifications.filter((n) => n.type !== 'Price alert' && n.type !== 'Certificate' && (stDash.type === 'all' || n.type === stDash.type) && (stDash.show === 'all' || (stDash.show === 'unread' ? !n.read : n.read)));
+    const actionCard = card(`Action required`, notifFilters(stDash) + notifList(acts, { toggle: true }), `<span class="pill pill-danger">${unread} unread</span><button class="btn btn-sm" data-nall>Mark all read</button>`);
 
     const tCard = card('Tenders closing soon', table([
       { h: 'Tender', r: (t) => `<a class="mono" href="#/tenders">${esc(t.id)}</a><div class="small">${esc(t.title)}</div>`, w: 'minmax(200px,2fr)' },
@@ -96,7 +98,7 @@
       { h: 'Last vendor · source', r: (x) => `${esc((App.vendor(x.m.lastVendor) || {}).name || '')}<div class="mono small">${esc(x.m.lastPo)}</div>`, w: 'minmax(180px,1.6fr)' }
     ], al, { min: 760, empty: 'No price alerts in this category' }) + '<p class="muted small">Prices excl. VAT.</p>', '<a class="btn btn-sm" href="#/price">Open price history</a>');
 
-    return `<div class="page-h"><div><h1>Dashboard</h1><div class="sub">Monday, 02/11/2026 · Good morning, Nguyễn Minh Anh</div></div>
+    return `<div class="page-h"><div><h1>Dashboard</h1><div class="sub">Monday, 02/11/2026 · Good morning, ${esc((App.state.user && App.state.user.name) || 'Nguyễn Minh Anh')}</div></div>
       <div class="acts"><button class="btn" data-act="toast" data-msg="Report exported: Dashboard_${st.period}_${st.cat}.xlsx">Export report</button><a class="btn btn-p" href="#/pr">New PR</a></div></div>
       <div class="filters card-flat"><div class="field inline"><label for="db-period">Period</label><select id="db-period" class="inp" data-db="period">${Object.entries(PERIODS).map(([k, [l]]) => `<option value="${k}"${st.period === k ? ' selected' : ''}>${l}</option>`).join('')}</select></div>
         <div class="field inline"><label for="db-cat">Category</label><select id="db-cat" class="inp" data-db="cat"><option value="all">All categories</option>${Object.entries(CAT).map(([k, l]) => `<option value="${k}"${st.cat === k ? ' selected' : ''}>${l}</option>`).join('')}</select></div></div>
@@ -106,32 +108,32 @@
       <div class="grid">${tCard}${pCard}</div>`;
   }
   App.page('dashboard', {
-    title: 'Dashboard', ws: 'procurement', render: dashboard,
+    title: 'Dashboard', ws: 'procurement', roles: ['procurement', 'admin'], render: dashboard,
     mount(root) {
       root.addEventListener('change', (e) => { const k = e.target.dataset.db; if (k) { st[k] = e.target.value; App.render(); } });
-      wireNotifs(root);
+      wireNotifs(root, stDash);
     }
   });
 
   /* ---------------- Notifications (bell panel, R-15) ---------------- */
   App.page('notifications', {
-    title: 'Notifications', ws: 'procurement',
+    title: 'Notifications', ws: 'procurement', roles: ['procurement', 'admin'],
     render() {
       const unread = D().notifications.filter((n) => !n.read).length;
       return `<div class="page-h"><div><h1>Notifications</h1><div class="sub">${unread} unread · in-app and Gmail</div></div>
         <div class="acts"><button class="btn" data-nall>Mark all read</button><button class="btn" data-act="toast" data-msg="Daily digest at 08:00 turned on">Daily digest</button></div></div>
-        ${card('Notification centre', notifFilters() + notifList(filterNotifs(), { toggle: true }))}
+        ${card('Notification centre', notifFilters(stNotif) + notifList(filterNotifs(stNotif), { toggle: true }))}
         ${card('Reminder & escalation rules', `<ul class="plain small"><li>PO unconfirmed 48 h → remind supplier · 72 h → escalate to buyer (PO-2026-0869)</li><li>Certificate / contract expiry → 60 and 30 days before</li><li>Tender closing → 24 h before</li><li>Price alert → last price differs from 90-day average by more than ±${D().priceAlertThreshold}%</li></ul>`, '<a class="btn btn-sm" href="#/admin/rules">Edit rules</a>')}`;
     },
-    mount: wireNotifs
+    mount: (root) => wireNotifs(root, stNotif)
   });
 
   /* ---------------- Global search (F-09) ---------------- */
   App.page('search', {
-    title: 'Search', ws: 'procurement',
+    title: 'Search', ws: 'procurement', roles: ['procurement', 'admin'],
     render(p) {
-      const q = (p.q || '').trim(), ql = q.toLowerCase();
-      const hit = (...f) => f.some((x) => x && String(x).toLowerCase().includes(ql));
+      const q = (p.q || '').trim();
+      const hit = (...f) => f.some((x) => x && App.matches(x, q));
       const mats = q ? D().materials.filter((m) => hit(m.id, m.name, m.en, m.group, m.hs)) : [];
       const vens = q ? D().vendors.filter((v) => hit(v.id, v.name, v.mst, v.email, v.contact, v.cat)) : [];
       const docs = q ? D().docs.filter((d) => hit(d.id, d.title, d.status, ...(d.mats || []))) : [];

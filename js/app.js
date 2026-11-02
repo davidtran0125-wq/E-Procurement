@@ -1,7 +1,28 @@
 /* ProcureLink core: hash router, shell, helpers. Pages register via App.page(). */
 (function () {
   const pages = {};
-  const state = { role: localStorage.getItem('pl.role') || null, toast: null };
+  const ls = { get(k) { try { return localStorage.getItem(k); } catch (e) { return null; } }, set(k, v) { try { localStorage.setItem(k, v); } catch (e) { /* storage blocked */ } }, del(k) { try { localStorage.removeItem(k); } catch (e) { /* storage blocked */ } } };
+  const state = { role: ls.get('pl.role') || null, user: null, lang: ls.get('pl.lang') === 'vi' ? 'vi' : 'en', toast: null };
+  // Restore the signed-in user (P1-01)
+  (function () { const em = ls.get('pl.user'); const U = (window.DATA && window.DATA.users) || []; const u = em && U.find((x) => x.email === em); if (u && state.role && u.roles.includes(state.role)) state.user = u; })();
+
+  /* Accent-, case- and space-insensitive text match (P1-08) */
+  const norm = (s) => String(s == null ? '' : s).normalize('NFD').replace(/[\u0300-\u036f]/g, '').replace(/đ/gi, 'd').replace(/\s+/g, '').toLowerCase();
+  const matches = (x, q) => norm(x).includes(norm(q));
+
+  /* Minimal EN/VI switch for shell and navigation labels (P1-09) */
+  const VI = {
+    Overview: 'Tổng quan', Dashboard: 'Bảng điều khiển', 'My approvals': 'Chờ tôi duyệt', 'Material IDs': 'Mã vật tư', 'Material 360°': 'Vật tư 360°',
+    Vendors: 'Nhà cung cấp', 'Vendor evaluation': 'Đánh giá NCC', Contracts: 'Hợp đồng', Certificates: 'Chứng chỉ', Sourcing: 'Mua sắm', Tenders: 'Đấu thầu',
+    'Purchase requests': 'Đề nghị mua hàng', 'Purchase orders': 'Đơn đặt hàng', 'Invoices & matching': 'Hóa đơn & đối chiếu', Insights: 'Phân tích', 'Price history': 'Lịch sử giá', Reports: 'Báo cáo',
+    'Supplier portal': 'Cổng nhà cung cấp', 'Invitations to bid': 'Thư mời thầu', 'My quotations': 'Báo giá của tôi', Deliveries: 'Giao hàng', Invoices: 'Hóa đơn', Scorecard: 'Bảng điểm', 'Company profile': 'Hồ sơ công ty',
+    'Admin console': 'Quản trị hệ thống', 'Users & roles': 'Người dùng & vai trò', 'Access policy': 'Chính sách truy cập', 'Approval matrix': 'Ma trận phê duyệt', 'Material master': 'Danh mục vật tư', Categories: 'Nhóm hàng',
+    'Evaluation templates': 'Mẫu đánh giá', 'Numbering & ID rules': 'Quy tắc đánh số', Integrations: 'Tích hợp', 'Notification rules': 'Quy tắc thông báo', 'SoD rules': 'Quy tắc SoD', 'Audit log': 'Nhật ký',
+    'Back to Procurement': 'Về Mua sắm', 'Switch workspace': 'Đổi không gian làm việc', 'Skip to content': 'Bỏ qua đến nội dung', Search: 'Tìm kiếm', Procurement: 'Mua sắm', Supplier: 'Nhà cung cấp', Admin: 'Quản trị',
+    'Search Material ID, PR, PO, tender, vendor…  ( / )': 'Tìm mã vật tư, PR, PO, gói thầu, NCC…  ( / )', 'Open menu': 'Mở menu', 'Close menu': 'Đóng menu', Notifications: 'Thông báo', unread: 'chưa đọc', waiting: 'đang chờ',
+    'Language: English. Switch to Vietnamese': 'Ngôn ngữ: Tiếng Việt. Chuyển sang tiếng Anh', 'No access': 'Không có quyền truy cập', 'Not built yet': 'Chưa xây dựng'
+  };
+  const t = (s) => (state.lang === 'vi' && VI[s]) || s;
 
   const esc = (s) => String(s == null ? '' : s).replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
   const vnd = (n) => (n == null ? '' : Math.round(n).toLocaleString('vi-VN') + ' ₫');
@@ -78,32 +99,33 @@
   const icon = (k) => `<svg aria-hidden="true" viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="${ICON[k.split('/')[0]] || ICON.dot}"/></svg>`;
 
   function shell(route, inner, ws) {
-    const groups = NAV[ws].map(([g, items]) => `<div class="nav-g"><div class="nav-gt">${esc(g)}</div>${items.map(([k, label, badge]) => {
+    const groups = NAV[ws].map(([g, items]) => `<div class="nav-g"><div class="nav-gt">${esc(t(g))}</div>${items.map(([k, label, badge]) => {
       const on = route === k || (k !== 'supplier' && route.startsWith(k + '/')) ? ' on' : '';
-      const b = badge === 'approvals' ? `<span class="badge" aria-label="${window.DATA.approvals.length} waiting">${window.DATA.approvals.length}</span>` : '';
-      return `<a class="nav-i${on}" href="#/${k}"${on ? ' aria-current="page"' : ''}>${icon(k)}<span>${esc(label)}</span>${b}</a>`;
+      const b = badge === 'approvals' ? `<span class="badge" aria-label="${window.DATA.approvals.length} ${t('waiting')}">${window.DATA.approvals.length}</span>` : '';
+      return `<a class="nav-i${on}" href="#/${k}"${on ? ' aria-current="page"' : ''}>${icon(k)}<span>${esc(t(label))}</span>${b}</a>`;
     }).join('')}</div>`).join('');
-    const foot = ws === 'procurement' ? `<a class="nav-i" href="#/admin/users">${icon('admin')}<span>Admin console</span></a>`
-      : ws === 'admin' ? `<a class="nav-i" href="#/dashboard">${icon('dashboard')}<span>Back to Procurement</span></a>` : '';
-    const [uname, urole] = USERS[ws];
+    const foot = ws === 'procurement' ? `<a class="nav-i" href="#/admin/users">${icon('admin')}<span>${esc(t('Admin console'))}</span></a>`
+      : ws === 'admin' ? `<a class="nav-i" href="#/dashboard">${icon('dashboard')}<span>${esc(t('Back to Procurement'))}</span></a>` : '';
+    const u = state.user; const [uname, urole] = u ? [u.name, u.vendor ? ((window.DATA.vendors.find((v) => v.id === u.vendor) || {}).name || u.title) : u.title] : USERS[ws];
     const unread = window.DATA.notifications.filter((n) => !n.read).length;
-    return `<a class="skip" href="#main" data-act="skip">Skip to content</a><div class="layout">
+    return `<a class="skip" href="#main" data-act="skip">${esc(t('Skip to content'))}</a><div class="layout">
       <div class="scrim" data-act="menu-close" hidden></div>
       <aside class="side" id="side">
-        <div class="brand"><span class="logo" aria-hidden="true">PL</span><span>ProcureLink</span><span class="ws">${esc(ws[0].toUpperCase() + ws.slice(1))}</span></div>
+        <div class="brand"><span class="logo" aria-hidden="true">PL</span><span>ProcureLink</span><span class="ws">${esc(t(ws[0].toUpperCase() + ws.slice(1)))}</span></div>
         <nav aria-label="Main">${groups}</nav>
-        <div class="side-f">${foot}<button class="nav-i linkbtn" data-act="switch">${icon('dot')}<span>Switch workspace</span></button></div>
+        <div class="side-f">${foot}<button class="nav-i linkbtn" data-act="switch">${icon('dot')}<span>${esc(t('Switch workspace'))}</span></button></div>
       </aside>
       <div class="main-col">
         <header class="top">
-          <button class="icon-btn menu-btn" aria-label="Open menu" aria-controls="side" aria-expanded="false" data-act="menu"><svg aria-hidden="true" viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 6h16M4 12h16M4 18h16"/></svg></button>
-          <form class="search" role="search" data-act="search"><label class="sr" for="gsearch">Search</label><input id="gsearch" type="search" placeholder="Search Material ID, PR, PO, tender, vendor…  ( / )"></form>
+          <button class="icon-btn menu-btn" aria-label="${esc(t('Open menu'))}" aria-controls="side" aria-expanded="false" data-act="menu"><svg aria-hidden="true" viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 6h16M4 12h16M4 18h16"/></svg></button>
+          ${ws === 'supplier' ? '' : `<form class="search" role="search" data-act="search"><label class="sr" for="gsearch">${esc(t('Search'))}</label><input id="gsearch" type="search" placeholder="${esc(t('Search Material ID, PR, PO, tender, vendor…  ( / )'))}"></form>`}
           <div class="top-r">
-            <a class="icon-btn bell" href="#/notifications" aria-label="Notifications, ${unread} unread"><svg aria-hidden="true" viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M18 8a6 6 0 1 0-12 0c0 7-3 9-3 9h18s-3-2-3-9M13.7 21a2 2 0 0 1-3.4 0"/></svg>${unread ? `<span class="dotc">${unread}</span>` : ''}</a>
+            <button class="btn btn-sm lang" data-act="lang" aria-pressed="${state.lang === 'vi'}" aria-label="${esc(t('Language: English. Switch to Vietnamese'))}"><span${state.lang === 'en' ? ' class="on"' : ''}>EN</span> · <span${state.lang === 'vi' ? ' class="on"' : ''}>VI</span></button>
+            <a class="icon-btn bell" href="#/notifications" aria-label="${esc(t('Notifications'))}, ${unread} ${esc(t('unread'))}"><svg aria-hidden="true" viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M18 8a6 6 0 1 0-12 0c0 7-3 9-3 9h18s-3-2-3-9M13.7 21a2 2 0 0 1-3.4 0"/></svg>${unread ? `<span class="dotc">${unread}</span>` : ''}</a>
             <div class="user"><span class="av" aria-hidden="true">${esc(uname.split(' ').pop()[0])}</span><span class="un"><b>${esc(uname)}</b><small>${esc(urole)}</small></span></div>
           </div>
         </header>
-        <main class="content" id="main" tabindex="-1">${inner}</main>
+        <main class="content" lang="en" id="main" tabindex="-1">${inner}</main>
       </div></div>`;
   }
 
@@ -135,13 +157,23 @@
     }
     if (!route) { location.hash = '#/' + HOME[state.role]; return; }
     const found = findPage(route);
-    const ws = found && found.p.ws ? found.p.ws : state.role;
+    // Role guard (P1-02): a page with `roles` opens only for those roles; otherwise redirect home with a message.
+    if (found && found.p.roles && !found.p.roles.includes(state.role)) {
+      const title = found.p.title || route;
+      state.notice = `${t('No access')}: “${title}” is not available in the ${state.role} workspace. You were taken to your home page.`;
+      location.replace('#/' + HOME[state.role]);
+      return;
+    }
+    // The workspace (sidebar) follows the role; admins also see procurement pages in the procurement shell.
+    const ws = state.role === 'admin' && found && found.p.ws ? found.p.ws : state.role;
     let inner;
-    if (!found) inner = `<div class="page-h"><h1>Not built yet</h1></div><div class="card">Screen <code>${esc(route)}</code> is not available yet.</div>`;
+    if (!found) inner = `<div class="page-h"><h1>${esc(t('Not built yet'))}</h1></div><div class="card">Screen <code>${esc(route)}</code> is not available yet.</div>`;
     else {
       try { inner = found.p.render(params, found.sub); }
       catch (e) { console.error(e); inner = errorState(`This screen could not be displayed (${route}): ${e.message}`); }
     }
+    if (state.notice) { inner = `<div class="alert alert-warning" role="alert">${esc(state.notice)}</div>` + inner; state.notice = null; }
+    document.documentElement.lang = state.lang;
     app.innerHTML = shell(route, inner, ws);
     document.title = ((found && found.p.title) || 'ProcureLink') + ' · ProcureLink';
     if (found && found.p.mount) found.p.mount(document.getElementById('main'), params, found.sub);
@@ -153,7 +185,7 @@
     const side = document.getElementById('side'); if (!side) return;
     side.classList.toggle('open', open);
     const btn = document.querySelector('[data-act=menu]'), scrim = document.querySelector('.scrim');
-    if (btn) { btn.setAttribute('aria-expanded', String(open)); btn.setAttribute('aria-label', open ? 'Close menu' : 'Open menu'); }
+    if (btn) { btn.setAttribute('aria-expanded', String(open)); btn.setAttribute('aria-label', t(open ? 'Close menu' : 'Open menu')); }
     if (scrim) scrim.hidden = !open;
     if (open) { const f = side.querySelector('.nav-i.on, .nav-i'); f && f.focus(); } else if (btn && side.contains(document.activeElement)) btn.focus();
   }
@@ -164,7 +196,8 @@
     const t = e.target.closest('[data-act]');
     if (!t) return;
     const a = t.dataset.act;
-    if (a === 'switch') { localStorage.removeItem('pl.role'); state.role = null; location.hash = '#/login'; }
+    if (a === 'switch') { ls.del('pl.role'); ls.del('pl.user'); state.role = null; state.user = null; location.hash = '#/login'; }
+    else if (a === 'lang') { state.lang = state.lang === 'vi' ? 'en' : 'vi'; ls.set('pl.lang', state.lang); render(); const b = document.querySelector('[data-act=lang]'); b && b.focus(); }
     else if (a === 'menu') setMenu(!document.getElementById('side').classList.contains('open'));
     else if (a === 'menu-close') setMenu(false);
     else if (a === 'skip') { e.preventDefault(); const m = document.getElementById('main'); m && m.focus(); }
@@ -197,8 +230,8 @@
 
   window.App = {
     page(key, def) { pages[key] = def; },
-    pages, state, render, esc, emptyState, loading, errorState, setMenu, vnd, num, pct, ty, mid, pill, docid, table, kpi, card, tabs, toast, HOME,
-    login(role) { state.role = role; localStorage.setItem('pl.role', role); location.hash = '#/' + HOME[role]; },
+    pages, state, render, esc, norm, matches, t, emptyState, loading, errorState, setMenu, vnd, num, pct, ty, mid, pill, docid, table, kpi, card, tabs, toast, HOME,
+    login(role, user) { state.role = role; state.user = user || null; ls.set('pl.role', role); if (user) ls.set('pl.user', user.email); else ls.del('pl.user'); location.hash = '#/' + HOME[role]; },
     material: (id) => window.DATA.materials.find((m) => m.id === id),
     vendor: (id) => window.DATA.vendors.find((v) => v.id === id)
   };

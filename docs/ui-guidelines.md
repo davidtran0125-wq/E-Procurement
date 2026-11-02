@@ -29,3 +29,7 @@ Visual source of truth: `docs/04-design-brief.md` §3. Use tokens in `css/styles
 - Every input has a label; icon-only buttons have `aria-label`. Touch targets ≥36px. Contrast ≥4.5:1 (use `--muted` #5F6672 as the lightest text).
 - Focus ring is global (`:focus-visible`); do not remove outlines.
 - Breakpoint 900px: sidebar becomes a drawer (`App.setMenu(open)`; closes on Esc, scrim click and navigation). Verify at 390 / 768 / 1440.
+
+## Access & shell
+- Register pages with `roles: [...]` when they show internal data. `App.render()` redirects other roles to `App.HOME[role]` with a "No access" notice.
+- Signed-in user: `App.state.user` (restored from `pl.user`). Shell labels go through `App.t(label)` (EN/VI, `pl.lang`). Text search uses `App.matches(text, q)` (accent-, case- and space-insensitive).

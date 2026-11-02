@@ -89,7 +89,7 @@
         else if (!u.roles.includes(st.role)) st.err = `${u.name} has no ${st.role} role. Assigned: ${u.roles.join(', ')}.`;
         else if (u.status !== 'Active') st.err = 'This account is not active yet. Use "I have an invitation".';
         else if (!st.consent) st.err = 'Please accept the privacy notice to continue.';
-        else { st.err = ''; App.state.user = u; App.login(st.role); return; }
+        else { st.err = ''; App.login(st.role, u); return; }
         rerender();
       } else {
         const email = root.querySelector('#iv-email').value.trim().toLowerCase();
@@ -97,7 +97,7 @@
         const u = U.find((x) => x.email === email && x.inviteCode === code);
         if (!u) st.inviteErr = 'No open invitation matches this Gmail and code.';
         else if (!st.consent) st.inviteErr = 'Please accept the privacy notice to activate your account.';
-        else { u.status = 'Active'; u.consent = window.DATA.today; st.inviteErr = ''; App.login('supplier'); App.toast(`Invitation accepted · ${u.vendor} account activated`); return; }
+        else { u.status = 'Active'; u.consent = window.DATA.today; st.inviteErr = ''; App.login('supplier', u); App.toast(`Invitation accepted · ${u.vendor} account activated`); return; }
         rerender();
       }
     };
