@@ -153,7 +153,7 @@
       return `<div class="page-h"><div><h1>${esc(App.t('Contracts'))}</h1><div class="sub">Framework, fixed-price, SLA and rate-card contracts · prices and commitments per Material ID</div></div>
         <div class="acts"><button class="btn btn-p" data-ct="new">New contract</button></div></div>
         <div class="grid-k">${kpi('Active contracts', `${D().contractStats.active} / ${D().contractStats.total}`, 'All vendors')}${kpi('Contract value', num(D().contractStats.value, 1) + ' tỷ ₫', 'Ceilings, excl. VAT')}${kpi('Expiring ≤ 60 days', String(exp.length), exp.map((c) => c.id).join(', ') || 'None', exp.length ? 'warning' : '')}${kpi('Average consumption', pct(D().contractStats.avgUse, 0), `${pct(avg, 0)} in this sample · released ÷ committed`)}</div>
-        <div class="alert alert-warning" role="status"><b>Off-contract purchase</b> · ${App.docid('PO-2026-0861')} buys ${mid('CON-24102')} at ${vnd(1680000)} (+6,4% vs ${vnd(1580000)}) after <a class="mono" href="#/contracts/CT-2025-007">CT-2025-007</a> expired 30/09/2026. Renew the contract or tender the volume.</div>
+        <div class="alert alert-warning" role="status"><b>Off-contract purchase</b> · ${App.docid('PO-2026-0861')} buys ${mid('CON-24102')} at ${vnd(1680000)} (+6,4% vs ${vnd(1580000)}) after <a class="mono" href="#/contracts/CT-2025-007">CT-2025-007</a> expired 30/09/2026. Renew the contract or <a href="#/tenders/new?mat=CON-24102">tender the volume</a>.</div>
         ${st.form ? newForm() : ''}${list()}`;
     },
     mount(root) {

@@ -112,7 +112,7 @@ window.DATA = {
     { id: 'PR-2026-0436', type: 'PR', title: 'Tủ điện MSB – Nhà xưởng C2', date: '22/10/2026', status: 'Approved', mats: ['EQP-31402'], value: 386000000, by: 'Lê Quốc Huy' },
     { id: 'PR-2026-0438', type: 'PR', title: 'Quạt hút công nghiệp – Kho A', date: '29/10/2026', status: 'Awaiting approval', mats: ['EQP-31501'], value: 86000000, by: 'Lê Quốc Huy' },
     { id: 'PR-2026-0440', type: 'PR', title: 'Dự án Kho B · thép, xi măng, bê tông', date: '20/10/2026', status: 'In tender', mats: ['CON-24015', 'CON-24102', 'CON-24330'], value: 3434000000, by: 'Nguyễn Minh Anh', next: 'TND-2026-031' },
-    { id: 'PR-2026-0452', type: 'PR', title: 'Dự án Kho B · giai đoạn 2', date: '31/10/2026', status: 'Draft', mats: ['CON-24020'], value: 921000000, by: 'Nguyễn Minh Anh' },
+    { id: 'PR-2026-0452', type: 'PR', title: 'Dự án Kho B · giai đoạn 2', date: '31/10/2026', status: 'Draft', mats: ['CON-24015', 'CON-24020', 'CON-24330', 'CON-24102', 'SRV-52210'], value: 4004500000, by: 'Nguyễn Minh Anh' },
     { id: 'TND-2026-024', type: 'TND', title: 'Thép D16 – Nhà xưởng C2', cat: 'CON', date: '18/09/2026', close: '30/09/2026', status: 'Awarded', mats: ['CON-24015'], invited: 4, bids: 4, award: 'V-1001' },
     { id: 'TND-2026-027', type: 'TND', title: 'Vận chuyển nội địa Q4/2026', cat: 'LOG', date: '01/09/2026', close: '15/09/2026', status: 'Awarded', mats: ['LOG-61012'], invited: 3, bids: 3, award: 'V-1006' },
     { id: 'TND-2026-029', type: 'TND', title: 'Bê tông thương phẩm – Nhà xưởng C2', cat: 'CON', date: '15/10/2026', close: '30/10/2026', status: 'Evaluation', mats: ['CON-24330', 'CON-24325', 'SRV-52210'], invited: 4, bids: 4, note: 'Evaluation due 04/11/2026' },
@@ -190,11 +190,11 @@ window.DATA = {
 
   /* Notifications for the signed-in Procurement user — 6 unread (R-15) */
   notifications: [
-    { id: 'N-801', type: 'PR approval', text: 'PR-2026-0431 Máy phát điện 500kVA waits for your approval (1,85 tỷ ₫)', doc: 'PR-2026-0431', mats: ['EQP-31007'], at: '02/11/2026 08:15', read: false, action: 'Review', href: '#/approvals' },
+    { id: 'N-801', type: 'PR approval', text: 'PR-2026-0431 Máy phát điện 500kVA waits for your approval (1,85 tỷ ₫)', doc: 'PR-2026-0431', mats: ['EQP-31007'], at: '02/11/2026 08:15', read: false, action: 'Review', href: '#/approvals?id=PR-2026-0431' },
     { id: 'N-802', type: 'PO overdue', text: 'PO-2026-0869 not confirmed by Đại Phong — 3 days overdue, escalated to buyer', doc: 'PO-2026-0869', mats: ['EQP-31244'], at: '02/11/2026 07:00', read: false, action: 'Follow up', href: '#/po' },
     { id: 'N-803', type: 'Invoice exception', text: 'INV-2026-0322 Sao Việt — unit price +2,7% vs PO-2026-0874 (tolerance ±0,5%)', doc: 'INV-2026-0322', mats: ['LOG-61012'], at: '01/11/2026 16:42', read: false, action: 'Resolve', href: '#/invoices' },
-    { id: 'N-804', type: 'Tender', text: 'TND-2026-031 closes 05/11/2026 17:00 · 4 of 5 bids received · sealed', doc: 'TND-2026-031', mats: ['CON-24015', 'CON-24102', 'CON-24330'], at: '01/11/2026 09:00', read: false, action: 'Open', href: '#/tenders' },
-    { id: 'N-805', type: 'Evaluation', text: 'TND-2026-029 technical evaluation due 04/11/2026 — your scores are missing', doc: 'TND-2026-029', mats: ['CON-24330'], at: '31/10/2026 17:30', read: false, action: 'Evaluate', href: '#/tenders' },
+    { id: 'N-804', type: 'Tender', text: 'TND-2026-031 closes 05/11/2026 17:00 · 4 of 5 bids received · sealed', doc: 'TND-2026-031', mats: ['CON-24015', 'CON-24102', 'CON-24330'], at: '01/11/2026 09:00', read: false, action: 'Open', href: '#/tenders/TND-2026-031' },
+    { id: 'N-805', type: 'Evaluation', text: 'TND-2026-029 technical evaluation due 04/11/2026 — your scores are missing', doc: 'TND-2026-029', mats: ['CON-24330'], at: '31/10/2026 17:30', read: false, action: 'Evaluate', href: '#/tenders/TND-2026-029' },
     { id: 'N-806', type: 'Price alert', text: 'LOG-61012 last price 18.500.000 ₫ is +8,9% vs 90-day average', doc: 'PO-2026-0874', mats: ['LOG-61012'], at: '31/10/2026 11:05', read: false, action: 'Open', href: '#/material360?id=LOG-61012' },
     { id: 'N-790', type: 'Certificate', text: 'ISO 9001 of CTCP Kim khí Bắc Sơn expired 15/10/2026 — vendor blocked for CON-24015', doc: 'V-1008', mats: ['CON-24015'], at: '30/10/2026 08:00', read: true, action: 'Open', href: '#/material360?id=CON-24015' },
     { id: 'N-788', type: 'Delivery', text: 'GRN-2026-1532 received 50 tấn CON-24015 on time & in full', doc: 'GRN-2026-1532', mats: ['CON-24015'], at: '28/10/2026 15:20', read: true, action: 'Open', href: '#/material360?id=CON-24015' },
@@ -332,4 +332,104 @@ window.DATA = {
       evidence: ['NCR rate 0 / 11 POs · 100% accepted qty', 'OTIF 89,5% by accepted qty', 'EQP-31244 +5,2% vs 90-day average', '', 'Avg. tender response 2,8 days', ''], comment: '' }
   ];
   D.scoreHistory = { 'V-1001': [['Q1/2026', 4.18], ['Q2/2026', 4.24], ['Q3/2026', 4.32]], 'V-1002': [['Q1/2026', 3.88], ['Q2/2026', 3.92], ['Q3/2026', 3.98]], 'V-1009': [['Q1/2026', 3.80], ['Q2/2026', 3.85], ['Q3/2026', 3.90]], 'V-1008': [['Q1/2026', 3.62], ['Q2/2026', 3.40]], 'V-1003': [['Q1/2026', 3.98], ['Q2/2026', 4.05]] };
+})(window.DATA);
+
+/* ---------- Phase 3: tenders (F-40..F-49), purchase requests (F-50..F-55), approvals (F-56..F-60) ---------- */
+(function (D) {
+  /* Tender details keyed by number. method: RFQ | Sealed bid | Two-envelope | e-Auction. delivery = last delivery date (R-03 banner when after 31/12/2026). */
+  D.tenders = {
+    'TND-2026-024': { method: 'Sealed bid', envelopes: 'Single', pr: 'PR-2026-0412', owner: 'Nguyễn Minh Anh', delivery: '30/11/2026', currency: 'VND', validity: 90, secPct: 1, closeTime: '17:00',
+      lines: [{ mat: 'CON-24015', qty: 80 }], step: 6, award: { status: 'Approved', vendor: 'V-1001', value: 1216000000 } },
+    'TND-2026-027': { method: 'RFQ', envelopes: 'Single', pr: null, owner: 'Trần Bảo Ngọc', delivery: '31/12/2026', currency: 'VND', validity: 90, secPct: 0, closeTime: '17:00', lines: [{ mat: 'LOG-61012', qty: 36 }], step: 6, award: { status: 'Approved', vendor: 'V-1006', value: 666000000 } },
+    'TND-2026-029': { method: 'Two-envelope', envelopes: 'Two', pr: 'PR-2026-0433', owner: 'Nguyễn Minh Anh', delivery: '15/12/2026', currency: 'VND', validity: 90, secPct: 1, secAmount: 15000000, closeTime: '17:00', step: 5,
+      weights: [40, 60], pass: 70,
+      lines: [{ mat: 'CON-24330', qty: 850 }, { mat: 'CON-24325', qty: 120 }, { mat: 'SRV-52210', qty: 40 }],
+      bidders: [
+        { vid: 'V-1009', name: 'Công ty TNHH Bê tông Tân Phước', rc: 'RC-029-003', at: '29/10/2026 10:12', tech: [84, 80], sec: 15000000, validity: 90, prices: [1270000, 1120000, 6300000] },
+        { vid: 'V-1002', name: 'CTCP VLXD An Khang', rc: 'RC-029-001', at: '27/10/2026 15:40', tech: [78, 74], sec: 15000000, validity: 90, prices: [1255000, 1135000, 6600000] },
+        { vid: 'V-1010', name: 'CTCP Xây lắp Phước Thành', rc: 'RC-029-004', at: '30/10/2026 16:31', tech: [72, 70], sec: 0, validity: 90, prices: [1285000, 1100000, 6200000] },
+        { vid: null, name: 'Công ty TNHH Bê tông Long Hậu', rc: 'RC-029-002', at: '28/10/2026 09:05', tech: [66, 64], sec: 15000000, validity: 60, prices: null }
+      ],
+      evaluators: ['Nguyễn Minh Anh', 'Trần Bảo Ngọc'],
+      opening: { tech: { at: '30/10/2026 17:05', by: ['Nguyễn Minh Anh', 'Đỗ Hoàng Nam'] }, price: { at: '01/11/2026 09:30', by: ['Nguyễn Minh Anh', 'Đỗ Hoàng Nam'] } },
+      committee: [['Nguyễn Minh Anh', 'Chair · technical evaluator', 'Signed 15/10/2026'], ['Trần Bảo Ngọc', 'Technical evaluator', 'Signed 15/10/2026'], ['Lê Quốc Huy', 'Commercial evaluator', 'Not signed'], ['Phạm Thu Trang', 'Witness (bid opening)', 'Signed 16/10/2026'], ['Đỗ Hoàng Nam', 'Award approver', 'Signed 15/10/2026']],
+      qa: [
+        { no: 1, line: 'CON-24330', q: 'Có chấp nhận phụ gia chống thấm B8 thay cho B6 không?', a: 'Chấp nhận B8 nếu giữ nguyên mác M300 và độ sụt 12 ± 2 cm.', at: '22/10/2026 10:00' },
+        { no: 2, line: 'SRV-52210', q: 'Một ca bơm tính bao nhiêu giờ và có gồm di chuyển cần bơm không?', a: '1 ca = 8 giờ tại công trường, đã gồm di chuyển và lắp đặt cần bơm 37 m.', at: '23/10/2026 15:30' }
+      ],
+      addenda: [{ no: 1, at: '24/10/2026', summary: 'SRV-52210: 36 → 40 ca; thêm yêu cầu cần bơm 37 m. Closing time unchanged (30/10/2026 17:00).', lines: ['CON-24330', 'SRV-52210'], acks: [['V-1009', '24/10/2026 14:10'], ['V-1002', '24/10/2026 16:02'], ['V-1010', '25/10/2026 08:45'], ['Long Hậu', '25/10/2026 09:20']] }],
+      files: [{ type: 'Specification / drawing', name: 'TND-029_spec_be-tong_M300_M250.pdf', ver: 'v2', by: 'Nguyễn Minh Anh', date: '24/10/2026', mats: ['CON-24330', 'CON-24325'] },
+        { type: 'BOQ', name: 'TND-029_BOQ_NhaxuongC2.xlsx', ver: 'v1', by: 'Nguyễn Minh Anh', date: '15/10/2026', mats: ['CON-24330', 'CON-24325', 'SRV-52210'] },
+        { type: 'Addendum', name: 'TND-029_Addendum_01.pdf', ver: 'v1', by: 'Nguyễn Minh Anh', date: '24/10/2026', mats: ['SRV-52210'] },
+        { type: 'Bid opening minutes', name: 'TND-029_Bien-ban-mo-thau.pdf', ver: 'v1', by: 'System', date: '01/11/2026', mats: [] }],
+      award: null },
+    'TND-2026-030': { method: 'RFQ', envelopes: 'Single', pr: 'PR-2026-0429', owner: 'Trần Bảo Ngọc', delivery: '31/12/2027', currency: 'VND', validity: 90, secPct: 1, closeTime: '17:00', lines: [{ mat: 'SRV-52118', qty: 12 }], step: 3 },
+    'TND-2026-031': { method: 'Sealed bid', envelopes: 'Single', pr: 'PR-2026-0440', owner: 'Nguyễn Minh Anh', delivery: '20/12/2026', currency: 'VND', validity: 90, secPct: 1, secAmount: 35000000, closeTime: '17:00', step: 3,
+      lines: [{ mat: 'CON-24015', qty: 120 }, { mat: 'CON-24102', qty: 300 }, { mat: 'CON-24330', qty: 850 }],
+      benchmark: 'CON-24015 line benchmarks CT-2026-008 (Q4 15.627.500 ₫)',
+      bidders: [
+        { vid: 'V-1001', name: 'Công ty TNHH Thép Minh Phát', rc: 'RC-031-001', at: '30/10/2026 09:48', status: 'Submitted' },
+        { vid: 'V-1002', name: 'CTCP VLXD An Khang', rc: 'RC-031-002', at: '31/10/2026 14:22', status: 'Submitted' },
+        { vid: 'V-1011', name: 'Công ty TNHH Thép Tân Long', rc: 'RC-031-003', at: '01/11/2026 10:05', status: 'Submitted' },
+        { vid: 'V-1008', name: 'CTCP Kim khí Bắc Sơn', rc: 'RC-031-004', at: '01/11/2026 16:37', status: 'Submitted', warn: 'ISO 9001 expired — blocked for CON-24015' },
+        { vid: 'V-1009', name: 'Công ty TNHH Bê tông Tân Phước', rc: null, at: null, status: 'Not submitted', warn: 'Reminder 04/11/2026 17:00' }
+      ],
+      committee: [['Nguyễn Minh Anh', 'Chair · evaluator', 'Signed 22/10/2026'], ['Lê Quốc Huy', 'Evaluator', 'Signed 23/10/2026'], ['Đỗ Hoàng Nam', 'Award approver', 'Signed 22/10/2026']],
+      qa: [{ no: 1, line: 'CON-24102', q: 'Giao xi măng bao hay xá?', a: 'Xi măng bao 50 kg, giao theo pallet tại Kho B.', at: '27/10/2026 11:00' }], addenda: [],
+      files: [{ type: 'Specification / drawing', name: 'TND-031_spec_thep_xi-mang_be-tong.pdf', ver: 'v1', by: 'Nguyễn Minh Anh', date: '22/10/2026', mats: ['CON-24015', 'CON-24102', 'CON-24330'] },
+        { type: 'BOQ', name: 'TND-031_BOQ_KhoB.xlsx', ver: 'v1', by: 'Nguyễn Minh Anh', date: '22/10/2026', mats: ['CON-24015', 'CON-24102', 'CON-24330'] }] },
+    'TND-2026-032': { method: 'Two-envelope', envelopes: 'Two', pr: 'PR-2026-0434', owner: 'Lê Quốc Huy', delivery: '15/12/2026', currency: 'VND or USD', fx: 'USD bids converted at the Vietcombank selling rate on the opening day', validity: 90, secPct: 1.5, closeTime: '17:00', step: 2,
+      lines: [{ mat: 'EQP-31244', qty: 6 }], weights: [40, 60], pass: 70,
+      qa: [{ no: 1, line: 'EQP-31244', q: 'Có chấp nhận động cơ IE2 không?', a: 'Không. Yêu cầu tối thiểu IE3 theo spec Material ID.', at: '30/10/2026 09:30' }], addenda: [] },
+    'TND-2026-033': { method: 'RFQ', envelopes: 'Single', pr: 'PR-2026-0427', owner: 'Trần Bảo Ngọc', delivery: '31/12/2027', currency: 'VND', validity: 90, secPct: 0, closeTime: '17:00', lines: [{ mat: 'SRV-52003', qty: 12 }], step: 3 },
+    'TND-2026-034': { method: 'e-Auction', envelopes: 'Single', pr: 'PR-2026-0435', owner: 'Trần Bảo Ngọc', delivery: '31/03/2027', currency: 'VND', validity: 90, secPct: 1, closeTime: '10:00', step: 3,
+      lines: [{ mat: 'LOG-61012', qty: 60 }],
+      auction: { start: 18500000, decrement: 0.5, live: '10/11/2026 09:00–10:00', extend: 5, visibility: 'Rank only' } },
+    'TND-2026-035': { method: 'Sealed bid', envelopes: 'Single', pr: 'PR-2026-0439', owner: 'Lê Quốc Huy', delivery: '15/01/2027', currency: 'VND', validity: 90, secPct: 1, closeTime: '17:00', lines: [{ mat: 'EQP-31455', qty: 4 }], step: 3 }
+  };
+
+  /* Purchase request details (F-50..F-55). PR-2026-0452: 10% on 2.438.000.000 + 8% on 1.566.500.000 = 4.004.500.000 */
+  D.budgets = {
+    'KHOB-VLXD': { name: 'Dự án Kho B · Vật liệu xây dựng', budget: 12000000000, invoiced: 2150000000, committed: 5400000000 },
+    'BD-CAPEX': { name: 'Nhà máy Bình Dương · Capex thiết bị', budget: 5000000000, invoiced: 900000000, committed: 1200000000 },
+    'KHOA-OPEX': { name: 'Kho A · Bảo trì & thiết bị nhỏ', budget: 800000000, invoiced: 310000000, committed: 120000000 },
+    'C2-STEEL': { name: 'Nhà xưởng C2 · Steel', budget: 6000000000, invoiced: 2900000000, committed: 1216000000 }
+  };
+  D.prs = {
+    'PR-2026-0452': { requester: 'Nguyễn Minh Anh', dept: 'Phòng Mua hàng', project: 'Dự án Kho B · giai đoạn 2', cc: 'KHOB-VLXD', cat: 'CON', need: '15/12/2026', site: 'Kho B · KCN Tân Uyên, Bình Dương',
+      reason: 'Giai đoạn 2 Dự án Kho B: móng và sàn khu kệ cao tầng theo bản vẽ KC-02 rev.3.', saved: '31/10/2026 17:42',
+      lines: [{ mat: 'CON-24015', qty: 120, price: 15200000 }, { mat: 'CON-24020', qty: 40, price: 15350000 }, { mat: 'CON-24330', qty: 500, price: 1320000 }, { mat: 'CON-24102', qty: 350, price: 1680000 }, { mat: 'SRV-52210', qty: 49, price: 6500000 }],
+      files: [{ type: 'BOQ', name: 'KhoB_GD2_BOQ.xlsx', ver: 'v2', by: 'Nguyễn Minh Anh', date: '31/10/2026', mats: ['CON-24015', 'CON-24020', 'CON-24330', 'CON-24102', 'SRV-52210'] },
+        { type: 'Specification / drawing', name: 'KC-02_rev3_mong-san.pdf', ver: 'v3', by: 'Nguyễn Minh Anh', date: '30/10/2026', mats: ['CON-24015', 'CON-24020', 'CON-24330'] },
+        { type: 'Quotation', name: 'BaoGia_TanPhuoc_bom-be-tong.pdf', ver: 'v1', by: 'Công ty TNHH Bê tông Tân Phước', date: '29/10/2026', mats: ['SRV-52210'], supplier: true }] },
+    'PR-2026-0431': { requester: 'Lê Quốc Huy', dept: 'Nhà máy Bình Dương', project: 'Nâng cấp nguồn điện dự phòng', cc: 'BD-CAPEX', cat: 'EQP', need: '30/12/2026', site: 'Nhà máy Bình Dương', reason: 'Thay máy phát 250kVA đã hết khấu hao, tải đỉnh mới 420 kVA.', saved: '30/10/2026 09:10',
+      lines: [{ mat: 'EQP-31007', qty: 1, price: 1850000000 }], files: [{ type: 'Quotation', name: 'BaoGia_DaiPhong_500kVA.pdf', ver: 'v1', by: 'Phạm Văn Đức', date: '29/10/2026', mats: ['EQP-31007'], supplier: true }] },
+    'PR-2026-0438': { requester: 'Lê Quốc Huy', dept: 'Kho A', project: 'Thông gió Kho A', cc: 'KHOA-OPEX', cat: 'EQP', need: '20/11/2026', site: 'Kho A', reason: 'Bổ sung quạt hút cho khu đóng gói.', saved: '29/10/2026 11:00',
+      lines: [{ mat: 'EQP-31501', qty: 12, price: 7166667 }], files: [] },
+    'PR-2026-0436': { requester: 'Lê Quốc Huy', dept: 'Nhà xưởng C2', project: 'Điện nhà xưởng C2', cc: 'C2-STEEL', cat: 'EQP', need: '25/11/2026', site: 'Nhà xưởng C2', reason: 'Tủ MSB cho khu mở rộng.', saved: '22/10/2026 10:00', lines: [{ mat: 'EQP-31402', qty: 2, price: 193000000 }], files: [] },
+    'PR-2026-0440': { requester: 'Nguyễn Minh Anh', dept: 'Phòng Mua hàng', project: 'Dự án Kho B · giai đoạn 1', cc: 'KHOB-VLXD', cat: 'CON', need: '20/12/2026', site: 'Kho B', reason: 'Giai đoạn 1 Dự án Kho B.', saved: '20/10/2026 15:00',
+      lines: [{ mat: 'CON-24015', qty: 120, price: 15200000 }, { mat: 'CON-24102', qty: 300, price: 1680000 }, { mat: 'CON-24330', qty: 850, price: 1320000 }], files: [] },
+    'PR-2026-0412': { requester: 'Nguyễn Minh Anh', dept: 'Phòng Mua hàng', project: 'Nhà xưởng C2', cc: 'C2-STEEL', cat: 'CON', need: '30/11/2026', site: 'Nhà xưởng C2', reason: 'Thép D16 cho kết cấu nhà xưởng C2.', saved: '02/09/2026 10:00',
+      lines: [{ mat: 'CON-24015', qty: 80, price: 16450000 }], files: [] }
+  };
+  /* Approval bands by value excl. VAT (F-54) */
+  D.approvalBands = [[200000000, 'Dept head'], [2000000000, 'Procurement Lead'], [Infinity, 'Finance Director']];
+  D.bulkLimit = 50000000;
+
+  /* Approval detail: chain history per item (F-57) */
+  D.approvalChains = {
+    'PR-2026-0431': [['Dept head · Nhà máy Bình Dương', 'Approved', '31/10/2026 16:05', 'Đúng kế hoạch capex 2026.'], ['Nguyễn Minh Anh · Procurement Lead', 'Waiting', 'Since 31/10/2026 16:05 · SLA ends 02/11/2026 17:00', ''], ['Đỗ Hoàng Nam · Finance Director', 'Next', 'Capex rule: EQP- above 1 tỷ ₫', '']],
+    'PR-2026-0438': [['Dept head · Kho A', 'Approved', '30/10/2026 09:40', ''], ['Nguyễn Minh Anh · Procurement Lead', 'Waiting', 'Since 30/10/2026 09:40 · SLA ends 03/11/2026 17:00', '']],
+    'EQP-31520': [['Lê Quốc Huy · Requester', 'Submitted', '30/10/2026 10:05', 'Number reserved'], ['Nguyễn Minh Anh · Material master owner', 'Waiting', 'Since 31/10/2026 16:20', ''], ['Phạm Thu Trang · Admin (publish)', 'Next', '', '']],
+    'PO-2026-0877 Rev.2': [['Nguyễn Minh Anh · Buyer', 'Raised', '01/11/2026 11:20', 'Thêm 5 tấn cho sàn tầng lửng.'], ['Approver step 1', 'Blocked — SoD', 'Requester cannot approve own change order → Đỗ Hoàng Nam', ''], ['Đỗ Hoàng Nam · Finance Director', 'Next', '', '']],
+    'V-1001': [['Võ Thị Lan · Supplier', 'Submitted', '30/10/2026 16:40', 'Đổi tài khoản nhận thanh toán.'], ['Nguyễn Minh Anh · Procurement Lead', 'Waiting', 'Call-back to registered phone required', ''], ['Finance verification', 'Next', '', '']],
+    'INV-2026-0322': [['Trần Bảo Ngọc · Buyer', 'Raised', '01/11/2026 16:42', 'Phụ phí nhiên liệu tháng 10.'], ['Nguyễn Minh Anh · Procurement Lead', 'Waiting', 'Since 01/11/2026 16:42', '']]
+  };
+  D.approvalHistory = [
+    { id: 'PR-2026-0436', type: 'PR approval', title: 'Tủ điện MSB – Nhà xưởng C2', decision: 'Approved', by: 'Nguyễn Minh Anh', at: '23/10/2026 10:15', comment: 'OK theo kế hoạch điện C2.' },
+    { id: 'PO-2026-0866', type: 'PO change order', title: 'Thép D20 · ngày giao 24/10 → 27/10', decision: 'Approved', by: 'Lê Quốc Huy', onBehalf: 'Nguyễn Minh Anh', at: '20/10/2026 14:02', comment: 'Đổi ngày giao, không đổi giá.' },
+    { id: 'PR-2026-0424', type: 'PR approval', title: 'Văn phòng phẩm Q4', decision: 'Returned', by: 'Nguyễn Minh Anh', at: '15/10/2026 09:30', comment: 'Thiếu Material ID cho 2 dòng.' }
+  ];
+  D.delegation = { to: 'Lê Quốc Huy', from: '10/11/2026', until: '14/11/2026', cap: 500000000, types: ['PR approval', 'PO change order'], above: 'Đỗ Hoàng Nam' };
+  D.sodRules = [['Requester ≠ approver of the same PR / change order / Material ID request', 'Block'], ['Vendor creator ≠ vendor approver', 'Block'], ['PO buyer ≠ GRN receiver', 'Warn'], ['Tender evaluator ≠ award approver', 'Block']];
 })(window.DATA);

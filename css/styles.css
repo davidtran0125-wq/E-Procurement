@@ -218,3 +218,17 @@ ul.plain > li.row-acts { padding: 6px 0; border-top: 1px solid var(--divider); }
 .inp.w-full { width: 100%; } .inp.inp-score { width: 84px; } .inp.inp-num { width: 80px; text-align: right; font-variant-numeric: tabular-nums; }
 .tbl-640 { min-width: 640px; } .tc-cols { grid-template-columns: minmax(180px,2fr) minmax(220px,2fr) 110px 90px; }
 .tbl .linkish { min-height: 36px; padding: 0 2px; }
+
+/* Phase 3 · sourcing (tenders, PR, approvals) */
+.tbl-1100 { min-width: 1150px; } .pr-cols { grid-template-columns: minmax(240px,2.2fr) 140px 190px minmax(120px,1fr) 150px minmax(200px,1.8fr) 90px; }
+.look { position: relative; }
+.look-l { position: static; margin: 2px 0 0; padding: 0; list-style: none; background: #fff; border: 1px solid var(--border); border-radius: 8px; box-shadow: 0 4px 16px rgba(16,24,40,.12); max-height: 260px; overflow: auto; }
+.look-l:empty { display: none; }
+.look-l li { padding: 8px 10px; min-height: 36px; cursor: pointer; font-size: 13px; } .look-l li:hover, .look-l li:focus { background: var(--primary-soft); outline: none; }
+.stack-bar { display: flex; height: 14px; border-radius: 4px; overflow: hidden; background: var(--divider); }
+.stack-bar span { display: block; height: 100%; } .sb-inv { background: var(--ink2); } .sb-warn { background: var(--warn); } .sb-pr { background: var(--primary); } .sb-rest { background: var(--ok); }
+.chain li.on { border-color: var(--primary); background: var(--primary-soft); }
+.ap-cols { grid-template-columns: 44px minmax(220px,2.2fr) minmax(150px,1.4fr) 150px minmax(150px,1.3fr) 110px; }
+.tbl-900 { min-width: 900px; }
+.ap-row.sel { background: var(--primary-soft); }
+.td .chk { margin: 0; }

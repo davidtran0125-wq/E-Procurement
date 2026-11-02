@@ -8,7 +8,7 @@
   const ROUTE = { PR: 'pr', TND: 'tenders', PO: 'po', GRN: 'po', CT: 'contracts', INV: 'invoices', NCR: 'po' };
   const vTone = { Preferred: 'success', Approved: 'info', Probation: 'warning', Blocked: 'danger' };
   const dtone = (s) => (/Closed|Awarded|Delivered|Matched|Accepted|Ready/.test(s) ? 'success' : /Blocked|Exception|overdue|Open$/.test(s) ? 'danger' : /Awaiting|Pending|Expiring|Partially|Q&A|Evaluation|not confirmed/.test(s) ? 'warning' : 'info');
-  const docLink = (id) => { const d = D().docs.find((x) => x.id === id); return `<a class="mono" href="#/${d ? ROUTE[d.type] + (d.type === 'CT' ? '/' + d.id : '') : 'search?q=' + encodeURIComponent(id)}">${esc(id)}</a>`; };
+  const docLink = (id) => { const d = D().docs.find((x) => x.id === id); return `<a class="mono" href="#/${d ? ROUTE[d.type] + (['CT', 'PR', 'TND'].includes(d.type) ? '/' + d.id : '') : 'search?q=' + encodeURIComponent(id)}">${esc(id)}</a>`; };
 
   function series(m) {
     if (m.series) return m.series;
@@ -39,7 +39,7 @@
     const header = `<div class="page-h"><div><div class="crumbs small muted"><a href="#/materials">Material IDs</a> / Material 360°</div>
         <h1><span class="mid-lg">${mid(m.id)}</span> ${esc(m.name)}</h1>
         <div class="sub">${esc(m.en)} · ${esc(CAT[m.cat])} › ${esc(m.group)} · base UoM ${esc(m.uom)} · ${pill(m.status, m.status === 'Active' ? 'success' : m.status === 'Blocked' ? 'danger' : 'warning')}${m.step ? ' ' + esc(m.step) : ''}</div></div>
-      <div class="acts">${switcher}<a class="btn" href="#/price?id=${esc(m.id)}">Price history</a><a class="btn" href="#/tenders">Start tender</a><a class="btn btn-p" href="#/pr?mat=${esc(m.id)}">Create PR</a></div></div>`;
+      <div class="acts">${switcher}<a class="btn" href="#/price?id=${esc(m.id)}">Price history</a><a class="btn" href="#/tenders/new?mat=${esc(m.id)}">Start tender</a><a class="btn btn-p" href="#/pr?mat=${esc(m.id)}">Create PR</a></div></div>`;
 
     const kpis = `<div class="grid-k">
       ${kpi('Last price (excl. VAT)', m.last ? vnd(m.last) : '—', m.last ? `${docLink(m.lastPo)} · ${esc((App.vendor(m.lastVendor) || {}).name || '')}` : 'No purchase yet')}
@@ -49,7 +49,7 @@
       ${kpi('Spend YTD', m.spendYtd ? num(m.spendYtd, 2) + ' tỷ ₫' : '—', saving ? `Saving ${vnd(saving)}` : 'excl. VAT')}
     </div>`;
 
-    const tiles = [['Vendors', `${elig.length} approved`, '#/vendors'], ['Tenders', `${openTnd.length} open · ${tnds.length} total`, '#/tenders'], ['PRs', `${openPr.length} open`, '#/pr'], ['POs', `${openPo.length} open · ${pos.length} total`, '#/po'],
+    const tiles = [['Vendors', `${elig.length} approved`, '#/vendors'], ['Tenders', `${openTnd.length} open · ${tnds.length} total`, `#/tenders?q=${m.id}`], ['PRs', `${openPr.length} open`, `#/pr?q=${m.id}`], ['POs', `${openPo.length} open · ${pos.length} total`, '#/po'],
       ['Contracts', cts.length ? cts.map((c) => `${c.status} · ${c.id}`).join(', ') : 'None', cts.length === 1 ? '#/contracts/' + cts[0].id : '#/contracts'], ['Certificates', `${m.certs.length} required`, `#/certificates?mat=${m.id}`], ['Invoices', `${invs.length}`, '#/invoices'],
       ['Price records', ser ? '12 months' : 'None', `#/price?id=${m.id}`], ['OTIF', otifPct != null ? pct(otifPct) : '—', '#/reports'], ['Saving', saving ? vnd(saving) : '—', '#/reports']];
     const linked = card('Linked by Material ID', `<div class="tiles">${tiles.map(([l, v, h]) => `<a class="tile" href="${h}"><span class="small muted">${l}</span><b>${esc(v)}</b></a>`).join('')}</div>`);

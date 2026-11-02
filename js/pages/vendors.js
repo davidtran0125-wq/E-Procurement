@@ -154,7 +154,7 @@
     const b = v.bank || {};
     const bank = card('Bank account', `<dl class="dl"><dt>In use</dt><dd class="mono">${esc(b.now || '—')}</dd></dl>
       ${b.pending ? `<div class="alert alert-warning mt" role="status"><b>Pending Finance verification</b> · new account <span class="mono">${esc(b.pending)}</span> requested ${esc(b.requested)} by ${esc(b.by)}. The current account stays in use until Finance verifies it by call-back to the registered phone. SoD: the vendor-master editor cannot approve payments.</div>` : '<p class="small muted">No pending change.</p>'}`,
-    b.pending ? '<a class="btn btn-sm" href="#/approvals">Open in My approvals</a>' : '');
+    b.pending ? '<a class="btn btn-sm" href="#/approvals?id=V-1001">Open in My approvals</a>' : '');
     const usable = D().materials.filter((m) => !L.some((x) => x.m.id === m.id) && !v.proposed.includes(m.id) && m.status !== 'Blocked');
     const mats = card(`Material IDs supplied (${L.length})`, table([
       { h: 'Material ID', r: (x) => mid(x.m.id), w: '120px' }, { h: 'Description', r: (x) => esc(x.m.name), w: 'minmax(180px,2fr)' },

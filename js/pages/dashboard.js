@@ -82,7 +82,7 @@
     const actionCard = card(`Action required`, notifFilters(stDash) + notifList(acts, { toggle: true }), `<span class="pill pill-danger">${unread} unread</span><button class="btn btn-sm" data-nall>Mark all read</button>`);
 
     const tCard = card('Tenders closing soon', table([
-      { h: 'Tender', r: (t) => `<a class="mono" href="#/tenders">${esc(t.id)}</a><div class="small">${esc(t.title)}</div>`, w: 'minmax(200px,2fr)' },
+      { h: 'Tender', r: (t) => `<a class="mono" href="#/tenders/${esc(t.id)}">${esc(t.id)}</a><div class="small">${esc(t.title)}</div>`, w: 'minmax(200px,2fr)' },
       { h: 'Category', r: (t) => esc(CAT[t.cat]) },
       { h: 'Closes', r: (t) => `${esc(t.close)}<div class="small muted">${daysTo(t.close) <= 0 ? 'Closed' : 'in ' + daysTo(t.close) + ' days'}</div>` },
       { h: 'Bids / invited', r: (t) => `${t.bids} / ${t.invited}${t.sealed ? ' · sealed' : ''}`, cls: 'num' },
@@ -99,7 +99,7 @@
     ], al, { min: 760, empty: 'No price alerts in this category' }) + '<p class="muted small">Prices excl. VAT.</p>', '<a class="btn btn-sm" href="#/price">Open price history</a>');
 
     return `<div class="page-h"><div><h1>Dashboard</h1><div class="sub">Monday, 02/11/2026 · Good morning, ${esc((App.state.user && App.state.user.name) || 'Nguyễn Minh Anh')}</div></div>
-      <div class="acts"><button class="btn" data-act="toast" data-msg="Report exported: Dashboard_${st.period}_${st.cat}.xlsx">Export report</button><a class="btn btn-p" href="#/pr">New PR</a></div></div>
+      <div class="acts"><button class="btn" data-act="toast" data-msg="Report exported: Dashboard_${st.period}_${st.cat}.xlsx">Export report</button><a class="btn btn-p" href="#/pr/new">New PR</a></div></div>
       <div class="filters card-flat"><div class="field inline"><label for="db-period">Period</label><select id="db-period" class="inp" data-db="period">${Object.entries(PERIODS).map(([k, [l]]) => `<option value="${k}"${st.period === k ? ' selected' : ''}>${l}</option>`).join('')}</select></div>
         <div class="field inline"><label for="db-cat">Category</label><select id="db-cat" class="inp" data-db="cat"><option value="all">All categories</option>${Object.entries(CAT).map(([k, l]) => `<option value="${k}"${st.cat === k ? ' selected' : ''}>${l}</option>`).join('')}</select></div></div>
       ${kpis}
@@ -149,7 +149,7 @@
           { h: 'Vendor', r: (v) => `<a href="#/vendors/${esc(v.id)}"><span class="mono small">${esc(v.id)}</span> ${esc(v.name)}</a>`, w: 'minmax(240px,2fr)' }, { h: 'Category', k: 'cat' }, { h: 'MST', r: (v) => `<span class="mono small">${esc(v.mst)}</span>` }, { h: 'Status', r: (v) => pill(v.status, v.status === 'Preferred' ? 'success' : v.status === 'Probation' ? 'warning' : v.status === 'Approved' ? 'info' : 'neutral') }
         ], vens, { min: 620, empty: 'No vendors' }), '<a class="btn btn-sm" href="#/vendors">Vendors</a>')}
         ${card(`Documents (${docs.length})`, table([
-          { h: 'Number', r: (d) => `<a class="mono" href="#/${route[d.type]}${d.type === 'CT' ? '/' + d.id : ''}">${esc(d.id)}</a>`, w: '150px' }, { h: 'Title', k: 'title', w: 'minmax(200px,2fr)' }, { h: 'Date', k: 'date', w: '110px' },
+          { h: 'Number', r: (d) => `<a class="mono" href="#/${route[d.type]}${['CT', 'PR', 'TND'].includes(d.type) ? '/' + d.id : ''}">${esc(d.id)}</a>`, w: '150px' }, { h: 'Title', k: 'title', w: 'minmax(200px,2fr)' }, { h: 'Date', k: 'date', w: '110px' },
           { h: 'Material IDs', r: (d) => (d.mats || []).map(mid).join(' '), w: 'minmax(160px,1.5fr)' }, { h: 'Status', r: (d) => pill(d.status, 'neutral') }
         ], docs, { min: 760, empty: 'No documents' }))}` : ''}`;
     },

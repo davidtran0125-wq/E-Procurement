@@ -20,7 +20,7 @@
     'Evaluation templates': 'Mẫu tiêu chí đánh giá', 'Numbering & ID rules': 'Quy tắc đánh số', Integrations: 'Tích hợp', 'Notification rules': 'Quy tắc thông báo', 'SoD rules': 'Quy tắc SoD', 'Audit log': 'Nhật ký',
     'Back to Procurement': 'Về Mua sắm', 'Switch workspace': 'Đổi không gian làm việc', 'Skip to content': 'Bỏ qua đến nội dung', Search: 'Tìm kiếm', Procurement: 'Mua sắm', Supplier: 'Nhà cung cấp', Admin: 'Quản trị',
     'Search Material ID, PR, PO, tender, vendor…  ( / )': 'Tìm mã vật tư, PR, PO, gói thầu, NCC…  ( / )', 'Open menu': 'Mở menu', 'Close menu': 'Đóng menu', Notifications: 'Thông báo', unread: 'chưa đọc', waiting: 'đang chờ',
-    'Language: English. Switch to Vietnamese': 'Ngôn ngữ: Tiếng Việt. Chuyển sang tiếng Anh', 'No access': 'Không có quyền truy cập', 'Not built yet': 'Chưa xây dựng'
+    'Language: English. Switch to Vietnamese': 'Ngôn ngữ: Tiếng Việt. Chuyển sang tiếng Anh', 'No access': 'Không có quyền truy cập', 'Not built yet': 'Chưa xây dựng', 'New tender': 'Gói thầu mới', 'Create PR': 'Tạo đề nghị mua hàng'
   };
   const t = (s) => (state.lang === 'vi' && VI[s]) || s;
 
@@ -101,7 +101,8 @@
   function shell(route, inner, ws) {
     const groups = NAV[ws].map(([g, items]) => `<div class="nav-g"><div class="nav-gt">${esc(t(g))}</div>${items.map(([k, label, badge]) => {
       const on = route === k || (k !== 'supplier' && route.startsWith(k + '/')) ? ' on' : '';
-      const b = badge === 'approvals' ? `<span class="badge" aria-label="${window.DATA.approvals.length} ${t('waiting')}">${window.DATA.approvals.length}</span>` : '';
+      const nq = App.src ? App.src.myQueue().length : window.DATA.approvals.length;
+      const b = badge === 'approvals' && nq ? `<span class="badge" aria-label="${nq} ${t('waiting')}">${nq}</span>` : '';
       return `<a class="nav-i${on}" href="#/${k}"${on ? ' aria-current="page"' : ''}>${icon(k)}<span>${esc(t(label))}</span>${b}</a>`;
     }).join('')}</div>`).join('');
     const foot = ws === 'procurement' ? `<a class="nav-i" href="#/admin/users">${icon('admin')}<span>${esc(t('Admin console'))}</span></a>`
