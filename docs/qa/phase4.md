@@ -110,3 +110,23 @@ No code files were edited. As briefed, these data decisions are accepted and I c
 | F-84 | PASS | Formula per Material ID line; Draft → Submitted → Validated; only Finance can validate. |
 | F-85 | PASS | Spend cube by vendor / Material ID / project; concentration 41,4%; off-contract table (P4-09). |
 | F-86 | PASS WITH FIXES | Budget formula correct except Nhà xưởng C2 committed (P4-07). |
+
+## Fix status (Agent 1)
+
+All 13 findings fixed; re-tested in headless Chromium (Playwright, `file://`) at 1440/390 px and `npm test`. No console errors.
+
+| ID | Status | What changed |
+|---|---|---|
+| P4-01 | Fixed | po.js `build()`: tender without an approved award sets `f.err` ("Award for TND-2026-029 is not approved yet — Create PO is available after approval."), rendered as `alert-warning`; Submit/Save draft disabled and `saveNew` refuses. The unapproved tender is shown in the select as "(not selectable)". |
+| P4-02 | Fixed | invoices.js `to-ap`: raiser = current user, assignee = the other lead (`Nguyễn Minh Anh` → `Đỗ Hoàng Nam`), chain says "SoD: raiser cannot approve"; banner "Release needs the Procurement Lead (not the raiser)". |
+| P4-03 | Fixed | po.js: open NCRs with Replace/Return keep a schedule slot `[qty, due, grn, cx, ncr]` (`syncNcrSlots`), selectable in `#pg-slot` ("replacement for NCR-…"). Status = open slots ? Partially received : Delivered. Header note rebuilt from the schedule (`noteFrom`). Receiving the replacement in full closes the NCR. Verified: PO-0877 28/2 Replace → "Partially received · 2 tấn due 05/11 (NCR-2026-018)". |
+| P4-04 | Fixed | price.js: "Average in view" = Σ(qty×price)/Σqty over filtered rows; vs 90-day uses rows dated ≥ today−90 (CON-24015 16.009.004; CON-24102 1.686.286; LOG-61012 18.600.000). When the master monthly series differs, the tile notes "Dashboard alert basis: monthly series avg … (incl. records outside this sample)". |
+| P4-05 | Fixed | invoices.js `tabOf` maps Matched to `match`; KPI uses the same count (3 = tab "To match (3)"). |
+| P4-06 | Fixed | price.js vendor comparison: latest record by date (with source + date); vendors with 0 records show "—" and are excluded from Cheapest. |
+| P4-07 | Fixed | data.js C2-STEEL committed = 916.500.000 (456.000.000 PO-0877 open + 460.500.000 PO-0866); available 2.183.500.000 ₫. |
+| P4-08 | Fixed | po.js cancel: NCR slots counted in open qty ("Line 1 · CON-24102 · 65 tấn open (NCR-2026-014)"); PO closes only with no open NCR and everything accepted invoiced, else Delivered. PO-0866 offers "Cancel open qty" for the 15 tấn under NCR-017. |
+| P4-09 | Fixed | One rule `App.src.offContract()` (sourcing.js) used by Reports and the Contracts banner: Material ID bought outside an active contract (other vendor / spot) or after its contract expired; tender-awarded POs excluded. PO-0861 row added ("CT-2025-007 expired 30/09/2026"); PO-0870 now `contract: 'CT-2026-011'` and drops off the list. |
+| P4-10 | Fixed | Minh Phát OTIF base = 48 deliveries (47/48 = 97,9%, 46/48 = 95,8%). |
+| P4-11 | Fixed | PO KPI "Invoiced (matched)" sums invoice subtotals of Matched / Ready / Paid only; exceptions shown separately (PO-0874: 0 ₫ · 228.000.000 ₫ in exception). |
+| P4-12 | Fixed | PO-0870 (HVAC T11) is "Confirmed" with an open schedule row promised 30/11/2026, accepted 0%. |
+| P4-13 | Fixed | Tender source pre-fills qty = award qty − qty on non-cancelled POs from that tender; when all 0 → "Award fully ordered on PO-2026-0877." and Submit is disabled. |

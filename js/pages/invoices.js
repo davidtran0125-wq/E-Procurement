@@ -13,7 +13,7 @@
   const st = { tab: 'all', q: '', cur: null, map: {} };
   const mat = (id) => App.material(id) || { id, name: id, uom: '', vat: 8 };
   const list = () => D().docs.filter((d) => d.type === 'INV' && D().invoices[d.id]);
-  const tabOf = (d) => (/Blocked/.test(d.status) ? 'blocked' : /Exception|No Material ID|credit|hold/i.test(d.status) ? 'exc' : /Ready|Paid/.test(d.status) ? 'ready' : /Matched/.test(d.status) ? 'matched' : 'match');
+  const tabOf = (d) => (/Blocked/.test(d.status) ? 'blocked' : /Exception|No Material ID|credit|hold/i.test(d.status) ? 'exc' : /Ready|Paid/.test(d.status) ? 'ready' : 'match');
   const sTone = (s) => (/Ready|Paid|Matched/.test(s) ? 'success' : /Blocked/.test(s) ? 'danger' : 'warning');
   const termDays = (v) => +(/(\d+) days/.exec((App.vendor(v) || {}).terms || '') || [0, 30])[1];
   const due = (d) => App.addDays(d.date, termDays(d.vendor));
@@ -63,7 +63,7 @@
     const rows = all.filter((d) => { const v = D().invoices[d.id]; return (st.tab === 'all' || tabOf(d) === st.tab) && (!q || App.matches(`${d.id} ${d.title} ${v.kh} ${v.no} ${v.po} ${v.grn} ${d.mats.join(' ')} ${(App.vendor(d.vendor) || {}).name} ${(App.vendor(d.vendor) || {}).mst}`, q)); }).sort((a, b) => App.dt(b.date) - App.dt(a.date));
     return `<div class="page-h"><div><h1>${esc(App.t('Invoices & matching'))}</h1><div class="sub">E-invoices (NĐ 123/2020, TT 78/2021) from the supplier portal and hoadon@ inbox · legal check, then 3-way match per Material ID line</div></div>
       <div class="acts"><button class="btn" data-act="toast" data-msg="hoadon@ inbox fetched · no new e-invoices since 08:00">Fetch e-invoice inbox</button><button class="btn" data-act="toast" data-msg="Choose the XML and PDF of the e-invoice (both required)">Upload XML + PDF</button></div></div>
-      <div class="grid-k">${kpi('All invoices', num(X.total), `${all.length} in this sample`)}${kpi('To match', num(X.toMatch), `${cnt('match') + cnt('matched')} in this sample`)}${kpi('Exceptions', num(X.exceptions), all.filter((d) => tabOf(d) === 'exc').map((d) => d.id.slice(4)).join(', ') || 'None', cnt('exc') ? 'warning' : '')}${kpi('Blocked', num(X.blocked), all.filter((d) => tabOf(d) === 'blocked').map((d) => d.id.slice(4)).join(', ') || 'None', cnt('blocked') ? 'danger' : '')}</div>
+      <div class="grid-k">${kpi('All invoices', num(X.total), `${all.length} in this sample`)}${kpi('To match', num(X.toMatch), `${cnt('match')} in this sample`)}${kpi('Exceptions', num(X.exceptions), all.filter((d) => tabOf(d) === 'exc').map((d) => d.id.slice(4)).join(', ') || 'None', cnt('exc') ? 'warning' : '')}${kpi('Blocked', num(X.blocked), all.filter((d) => tabOf(d) === 'blocked').map((d) => d.id.slice(4)).join(', ') || 'None', cnt('blocked') ? 'danger' : '')}</div>
       ${banner()}
       <div class="seg seg-wrap" role="group" aria-label="Invoice status">${TABS.map(([k, l]) => `<button data-inv="tab" data-k="${k}" aria-pressed="${st.tab === k}">${l} (${cnt(k)})</button>`).join('')}</div>
       ${card('E-invoices', `<div class="filters"><label class="sr" for="inv-q">Search invoices</label><input class="inp grow" id="inv-q" type="search" data-invf="q" value="${esc(st.q)}" placeholder="Search INV, ký hiệu/số, MST, PO, GRN or Material ID"></div>
@@ -98,7 +98,7 @@
     ], M, { min: 1000, label: 'Match by Material ID line', cls: 'match-grid' }) : App.errorState('Matching is blocked until the legal checks pass. Ask the supplier for a replacement invoice with a valid Mã CQT.');
     const allOk = lok && M.length && M.every((r) => r.res === 'Matched');
     const priceExc = M.find((r) => r.res === 'Price mismatch');
-    const exc = /Exception|No Material ID|hold|credit/i.test(d.status) ? `<div class="alert alert-warning" role="status"><b>${esc(v.hold || 'On hold')}.</b> Assigned to buyer <b>${esc(v.assigned || '—')}</b>${v.resolveBy ? ` · resolve by ${esc(v.resolveBy)} (escalates after 3 working days)` : ''}.${priceExc ? ` Invoice price ${vnd(priceExc.price)} vs PO ${vnd(priceExc.poPrice)} (${sg(priceExc.pd)}) — written to Price history as source Invoice.` : ''} Release needs the Procurement Lead.</div>` : '';
+    const exc = /Exception|No Material ID|hold|credit/i.test(d.status) ? `<div class="alert alert-warning" role="status"><b>${esc(v.hold || 'On hold')}.</b> Assigned to buyer <b>${esc(v.assigned || '—')}</b>${v.resolveBy ? ` · resolve by ${esc(v.resolveBy)} (escalates after 3 working days)` : ''}.${priceExc ? ` Invoice price ${vnd(priceExc.price)} vs PO ${vnd(priceExc.poPrice)} (${sg(priceExc.pd)}) — written to Price history as source Invoice.` : ''} Release needs the Procurement Lead (not the raiser).</div>` : '';
     const inAp = D().approvals.some((a) => a.id === d.id);
     let acts = '';
     if (!lok) acts = `<button class="btn btn-sm" data-act="toast" data-msg="Replacement invoice requested from ${esc(App.vshort(ven))} (Gmail + portal)">Request replacement invoice</button>`;
@@ -146,8 +146,9 @@
         const d = S.docOf(st.cur); const v = D().invoices[st.cur]; if (!d) return;
         if (k === 'credit') { d.status = 'On hold · credit note requested'; App.render(); App.toast(`Credit note requested from ${App.vshort(App.vendor(d.vendor))}`); }
         else if (k === 'to-ap') {
-          const t = totals(v); D().approvals.push({ id: d.id, type: 'Invoice exception', title: d.title, mats: d.mats, value: t.net, by: v.assigned || S.me(), step: 'Step 1 of 1', sla: App.addDays(D().today, 2) + ' 17:00', assignee: 'Nguyễn Minh Anh' });
-          D().approvalChains[d.id] = [[`${v.assigned || S.me()} · Buyer`, 'Raised', NOW, 'Accept price variance'], ['Nguyễn Minh Anh · Procurement Lead', 'Waiting', 'SLA 2 working days', '']]; App.render(); App.toast(`${d.id} sent to My approvals (Procurement Lead)`);
+          const by = S.me(); const ap = by === 'Nguyễn Minh Anh' ? 'Đỗ Hoàng Nam' : 'Nguyễn Minh Anh'; const role = ap === 'Đỗ Hoàng Nam' ? 'Finance Director' : 'Procurement Lead';
+          const t = totals(v); D().approvals.push({ id: d.id, type: 'Invoice exception', title: d.title, mats: d.mats, value: t.net, by, step: 'Step 1 of 1', sla: App.addDays(D().today, 2) + ' 17:00', assignee: ap });
+          D().approvalChains[d.id] = [[`${by} · Buyer`, 'Raised', NOW, 'Accept price variance'], [`${ap} · ${role}`, 'Waiting', 'SLA 2 working days · SoD: raiser cannot approve', '']]; App.render(); App.toast(`${d.id} sent to My approvals (${ap}, not the raiser)`);
         }
         else if (k === 'hold') { d.status = 'On hold'; v.hold = 'On hold'; v.assigned = v.assigned || S.me(); App.render(); }
         else if (k === 'ready') { d.status = 'Ready for payment'; v.stage = 3; App.render(); App.toast(`${d.id} ready for payment · due ${due(d)}`); }

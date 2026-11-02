@@ -55,6 +55,18 @@
   const delegable = (a) => { const g = D().delegation; return dlgActive() && assignee(a) === 'Nguyễn Minh Anh' && g.types.includes(a.type) && (a.value == null || a.value <= g.cap); };
   const myQueue = () => (App.state.role === 'admin' ? D().approvals : D().approvals.filter((a) => assignee(a) === me() || (D().delegation && D().delegation.to === me() && delegable(a))));
 
-  App.src = { me, vatLabel, validDate, money, read, field, focusErr, docOf, prLink, tndLink, files, upload, nextVer, assignee, myQueue, dlgActive, delegable,
+  /* P4-09 · one off-contract rule for Contracts and Reports: a Material ID bought outside an active contract that covers it
+     (spot PO or another vendor), or after its contract expired. Tender-awarded POs are competitive and are not counted. */
+  function offContract() {
+    return D().docs.filter((d) => d.type === 'PO' && !/Draft|Pending|Cancelled/.test(d.status)).flatMap((d) => d.mats.map((m) => {
+      const p = D().pos[d.id]; if (p && p.tender) return null;
+      const cov = D().contracts.filter((x) => x.lines.some((l) => l.mat === m));
+      const act = cov.find((x) => App.dt(x.start) <= App.dt(d.date) && App.dt(x.end) >= App.dt(d.date));
+      if (act) return p && p.contract === act.id ? null : (act.vendor !== d.vendor || !p || !p.contract) ? { d, m, c: act, why: act.vendor !== d.vendor ? 'Other vendor' : 'Spot PO, not released from the contract' } : null;
+      const exp = cov.filter((x) => App.dt(x.end) < App.dt(d.date)).sort((a, b) => App.dt(b.end) - App.dt(a.end))[0];
+      return exp ? { d, m, c: exp, why: `${exp.id} expired ${exp.end}` } : null;
+    })).filter(Boolean);
+  }
+  App.src = { me, offContract, vatLabel, validDate, money, read, field, focusErr, docOf, prLink, tndLink, files, upload, nextVer, assignee, myQueue, dlgActive, delegable,
     bar: (p, tone) => `<div class="bar" role="img" aria-label="${esc(num(p, 0))}%"><span class="${tone || ''}" style="width:${Math.max(0, Math.min(100, p)).toFixed(1)}%"></span></div>` };
 })();

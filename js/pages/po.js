@@ -31,16 +31,35 @@
         lines: [{ mat: d.mats[0], qty: q, price: d.price || Math.round(d.value / q), sched: [[q, App.addDays(d.date, 14), recv ? (g ? g.id : 'archived') : null]] }],
         confirm: { status: 'Confirmed', by: 'Supplier (portal)', at: App.addDays(d.date, 1) }, revs: [], files: [] };
     }
+    syncNcrSlots(id, D().pos[id]);
     return D().pos[id];
+  }
+  /* P4-03: an open NCR with action Replace / Return keeps the rejected qty open as its own schedule slot [qty, due, grn, cx, ncr] */
+  function syncNcrSlots(id, p) {
+    Object.entries(D().ncrs).forEach(([nid, n]) => {
+      if (n.po !== id || !/Replace|Return/.test(n.action)) return;
+      const li = p.lines.findIndex((l) => l.mat === n.mat); if (li < 0) return; const l = p.lines[li];
+      const slot = l.sched.find((x) => x[4] === nid);
+      if (n.status !== 'Closed' && !slot) { const m = /due (\d{2}\/\d{2}\/\d{4})/.exec(n.supplier || ''); n.due = n.due || (m ? m[1] : App.addDays(String(n.raised).slice(0, 10), 7)); l.sched.push([n.qty, n.due, null, null, nid]); }
+      if (n.status === 'Closed' && slot && !slot[2] && !slot[3]) l.sched.splice(l.sched.indexOf(slot), 1);
+    });
+  }
+  const openSlots = (p) => sched(p).filter((r) => !r.rec && !r.cx);
+  /* Header note rebuilt from the schedule (P4-03) */
+  function noteFrom(p, d) {
+    const keep = /Rev\.\d pending/.exec(d.note || ''); const u = (r) => mat(r.mat).uom;
+    const parts = openSlots(p).map((r) => `${num(r.qty)} ${u(r)} due ${r.due.slice(0, 5)}${r.ncr ? ` (${r.ncr})` : ''}`);
+    const ncr = openNcr(d.id).map((n) => `${n.id} open · ${num(n.qty)} ${mat(n.mat).uom} rejected`);
+    return parts.concat(ncr).concat(keep ? [keep[0]] : []).join(' · ');
   }
   /* Schedule rows with receipt results (OTIF uses the accepted qty, R-07) */
   function sched(p) {
     const rows = [];
     p.lines.forEach((l, li) => l.sched.forEach((s, si) => {
-      const [qty, due, gid, cx] = s; const g = gid && D().grns[gid]; const gl = g && g.lines.find((x) => x[0] === li && x[1] === si);
+      const [qty, due, gid, cx, ncr] = s; const g = gid && D().grns[gid]; const gl = g && g.lines.find((x) => x[0] === li && x[1] === si);
       const arch = gid === 'archived'; const rec = !!(gl || arch);
       const delivered = arch ? qty : gl ? gl[2] : 0, accepted = arch ? qty : gl ? gl[3] : 0, rejected = gl ? gl[4] : 0;
-      rows.push({ li, si, mat: l.mat, qty, due, gid, g, rec, cx, delivered, accepted, rejected, reason: gl ? gl[5] : '', date: g ? g.date : arch ? due : '', onTime: rec ? (arch || App.dt(g.date) <= App.dt(due)) : null, inFull: rec ? accepted >= qty : null });
+      rows.push({ li, si, mat: l.mat, qty, due, gid, g, rec, cx, ncr, delivered, accepted, rejected, reason: gl ? gl[5] : '', date: g ? g.date : arch ? due : '', onTime: rec ? (arch || App.dt(g.date) <= App.dt(due)) : null, inFull: rec ? accepted >= qty : null });
     }));
     return rows;
   }
@@ -97,8 +116,12 @@
       if (ref === 'PR-2026-0436') f.vendor = vendor || 'V-1004';
     } else if (src === 'tender' && D().tenders[ref]) {
       const t = D().tenders[ref]; const a = t.award; const pr = t.pr && D().prs[t.pr]; f.site = pr ? pr.site : 'Nhà xưởng C2';
+      if (!a || a.status !== 'Approved') { f.err = 'Award for ' + ref + ' is not approved yet — Create PO is available after approval.'; f.terms = ''; return f; }
       if (a.pick && t.bidders) { const vs = [...new Set(a.pick)]; f.vendor = vs.includes(vendor) ? vendor : vs[0]; const b = t.bidders.find((x) => x.vid === f.vendor); f.lines = t.lines.map((l, i) => ({ mat: l.mat, qty: l.qty, price: b.prices[i], due: t.delivery, keep: a.pick[i] === f.vendor })).filter((l) => l.keep); f.vendors = vs; }
       else { f.vendor = a.vendor; const tq = t.lines.reduce((s, l) => s + l.qty, 0); f.lines = t.lines.map((l) => ({ mat: l.mat, qty: l.qty, price: Math.round(a.value / tq), due: t.delivery })); }
+      const prior = docs().filter((d) => { const x = D().pos[d.id]; return x && !/Cancelled|Draft/.test(d.status) && x.tender === ref && x.vendor === f.vendor; });
+      if (prior.length) { f.lines.forEach((l) => { const used = prior.reduce((s, d) => s + D().pos[d.id].lines.filter((x) => x.mat === l.mat).reduce((a, x) => a + x.qty - (x.cancelled || 0), 0), 0); l.qty = Math.max(0, l.qty - used); });
+        if (f.lines.every((l) => !(+l.qty > 0))) f.err = 'Award fully ordered on ' + prior.map((d) => d.id).join(', ') + '.'; }
     } else if (src === 'contract') {
       const c = D().contracts.find((x) => x.id === ref);
       if (c) { f.vendor = c.vendor; f.site = 'Kho B · KCN Tân Uyên, Bình Dương'; f.lines = c.lines.map((l) => ({ mat: l.mat, qty: '', price: l.q4, due: App.addDays(D().today, 7), ceiling: l.q4, left: l.commit - l.released })); }
@@ -109,7 +132,7 @@
   const existingFor = (f) => docs().filter((d) => { const x = D().pos[d.id]; return x && d.status !== 'Cancelled' && ((f.src === 'pr' && x.pr === f.ref) || (f.src === 'tender' && x.tender === f.ref && x.vendor === f.vendor)); });
   function initNew(p, sub) {
     const draft = sub && sub !== 'new' ? sub : null;
-    if (draft) { const x = det(draft); const f = build(x.pr ? 'pr' : x.tender ? 'tender' : x.contract ? 'contract' : 'pr', x.pr || x.tender || x.contract || '', x.vendor); f.id = draft; f.site = x.site; f.terms = x.terms; f.lines = x.lines.map((l) => ({ mat: l.mat, qty: l.qty, price: l.price, due: l.sched[0][1] })); return f; }
+    if (draft) { const x = det(draft); const f = build(x.pr ? 'pr' : x.tender ? 'tender' : x.contract ? 'contract' : 'pr', x.pr || x.tender || x.contract || '', x.vendor); f.id = draft; f.err = null; f.site = x.site; f.terms = x.terms; f.lines = x.lines.map((l) => ({ mat: l.mat, qty: l.qty, price: l.price, due: l.sched[0][1] })); return f; }
     const src = p.tender ? 'tender' : p.contract ? 'contract' : 'pr';
     const ref = p.tender || p.contract || p.pr || 'PR-2026-0436';
     const f = build(src, ref);
@@ -128,7 +151,7 @@
     const tmp = { lines: f.lines.map((l) => ({ mat: l.mat, qty: +l.qty || 0, price: +l.price || 0 })) }; const tt = vatSplit(tmp);
     const ex = existingFor(f).filter((d) => d.id !== f.id);
     const prOpts = D().docs.filter((d) => d.type === 'PR' && D().prs[d.id]).map((d) => [d.id, `${d.id} · ${d.title}${d.status === 'Approved' ? '' : ' — ' + d.status + ' (not selectable)'}`, d.status !== 'Approved']);
-    const refOpts = f.src === 'pr' ? prOpts : f.src === 'tender' ? awardedTenders().map((d) => [d.id, `${d.id} · ${d.title}`]) : activeCts().map((c) => [c.id, `${c.id} · ${(S.docOf(c.id) || {}).title}`]);
+    const refOpts = f.src === 'pr' ? prOpts : f.src === 'tender' ? awardedTenders().map((d) => [d.id, `${d.id} · ${d.title}`]).concat(awardedTenders().some((d) => d.id === f.ref) || !f.ref ? [] : [[f.ref, `${f.ref} — award not approved (not selectable)`, true]]) : activeCts().map((c) => [c.id, `${c.id} · ${(S.docOf(c.id) || {}).title}`]);
     const vendOpts = f.src === 'pr' ? [...new Set(f.lines.flatMap((l) => approvedVendors(l.mat)))].concat(D().vendors.filter((x) => x.risk === 'High').map((x) => x.id)) : f.vendors || [f.vendor];
     const blockedFor = f.lines.filter((l) => mat(l.mat).vendors.some((x) => x[0] === f.vendor && x[1] === 'Blocked')).map((l) => l.mat);
     const route = tt.net > 2000000000 ? ['Procurement Lead', 'Finance Director'] : ['Procurement Lead'];
@@ -148,9 +171,10 @@
       ${v && v.risk === 'High' ? `<div class="alert alert-warning" role="alert"><b>High-risk vendor.</b> ${esc(v.name)}: ${(v.riskReasons || []).map(esc).join(' · ')}.<label class="chk mt-s"><input type="checkbox" name="ack" value="1"${f.ack ? ' checked' : ''}${e.ack ? ' aria-invalid="true" aria-describedby="pn-ack-e"' : ''}> I have reviewed the risk and want to continue</label>${e.ack ? `<span class="err" id="pn-ack-e" role="alert">${esc(e.ack)}</span>` : ''}</div>` : ''}
       ${blockedFor.length ? `<div class="alert alert-danger" role="alert">${esc(v ? v.name : '')} is blocked for ${blockedFor.map(esc).join(', ')} (certificate). Choose another vendor.</div>` : ''}
       ${ex.length ? `<div class="alert alert-info" role="status">Already issued from this source: ${ex.map((d) => `<a class="mono" href="#/po/${esc(d.id)}">${esc(d.id)}</a> (${esc(d.status)})`).join(', ')}.</div>` : ''}
+      ${f.err ? `<div class="alert alert-warning" role="alert">${esc(f.err)}</div>` : ''}
       <h3 class="h-sub">Lines (${f.lines.length})</h3>${linesTbl}
       <dl class="dl mt">${Object.entries(tt.by).sort((a, b) => b[0] - a[0]).map(([r, x]) => `<dt>VAT ${esc(S.vatLabel(r))} on</dt><dd>${vnd(x)} + VAT ${vnd(x * r / 100)}</dd>`).join('')}<dt>Total excl. VAT</dt><dd><b>${vnd(tt.net)}</b></dd><dt>Total incl. VAT</dt><dd><b>${vnd(tt.gross)}</b></dd></dl>
-      <div class="row-acts"><a class="btn" href="#/po">Cancel</a><button type="button" class="btn" data-po="save-draft">Save draft</button><button type="submit" class="btn btn-p">Submit for approval</button></div></form>`);
+      <div class="row-acts"><a class="btn" href="#/po">Cancel</a><button type="button" class="btn" data-po="save-draft"${f.err ? ' disabled' : ''}>Save draft</button><button type="submit" class="btn btn-p"${f.err ? ' disabled aria-disabled="true"' : ''}>Submit for approval</button></div></form>`);
     const side = card('Approval route', `<ol class="chain">${route.map((r, i) => `<li><span class="small muted">Step ${i + 1} of ${route.length}</span><b>${r}</b><span class="small">${r === 'Procurement Lead' ? (S.me() === 'Nguyễn Minh Anh' ? 'Đỗ Hoàng Nam (SoD: you are the buyer)' : 'Nguyễn Minh Anh') : 'Đỗ Hoàng Nam'}</span></li>`).join('')}</ol>
       <p class="small muted">${vnd(tt.net)} excl. VAT · ${tt.net > 2000000000 ? '> 2 tỷ adds the Finance Director' : '≤ 2 tỷ ₫: Procurement Lead'}. Dept head approval is carried from the PR. After approval: Send to supplier (Gmail + portal), confirmation within 48 h.</p>`)
       + card('Price check', `<p class="small mt-0">Each line is compared with the last PO price and the 90-day average of its Material ID (excl. VAT). A difference above ±${D().priceAlertThreshold}% raises a price alert.</p>`);
@@ -164,6 +188,7 @@
   }
   function saveNew(root, submit) {
     readNew(root); const f = st.nf; const e = {}; const v = App.vendor(f.vendor);
+    if (f.err) { st.nerr = { _: f.err }; App.render(); return; }
     if (!f.lines.length) e._ = 'No lines — choose a source.';
     if (f.src === 'pr' && (S.docOf(f.ref) || {}).status !== 'Approved') e.ref = 'Only an approved PR can be used.';
     f.lines.forEach((l, i) => { const m = mat(l.mat);
@@ -215,7 +240,7 @@
     return card('Delivery schedule & goods receipt', table([
       { h: 'Material ID', r: (r) => mid(r.mat), w: '120px' },
       { h: 'Scheduled', r: (r) => `${num(r.qty)} ${esc(mat(r.mat).uom)}`, cls: 'num', w: '100px' },
-      { h: 'Promised', r: (r) => `${esc(r.due)}${r.cx ? `<div>${pill('Cancelled', 'danger')}</div>` : ''}`, w: '110px' },
+      { h: 'Promised', r: (r) => `${esc(r.due)}${r.ncr ? `<div class="small muted">${esc(r.ncr)}</div>` : ''}${r.cx ? `<div>${pill('Cancelled', 'danger')}</div>` : ''}`, w: '110px' },
       { h: 'GRN', r: (r) => (r.g ? `<span class="mono">${esc(r.gid)}</span><div class="small muted">${esc(r.date)}</div>` : r.rec ? '<span class="small muted">Archived</span>' : r.cx ? '—' : `<span class="small muted">${App.daysTo(r.due) < 0 ? 'Late · not received' : 'Open'}</span>`), w: '130px' },
       { h: 'Received · accepted · rejected', r: (r) => (r.rec ? `${num(r.delivered)} · <b>${num(r.accepted)}</b> · ${r.rejected ? `<span class="tone-danger">${num(r.rejected)}</span>` : '0'}` : '—'), cls: 'num', w: '180px' },
       { h: 'On time', r: (r) => (r.onTime == null ? '—' : pill(r.onTime ? 'Yes' : 'No', r.onTime ? 'success' : 'danger')), w: '90px' },
@@ -229,7 +254,7 @@
     const docsReq = m.certs.filter((c) => /GRN/.test(c[1])).map((c) => c[0]).concat(r.mat === 'CON-24015' || r.mat === 'CON-24020' ? ['Mill certificate'] : []).concat(['Biên bản giao nhận']);
     return `<form id="po-grn" class="stack mt decide-panel" novalidate><h3 class="h-sub mt-0">Record goods receipt</h3>
       ${S.me() === p.buyer ? '<div class="alert alert-warning" role="status"><b>SoD warning:</b> you are the buyer of this PO. PO buyer ≠ GRN receiver is a warn rule — the receipt is allowed and logged.</div>' : ''}
-      <div class="form-grid">${S.field('pg', e, 'slot', 'Scheduled delivery', `${r.li}:${r.si}`, { options: open.map((x) => [`${x.li}:${x.si}`, `${x.mat} · ${num(x.qty)} ${mat(x.mat).uom} · promised ${x.due}`]) })}
+      <div class="form-grid">${S.field('pg', e, 'slot', 'Scheduled delivery', `${r.li}:${r.si}`, { options: open.map((x) => [`${x.li}:${x.si}`, `${x.mat} · ${num(x.qty)} ${mat(x.mat).uom} · promised ${x.due}${x.ncr ? ' · replacement for ' + x.ncr : ''}`]) })}
         ${S.field('pg', e, 'date', 'Received on', f.date, { req: true, ph: 'dd/mm/yyyy' })}
         ${S.field('pg', e, 'delivered', `Delivered (${m.uom})`, f.delivered, { req: true, mode: 'decimal' })}${S.field('pg', e, 'accepted', `Accepted (${m.uom})`, f.accepted, { req: true, mode: 'decimal', hint: 'Accepted + rejected = delivered' })}
         ${S.field('pg', e, 'rejected', `Rejected (${m.uom})`, f.rejected, { mode: 'decimal' })}${S.field('pg', e, 'inspector', 'Inspector (QC)', f.inspector, { req: true })}
@@ -257,13 +282,15 @@
     let msg = `${gid} saved · ${num(ac)} ${m.uom} accepted`;
     if (rj > 0) {
       const nid = nextNo('NCR', 'NCR-2026-', 3); g.ncr = nid;
-      D().ncrs[nid] = { grn: gid, po: id, mat: r.mat, qty: rj, action: f.action, discount: f.action === 'Accept with discount' ? n(f.discount) : null, raised: NOW, by: f.inspector, supplier: 'Sent to supplier by Gmail + portal · answer due ' + App.addDays(D().today, 3), status: 'Open' };
+      D().ncrs[nid] = { grn: gid, po: id, mat: r.mat, qty: rj, action: f.action, discount: f.action === 'Accept with discount' ? n(f.discount) : null, raised: NOW, by: f.inspector, supplier: 'Sent to supplier by Gmail + portal · answer due ' + App.addDays(D().today, 3), status: 'Open', due: App.addDays(D().today, 3) };
       D().docs.push({ id: nid, type: 'NCR', title: `${m.name} · ${num(rj)} ${m.uom} rejected`, date: D().today, status: 'Open', mats: [r.mat], vendor: p.vendor, po: id });
       msg += ` · ${nid} created (${f.action}) and sent to the supplier`;
     }
     D().grns[gid] = g; p.lines[r.li].sched[r.si][2] = gid;
+    if (r.ncr && !rj && D().ncrs[r.ncr]) { const nn = D().ncrs[r.ncr]; nn.status = 'Closed'; nn.supplier += ' · replaced on ' + gid; const nd = S.docOf(r.ncr); if (nd) nd.status = 'Closed · replaced'; msg += ` · ${r.ncr} closed (replacement received)`; }
+    syncNcrSlots(id, p);
     D().docs.push({ id: gid, type: 'GRN', title: `${m.name} · ${num(ac)} ${m.uom} accepted`, date: f.date, status: rj ? 'Accepted with NCR' : 'Accepted', mats: [r.mat], vendor: p.vendor, po: id });
-    d.status = sched(p).every((x) => x.rec || x.cx) ? 'Delivered' : 'Partially received';
+    d.status = openSlots(p).length ? 'Partially received' : 'Delivered'; d.note = noteFrom(p, d);
     st.grn = null; App.render(); App.toast(msg);
   }
   function ncrCard(id) {
@@ -331,7 +358,7 @@
     p.revs.unshift(rev); st.co = null; App.render();
   }
   function applyRev(id, p, d, rev) {
-    (rev.change || []).forEach((c) => { const l = p.lines[c.i]; if (c.qty != null) { const open = l.sched.find((s) => !s[2] && !s[3]); const dq = c.qty - l.qty; if (open) open[0] += dq; else l.sched.push([dq, App.addDays(D().today, 7), null]); l.qty = c.qty; } if (c.due) l.sched[c.si][1] = c.due; });
+    (rev.change || []).forEach((c) => { const l = p.lines[c.i]; if (c.qty != null) { const open = l.sched.find((s) => !s[2] && !s[3] && !s[4]); const dq = c.qty - l.qty; if (open) open[0] += dq; else l.sched.push([dq, App.addDays(D().today, 7), null]); l.qty = c.qty; } if (c.due) l.sched[c.si][1] = c.due; });
     p.revs.forEach((r) => { if (/^Current/.test(r.status)) r.status = 'Superseded'; });
     rev.status = 'Current · awaiting supplier re-confirmation'; p.rev = rev.no;
     p.confirm = { status: 'Awaiting re-confirmation', sent: NOW, note: `Rev.${rev.no} sent by Gmail + portal` };
@@ -343,7 +370,7 @@
     const recv = p.lines.reduce((a, l, i) => a + receivedQty(p, i), 0);
     if (!st.cx) return card('Cancel', `<p class="small mt-0">${opens.length ? `Open quantity can be cancelled with a reason; the supplier is notified. ${recv ? 'Received quantities cannot be cancelled.' : ''}` : 'Nothing open to cancel — every scheduled delivery has been received.'}</p>`, opens.length ? '<button class="btn btn-sm btn-d" data-po="cx-open">Cancel open qty</button>' : '');
     const f = st.cx; const e = st.cxErr;
-    return card('Cancel open quantity', `<form id="po-cx" class="stack" novalidate>${S.field('px', e, 'scope', 'Scope', f.scope, { options: [['all', `Whole PO · all open quantity${recv ? ' (received qty stays)' : ''}`]].concat(opens.map(([i, q]) => [String(i), `Line ${i + 1} · ${p.lines[i].mat} · ${num(q)} ${mat(p.lines[i].mat).uom} open`])) })}
+    return card('Cancel open quantity', `<form id="po-cx" class="stack" novalidate>${S.field('px', e, 'scope', 'Scope', f.scope, { options: [['all', `Whole PO · all open quantity${recv ? ' (received qty stays)' : ''}`]].concat(opens.map(([i, q]) => { const nc = openSlots(p).filter((r) => r.li === i && r.ncr).map((r) => r.ncr); return [String(i), `Line ${i + 1} · ${p.lines[i].mat} · ${num(q)} ${mat(p.lines[i].mat).uom} open${nc.length ? ` (${nc.join(', ')})` : ''}`]; })) })}
       ${S.field('px', e, 'reason', 'Reason', f.reason, { area: true, req: true, hint: 'Required · sent to the supplier' })}
       <div class="row-acts"><button type="button" class="btn btn-sm" data-po="cx-cancel">Back</button><button type="submit" class="btn btn-sm btn-d">Cancel open quantity</button></div></form>`);
   }
@@ -353,7 +380,9 @@
     let cq = 0; const txt = [];
     p.lines.forEach((l, i) => { if (f.scope !== 'all' && +f.scope !== i) return; const q = openQty(p, i); if (!q) return; l.sched.forEach((s) => { if (!s[2] && !s[3]) s[3] = 'Cancelled'; }); l.cancelled = (l.cancelled || 0) + q; cq += q; txt.push(`${l.mat} −${num(q)} ${mat(l.mat).uom}`); });
     const recv = p.lines.reduce((a, l, i) => a + receivedQty(p, i), 0);
-    d.status = recv ? (sched(p).every((x) => x.rec || x.cx) ? 'Closed' : d.status) : (p.lines.every((l) => l.cancelled >= l.qty) ? 'Cancelled' : d.status);
+    const allInv = p.lines.every((l, i) => invoicedQty(id, l) >= acceptedQty(p, i));
+    d.status = recv ? (openSlots(p).length ? d.status : (!openNcr(id).length && allInv ? 'Closed' : 'Delivered')) : (p.lines.every((l) => l.cancelled >= l.qty) ? 'Cancelled' : d.status);
+    d.note = noteFrom(p, d);
     d.value = value(p);
     p.revs.forEach((r) => { if (/^Current/.test(r.status)) r.status = 'Superseded'; });
     const no = Math.max(0, ...p.revs.map((r) => r.no)) + 1; p.revs.unshift({ no, status: 'Current · cancellation sent to supplier', at: NOW, by: S.me(), diff: 'Cancelled open qty: ' + txt.join(' · '), reason: f.reason }); p.rev = no;
@@ -365,13 +394,14 @@
   }
   function detail(d) {
     const id = d.id; const p = det(id); const v = App.vendor(p.vendor); const tt = vatSplit(p);
-    const acc = p.lines.reduce((a, l, i) => a + acceptedQty(p, i) * l.price, 0); const inv = p.lines.reduce((a, l) => a + invoicedQty(id, l) * l.price, 0);
+    const acc = p.lines.reduce((a, l, i) => a + acceptedQty(p, i) * l.price, 0); const invs = invoicesOf(id); const okInv = invs.filter((v) => /Matched|Ready|Paid/.test(v.doc.status)); const sub = (v) => v.lines.reduce((a, x) => a + x[2] * x[3], 0);
+    const inv = okInv.reduce((a, v) => a + sub(v), 0); const exc = invs.filter((v) => !/Matched|Ready|Paid/.test(v.doc.status)).reduce((a, v) => a + sub(v), 0);
     const head = `<div class="page-h"><div><div class="crumbs small muted"><a href="#/po">Purchase orders</a> / ${esc(id)}</div><h1><span class="mono">${esc(id)}</span> <span class="small muted">Rev.${p.rev}</span> ${esc(d.title)}</h1>
       <div class="sub">${v ? esc(v.name) : ''} · ${pill(d.status, tone(d.status))}${d.note ? ` · <span class="small">${esc(d.note)}</span>` : ''}</div></div>
       <div class="acts"><a class="btn" href="#/po/${esc(id)}/print">Print preview</a>${/Sent|Confirmed|Partially/.test(d.status) && sched(p).some((r) => !r.rec && !r.cx) ? '<button class="btn btn-p" data-po="grn-open">Record goods receipt</button>' : ''}</div></div>`;
     const alerts = (v && v.risk === 'High' ? `<div class="alert alert-warning" role="status"><b>High-risk vendor.</b> ${(v.riskReasons || []).map(esc).join(' · ')}</div>` : '')
       + (p.confirm && p.confirm.status === 'Not confirmed' ? `<div class="alert alert-danger" role="alert"><b>Not confirmed by ${esc(App.vshort(v))}.</b> ${esc(p.confirm.note || '')}</div>` : '');
-    const kpis = `<div class="grid-k kpi-money">${kpi('Value excl. VAT', vnd(tt.net), `Rev.${p.rev}`)}${kpi('VAT', vnd(tt.vat), Object.keys(tt.by).map((r) => r + '%').join(' + '))}${kpi('Total incl. VAT', vnd(tt.gross), ty(tt.gross))}${kpi('Accepted', pct(tt.net ? acc / tt.net * 100 : 0, 0), vnd(acc))}${kpi('Invoiced', pct(tt.net ? inv / tt.net * 100 : 0, 0), vnd(inv))}</div>`;
+    const kpis = `<div class="grid-k kpi-money">${kpi('Value excl. VAT', vnd(tt.net), `Rev.${p.rev}`)}${kpi('VAT', vnd(tt.vat), Object.keys(tt.by).map((r) => r + '%').join(' + '))}${kpi('Total incl. VAT', vnd(tt.gross), ty(tt.gross))}${kpi('Accepted', pct(tt.net ? acc / tt.net * 100 : 0, 0), vnd(acc))}${kpi('Invoiced (matched)', pct(tt.net ? inv / tt.net * 100 : 0, 0), vnd(inv) + (exc ? `<div class="small tone-warning">${vnd(exc)} in exception / not matched</div>` : ''))}</div>`;
     const files = S.files('pof', p.files, d.mats, st.up, ['Signed PO', 'Mill certificate', 'Biên bản giao nhận', 'Specification / drawing', 'Other']);
     return `${head}${alerts}${progress(stepOf(d.status), d.status)}${kpis}<div class="grid-2"><div class="stack">${linesCard(id, p)}${schedCard(id, p, d)}${ncrCard(id)}${matchCard(id, p)}${files}</div>
       <div class="stack">${header(id, p, d)}${confirmCard(id, p, d)}${revCard(id, p, d)}${cancelCard(id, p, d)}</div></div>`;
@@ -458,7 +488,7 @@
         else if (a === 'cx-cancel') { st.cx = null; App.render(); }
         else if (a === 'send') { d.status = 'Sent · not confirmed'; p.confirm = { status: 'Not confirmed', sent: NOW, note: 'Reminder at 48 h · escalation to the buyer at 72 h' }; if (!p.revs.length) p.revs = [{ no: 0, status: 'Current', at: NOW, by: S.me(), diff: 'Original issue', reason: '' }]; App.render(); App.toast(`${id} sent to ${App.vshort(App.vendor(p.vendor))} by Gmail + portal · PDF Rev.${p.rev} attached`); }
         else if (a === 'confirm') { const v = App.vendor(p.vendor); const re = p.confirm && p.confirm.status === 'Awaiting re-confirmation'; p.confirm = { status: 'Confirmed', by: v.contact + ' (portal)', at: NOW, note: re ? `Rev.${p.rev} re-confirmed` : '' }; if (/^Sent/.test(d.status)) d.status = 'Confirmed'; p.revs.forEach((r) => { if (/awaiting supplier re-confirmation/.test(r.status)) r.status = 'Current · re-confirmed by supplier ' + D().today; }); if (/3 days overdue/.test(d.note || '')) d.note = ''; D().notifications.filter((n) => n.doc === id).forEach((n) => { n.read = true; }); App.render(); App.toast(`${id} confirmed by ${v.contact}`); }
-        else if (a === 'ncr-close') { const n = D().ncrs[b.dataset.id]; n.status = 'Closed'; n.supplier += ' · closed ' + D().today; const nd = S.docOf(b.dataset.id); if (nd) nd.status = n.action === 'Accept with discount' ? 'Closed · accepted with discount' : 'Closed'; if (n.action === 'Accept with discount') { const g = D().grns[n.grn]; const gl = g && g.lines.find((x) => x[4]); if (gl) { gl[3] += gl[4]; gl[4] = 0; } } App.render(); App.toast(`${b.dataset.id} closed · OTIF, NCR rate and Material 360° updated`); }
+        else if (a === 'ncr-close') { const n = D().ncrs[b.dataset.id]; n.status = 'Closed'; n.supplier += ' · closed ' + D().today; const nd = S.docOf(b.dataset.id); if (nd) nd.status = n.action === 'Accept with discount' ? 'Closed · accepted with discount' : 'Closed'; if (n.action === 'Accept with discount') { const g = D().grns[n.grn]; const gl = g && g.lines.find((x) => x[4]); if (gl) { gl[3] += gl[4]; gl[4] = 0; } } syncNcrSlots(id, p); if (/Partially/.test(d.status) && !openSlots(p).length) d.status = 'Delivered'; d.note = noteFrom(p, d); App.render(); App.toast(`${b.dataset.id} closed · OTIF, NCR rate and Material 360° updated`); }
       });
     }
   });

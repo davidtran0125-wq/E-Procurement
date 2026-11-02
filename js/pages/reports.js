@@ -17,10 +17,7 @@
       return Object.assign(s, { val: 1520000000 - award, baseTxt: '1.520.000.000 ₫ (last PO per line)', awardTxt: vnd(award) });
     });
   }
-  const offContract = () => D().docs.filter((d) => d.type === 'PO').flatMap((d) => d.mats.map((m) => {
-    const c = D().contracts.find((x) => x.lines.some((l) => l.mat === m) && App.dt(x.start) <= App.dt(d.date) && App.dt(x.end) >= App.dt(d.date));
-    const p = D().pos[d.id]; return c && (c.vendor !== d.vendor || (p && !p.contract && !p.tender)) ? { d, m, c } : null;
-  })).filter(Boolean);
+  const offContract = () => S.offContract();
 
   function render() {
     const V = D().vendors; const ov = R().otifVendors; const K = D().kpi;
@@ -62,9 +59,9 @@
     const cube = card('Spend cube', `<div class="seg seg-nw" role="group" aria-label="Spend by">${[['vendor', 'By vendor'], ['mat', 'By Material ID'], ['project', 'By project']].map(([k, l]) => `<button data-rp="cube" data-k="${k}" aria-pressed="${st.cube === k}">${l}</button>`).join('')}</div><div class="mt">${App.chart.bars(cubeRows, (v) => num(v, 2) + ' tỷ ₫')}</div>
       <p class="small muted">Spend YTD ${num(SPEND, 1)} tỷ ₫ excl. VAT · keyed by Material ID → category. ${st.cube === 'vendor' ? `<b>Top 5 vendors = ${num(top5, 2)} tỷ ₫ = ${pct(top5 / SPEND * 100)}</b> (concentration).` : st.cube === 'project' ? 'Project spend = invoiced + committed.' : 'Material IDs in this sample.'}</p>`);
     const off = offContract();
-    const cover = card('Contract coverage & off-contract spend', `<div class="grid-k">${kpi('Contract coverage', pct(R().coverage), 'Spend under an active contract')}${kpi('Off-contract', pct(100 - R().coverage), 'Material IDs with a contract, bought outside it', 'warning')}</div>` + table([
+    const cover = card('Contract coverage & off-contract spend', `<div class="grid-k">${kpi('Contract coverage', pct(R().coverage), 'Spend under an active contract')}${kpi('Off-contract', pct(100 - R().coverage), 'Bought outside an active contract, or after it expired', 'warning')}</div>` + table([
       { h: 'Material ID', r: (x) => mid(x.m), w: '120px' }, { h: 'PO', r: (x) => `<a class="mono" href="#/po/${x.d.id}">${x.d.id}</a><div class="small muted">${esc(x.d.date)}</div>`, w: '130px' },
-      { h: 'Bought from', r: (x) => esc(App.vshort(App.vendor(x.d.vendor))), w: 'minmax(120px,1fr)' }, { h: 'Contract in force', r: (x) => `<a class="mono" href="#/contracts/${x.c.id}">${x.c.id}</a><div class="small muted">${esc(App.vshort(App.vendor(x.c.vendor)))}</div>`, w: 'minmax(130px,1fr)' },
+      { h: 'Bought from', r: (x) => esc(App.vshort(App.vendor(x.d.vendor))), w: 'minmax(120px,1fr)' }, { h: 'Contract', r: (x) => `<a class="mono" href="#/contracts/${x.c.id}">${x.c.id}</a><div class="small muted">${esc(x.why)}</div>`, w: 'minmax(160px,1.3fr)' },
       { h: 'Value excl. VAT', r: (x) => vnd(x.d.value), cls: 'num', w: '140px' }
     ], off, { min: 700, empty: 'No off-contract POs', label: 'Off-contract POs' }));
     const C = R().cycle;

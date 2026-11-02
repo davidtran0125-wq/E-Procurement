@@ -166,7 +166,7 @@ window.DATA = {
     { id: 'PO-2026-0831', type: 'PO', title: 'Dịch vụ vệ sinh công nghiệp T10', date: '01/10/2026', status: 'Delivered', mats: ['SRV-52118'], vendor: 'V-1005', qty: '1 tháng', price: 62000000, value: 62000000 },
     { id: 'PO-2026-0844', type: 'PO', title: 'Bê tông M250 – Kho A', date: '03/10/2026', status: 'Closed', mats: ['CON-24325'], vendor: 'V-1009', qty: '300 m³', price: 1150000, value: 345000000 },
     { id: 'PO-2026-0855', type: 'PO', title: 'Bơm ly tâm 75kW – Trạm bơm', date: '13/10/2026', status: 'Delivered', mats: ['EQP-31244'], vendor: 'V-1003', qty: '2 cái', price: 182000000, value: 364000000 },
-    { id: 'PO-2026-0870', type: 'PO', title: 'Bảo trì hệ thống HVAC T11', date: '27/10/2026', status: 'Delivered', mats: ['SRV-52003'], vendor: 'V-1005', qty: '1 tháng', price: 48000000, value: 48000000 }
+    { id: 'PO-2026-0870', type: 'PO', title: 'Bảo trì hệ thống HVAC T11', date: '27/10/2026', status: 'Confirmed', mats: ['SRV-52003'], vendor: 'V-1005', qty: '1 tháng', price: 48000000, value: 48000000 }
   ],
 
   /* Attachments linked by Material ID (R-19) */
@@ -402,7 +402,7 @@ window.DATA = {
     'KHOB-VLXD': { name: 'Dự án Kho B · Vật liệu xây dựng', budget: 12000000000, invoiced: 2150000000, committed: 5400000000 },
     'BD-CAPEX': { name: 'Nhà máy Bình Dương · Capex thiết bị', budget: 5000000000, invoiced: 900000000, committed: 1200000000 },
     'KHOA-OPEX': { name: 'Kho A · Bảo trì & thiết bị nhỏ', budget: 800000000, invoiced: 310000000, committed: 120000000 },
-    'C2-STEEL': { name: 'Nhà xưởng C2 · Steel', budget: 6000000000, invoiced: 2900000000, committed: 1216000000 }
+    'C2-STEEL': { name: 'Nhà xưởng C2 · Steel', budget: 6000000000, invoiced: 2900000000, committed: 916500000 }
   };
   D.prs = {
     'PR-2026-0452': { requester: 'Nguyễn Minh Anh', dept: 'Phòng Mua hàng', project: 'Dự án Kho B · giai đoạn 2', cc: 'KHOB-VLXD', cat: 'CON', need: '15/12/2026', site: 'Kho B · KCN Tân Uyên, Bình Dương',
@@ -480,6 +480,8 @@ window.DATA = {
     'PO-2026-0866': { vendor: 'V-1001', pr: 'PR-2026-0426', tender: null, contract: null, buyer: 'Lê Quốc Huy', site: 'Nhà xưởng C2', terms: '30 days after invoice', rev: 1,
       lines: [{ mat: 'CON-24020', qty: 30, price: 15350000, sched: [done(15, '27/10/2026', 'GRN-2026-1528'), done(15, '31/10/2026', 'GRN-2026-1539')] }], confirm: { status: 'Confirmed', by: 'Võ Thị Lan (portal)', at: '21/10/2026 08:30', note: 'Rev.1 re-confirmed' },
       revs: [{ no: 1, status: 'Current', at: '20/10/2026 14:02', by: 'Nguyễn Minh Anh', diff: 'Lot 1 date 24/10 → 27/10/2026 · no price change', reason: 'Đổi ngày giao, không đổi giá.' }, { no: 0, status: 'Superseded', at: '19/10/2026 09:00', by: 'Nguyễn Minh Anh', diff: 'Original issue (spot PO, not released from CT-2026-008)', reason: '' }], files: [] },
+    'PO-2026-0870': { vendor: 'V-1005', pr: null, tender: null, contract: 'CT-2026-011', buyer: 'Trần Bảo Ngọc', site: 'Văn phòng HCM + Nhà máy Bình Dương', terms: '30 days after invoice', rev: 0,
+      lines: [{ mat: 'SRV-52003', qty: 1, price: 48000000, sched: [done(1, '30/11/2026', null)] }], confirm: { status: 'Confirmed', by: 'Bùi Minh Khoa (portal)', at: '28/10/2026 09:00' }, revs: [{ no: 0, status: 'Current', at: '27/10/2026 10:00', by: 'Trần Bảo Ngọc', diff: 'Release CT-2026-011 · HVAC T11', reason: '' }], files: [] },
     'PO-2026-0812': { vendor: 'V-1006', pr: null, tender: null, contract: null, buyer: 'Trần Bảo Ngọc', site: 'KCN Phú Mỹ, Bà Rịa – Vũng Tàu', terms: '30 days after invoice', rev: 0,
       lines: [{ mat: 'LOG-61045', qty: 3000, price: 105000, sched: [done(1000, '30/09/2026', 'GRN-2026-1470'), done(1000, '31/10/2026', null), done(1000, '30/11/2026', null)] }], confirm: { status: 'Confirmed', by: 'Lý Thanh Tùng (portal)', at: '26/09/2026 10:00' }, revs: [], files: [] },
     'PO-2026-0831': { vendor: 'V-1005', pr: null, tender: null, contract: null, buyer: 'Trần Bảo Ngọc', site: 'Nhà máy Bình Dương', terms: '30 days after invoice', rev: 0,
@@ -536,7 +538,7 @@ window.DATA = {
   D.reports = {
     otif: { onTime: 94.0, inFull: 96.8, deliveries: 1284, late: 77, short: 41 },
     /* vendor: [deliveries, on time %, in full %] — OTIF = vendor.otif */
-    otifVendors: { 'V-1001': [24, 97.9, 97.9], 'V-1002': [34, 94.1, 97.1], 'V-1003': [19, 94.7, 94.7], 'V-1004': [25, 92.0, 96.0], 'V-1005': [25, 96.0, 100], 'V-1006': [45, 88.9, 97.8], 'V-1008': [25, 88.0, 96.0], 'V-1009': [79, 94.9, 97.5], 'V-1010': [30, 93.3, 96.7], 'V-1011': [46, 93.5, 95.7] },
+    otifVendors: { 'V-1001': [48, 97.9, 97.9], 'V-1002': [34, 94.1, 97.1], 'V-1003': [19, 94.7, 94.7], 'V-1004': [25, 92.0, 96.0], 'V-1005': [25, 96.0, 100], 'V-1006': [45, 88.9, 97.8], 'V-1008': [25, 88.0, 96.0], 'V-1009': [79, 94.9, 97.5], 'V-1010': [30, 93.3, 96.7], 'V-1011': [46, 93.5, 95.7] },
     saving: { reported: 9.7, rate: 5.2, target: 4, avoidance: 2.1, validated: 8.9 },
     savings: [
       { id: 'SAV-2026-118', mat: 'CON-24015', doc: 'TND-2026-024 → PO-2026-0877', type: 'Price reduction', base: 16450000, award: 15200000, qty: 80, status: 'Validated', by: 'Đỗ Hoàng Nam · 25/10/2026' },
