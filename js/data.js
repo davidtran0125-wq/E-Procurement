@@ -94,9 +94,9 @@ window.DATA = {
   vendors: [
     { id: 'V-1001', name: 'Công ty TNHH Thép Minh Phát', cat: 'Construction', status: 'Preferred', score: 4.32, grade: 'A', otif: 95.8, email: 'sales.minhphat@gmail.com', contact: 'Võ Thị Lan', mst: '0315 284 671', risk: 'Low', city: 'TP.HCM' },
     { id: 'V-1002', name: 'CTCP VLXD An Khang', cat: 'Construction', status: 'Approved', score: 3.98, grade: 'B', otif: 91.2, email: 'kinhdoanh.ankhang@gmail.com', contact: 'Ngô Văn Tài', mst: '0313 902 118', risk: 'Low', city: 'Đồng Nai' },
-    { id: 'V-1003', name: 'Công ty TNHH Thiết bị Công nghiệp Đại Phong', cat: 'Equipment', status: 'Preferred', score: 4.05, grade: 'A', otif: 89.5, email: 'daiphong.equip@gmail.com', contact: 'Phạm Văn Đức', mst: '0312 456 789', risk: 'Medium', city: 'Bình Dương' },
+    { id: 'V-1003', name: 'Công ty TNHH Thiết bị Công nghiệp Đại Phong', cat: 'Equipment', status: 'Preferred', score: 4.05, grade: 'B', otif: 89.5, email: 'daiphong.equip@gmail.com', contact: 'Phạm Văn Đức', mst: '0312 456 789', risk: 'Medium', city: 'Bình Dương' },
     { id: 'V-1004', name: 'CTCP Cơ điện Trường Sơn', cat: 'Equipment / Services', status: 'Approved', score: 3.82, grade: 'B', otif: 88.0, email: 'truongson.me@gmail.com', contact: 'Đặng Thị Hoa', mst: '0310 771 245', risk: 'Low', city: 'TP.HCM' },
-    { id: 'V-1005', name: 'Công ty TNHH Dịch vụ Kỹ thuật Hưng Long', cat: 'Services', status: 'Preferred', score: 4.10, grade: 'A', otif: 96.0, email: 'hunglong.service@gmail.com', contact: 'Bùi Minh Khoa', mst: '0314 559 830', risk: 'Low', city: 'TP.HCM' },
+    { id: 'V-1005', name: 'Công ty TNHH Dịch vụ Kỹ thuật Hưng Long', cat: 'Services', status: 'Preferred', score: 4.10, grade: 'B', otif: 96.0, email: 'hunglong.service@gmail.com', contact: 'Bùi Minh Khoa', mst: '0314 559 830', risk: 'Low', city: 'TP.HCM' },
     { id: 'V-1006', name: 'CTCP Logistics Sao Việt', cat: 'Logistics', status: 'Approved', score: 3.65, grade: 'B', otif: 86.7, email: 'ops.saoviet@gmail.com', contact: 'Lý Thanh Tùng', mst: '0311 640 092', risk: 'Medium', city: 'TP.HCM' },
     { id: 'V-1007', name: 'Công ty TNHH Kho vận Phú Mỹ', cat: 'Logistics', status: 'Pending approval', score: null, grade: '—', otif: null, email: 'kho.phumy@gmail.com', contact: 'Huỳnh Gia Bảo', mst: '3502 418 776', risk: '—', city: 'Bà Rịa – Vũng Tàu' },
     { id: 'V-1008', name: 'CTCP Kim khí Bắc Sơn', cat: 'Construction', status: 'Probation', score: 3.40, grade: 'C', otif: 84.0, email: 'bacson.steel@gmail.com', contact: 'Trịnh Văn Hải', mst: '0106 228 914', risk: 'High', city: 'Hà Nội' },
@@ -135,6 +135,7 @@ window.DATA = {
     { id: 'PO-2026-0882', type: 'PO', title: 'Tủ điện MSB – Nhà xưởng C2', date: '02/11/2026', status: 'Draft', mats: ['EQP-31402'], vendor: 'V-1004', qty: '2 bộ', price: 193000000, value: 386000000 },
     { id: 'GRN-2026-1518', type: 'GRN', title: 'Xi măng PCB40 · 55 tấn accepted', date: '24/10/2026', status: 'Accepted with NCR', mats: ['CON-24102'], vendor: 'V-1002' },
     { id: 'GRN-2026-1532', type: 'GRN', title: 'Thép D16 · 50 tấn on time & in full', date: '28/10/2026', status: 'Accepted', mats: ['CON-24015'], vendor: 'V-1001' },
+    { id: 'CT-2025-007', type: 'CT', title: 'Fixed price – Xi măng An Khang 2025–2026', date: '01/10/2025', status: 'Expired', mats: ['CON-24102'], vendor: 'V-1002', note: 'Expired 30/09/2026' },
     { id: 'CT-2025-019', type: 'CT', title: 'Rate card Logistics Sao Việt', date: '01/01/2026', status: 'Expiring', mats: ['LOG-61012'], vendor: 'V-1006', note: 'Expires 31/12/2026' },
     { id: 'CT-2026-008', type: 'CT', title: 'Framework – Thép Minh Phát 2026', date: '01/01/2026', status: 'Expiring', mats: ['CON-24015', 'CON-24020'], vendor: 'V-1001', note: '1.200 tấn commitment · 640 tấn released · 01/01–31/12/2026' },
     { id: 'CT-2026-011', type: 'CT', title: 'HVAC maintenance SLA – Hưng Long', date: '01/01/2026', status: 'Active', mats: ['SRV-52003'], vendor: 'V-1005' },
@@ -218,3 +219,117 @@ window.DATA = {
   },
   priceAlertThreshold: 5
 };
+
+/* ---------- Phase 2: vendors, evaluation, contracts, certificates (Modules 4–7) ---------- */
+(function (D) {
+  /* Vendor profile extensions (F-20..F-26): tax check, risk reasons (R-16), bank change (R-08), proposed Material ID links */
+  const ext = {
+    'V-1001': { terms: '30 days · advance 30% / 70%', phone: '0283 812 4471', address: '125 Quốc lộ 1A, P. Bình Hưng Hòa, Q. Bình Tân, TP.HCM', since: '15/03/2019', riskReasons: ['NCR-2026-017 awaiting supplier (CON-24020 · minor)'],
+      bank: { now: 'Vietcombank ···· 2210', pending: 'BIDV ···· 0937', requested: '30/10/2026 16:40', by: 'Võ Thị Lan (portal)' } },
+    'V-1002': { terms: '45 days', phone: '0251 382 6650', address: 'KCN Biên Hòa 2, TP. Biên Hòa, Đồng Nai', since: '02/06/2020', riskReasons: ['NCR-2026-014 open (CON-24102 · 5 bao rách)'], bank: { now: 'ACB ···· 5521' } },
+    'V-1003': { terms: '30 days', phone: '0274 377 9012', address: 'KCN VSIP 1, TP. Thuận An, Bình Dương', since: '20/09/2018', riskReasons: ['Single source for EQP-31007', 'PO-2026-0869 not confirmed · 3 days overdue', 'ISO 9001 expires 28/11/2026'], bank: { now: 'Techcombank ···· 8843' } },
+    'V-1004': { terms: '45 days', phone: '0283 991 2044', address: '88 Đường số 7, KCN Tân Tạo, Q. Bình Tân, TP.HCM', since: '11/01/2021', riskReasons: [], bank: { now: 'VietinBank ···· 1176' } },
+    'V-1005': { terms: '30 days', phone: '0283 620 1188', address: '45 Nguyễn Văn Linh, Q.7, TP.HCM', since: '05/01/2022', riskReasons: [], bank: { now: 'Vietcombank ···· 4402' } },
+    'V-1006': { terms: '30 days', phone: '0283 740 5599', address: '12 Đường D1, KCN Cát Lái, TP. Thủ Đức, TP.HCM', since: '10/01/2020', riskReasons: ['Single source for LOG-61012 and LOG-61045', 'OTIF 86,7% (below 90% watch level)', 'INV-2026-0322 price exception +2,7%'], bank: { now: 'MB ···· 7730' } },
+    'V-1007': { terms: '30 days', phone: '0254 389 1020', address: 'KCN Phú Mỹ 1, TX. Phú Mỹ, Bà Rịa – Vũng Tàu', since: '30/10/2026', riskReasons: ['Onboarding review in progress'], bank: { now: '—', pending: 'Sacombank ···· 3318', requested: '31/10/2026 09:10', by: 'Huỳnh Gia Bảo (portal)' },
+      onboarding: [['Company & MST check', 'OK'], ['Legal representative', 'OK'], ['Giấy CNĐKDN upload', 'OK'], ['Bank account', 'Missing'], ['Categories', 'OK'], ['Material IDs offered', 'OK'], ['Certificates', 'Missing'], ['Code-of-conduct acceptance', 'OK']],
+      proposed: ['LOG-61045'] },
+    'V-1008': { terms: '30 days', phone: '0243 765 2201', address: 'Lô C3, KCN Quang Minh, Mê Linh, Hà Nội', since: '08/04/2021', riskReasons: ['ISO 9001 expired 15/10/2026 (mandatory for CON-24015)', 'OTIF 84,0% < 85%'], bank: { now: 'BIDV ···· 6604' } },
+    'V-1009': { terms: '30 days', phone: '0283 896 4410', address: '201 Quốc lộ 13, TP. Thủ Đức, TP.HCM', since: '14/02/2022', riskReasons: ['INV-2026-0321 blocked · legal check'], bank: { now: 'Vietcombank ···· 0915' } },
+    'V-1010': { terms: '45 days', phone: '0272 351 7788', address: 'KCN Đức Hòa 1, Long An', since: '03/05/2023', riskReasons: [], bank: { now: 'Agribank ···· 2047' } },
+    'V-1011': { terms: '30 days', phone: '0274 362 5520', address: 'KCN Mỹ Phước 3, TX. Bến Cát, Bình Dương', since: '19/07/2023', riskReasons: ['Hợp quy QCVN 7 expires 20/11/2026'], bank: { now: 'VPBank ···· 3361' } }
+  };
+  D.vendors.forEach((v) => Object.assign(v, { taxStatus: 'Đang hoạt động', mstChecked: '28/10/2026', mstVerified: true, riskChecked: '02/11/2026 06:00', proposed: [] }, ext[v.id] || {}));
+
+  /* Contracts (F-30..F-35). Lines are per Material ID; released qty per line. Security = performance security (R-09). Docs = typed, versioned (R-19). */
+  D.contracts = [
+    { id: 'CT-2026-008', ctype: 'Framework', vendor: 'V-1001', start: '01/01/2026', end: '31/12/2026', ceiling: 19500000000, vat: 10, owner: 'Nguyễn Minh Anh', esign: 'E-signed v3 · 05/01/2026', minPct: 80, forecast: 860,
+      lines: [{ mat: 'CON-24015', commit: 900, released: 505, q3: 16450000, q4: 15627500 }, { mat: 'CON-24020', commit: 300, released: 135, q3: 16160000, q4: 15352000 }],
+      adjust: 'Steel price index clause: max ±5% per quarter. Q4 index −6,8% → −5,0% applied by Phụ lục 01 (01/10/2026). PO price may not exceed the current contract price.',
+      terms: [['Payment', '30 days after invoice'], ['Late delivery penalty', '0,1% per day, max 8%'], ['Warranty', 'Replace defective lot within 7 days'], ['Incoterms', 'DAP site (Nhà xưởng C2 / Kho B)']],
+      security: { amount: 975000000, bank: 'Vietcombank – CN Sài Gòn', ref: 'BL-VCB-2026-00418', expiry: '31/01/2027' },
+      releases: [['PO-2026-0118', 'CON-24015', 60, 16450000, '20/01/2026'], ['PO-2026-0204', 'CON-24015', 50, 16450000, '18/02/2026'], ['PO-2026-0297', 'CON-24015', 55, 16450000, '16/03/2026'], ['PO-2026-0365', 'CON-24015', 50, 16450000, '10/04/2026'],
+        ['PO-2026-0442', 'CON-24015', 60, 16450000, '08/05/2026'], ['PO-2026-0531', 'CON-24015', 45, 16450000, '05/06/2026'], ['PO-2026-0590', 'CON-24020', 135, 16160000, '22/06/2026'], ['PO-2026-0618', 'CON-24015', 50, 16450000, '06/07/2026'],
+        ['PO-2026-0705', 'CON-24015', 45, 16450000, '10/08/2026'], ['PO-2026-0802', 'CON-24015', 45, 16450000, '15/09/2026'], ['PO-2026-0858', 'CON-24015', 45, 15627500, '14/10/2026']],
+      files: [{ type: 'Signed contract', name: 'CT-2026-008_signed.pdf', ver: 'v3', by: 'Nguyễn Minh Anh', date: '05/01/2026', mats: ['CON-24015', 'CON-24020'], tag: 'Signed' },
+        { type: 'Phụ lục (amendment)', name: 'CT-2026-008_PL01_index.pdf', ver: 'v1', by: 'Nguyễn Minh Anh', date: '01/10/2026', mats: ['CON-24015', 'CON-24020'], tag: 'Signed' },
+        { type: 'Performance security', name: 'BL-VCB-2026-00418.pdf', ver: 'v1', by: 'Võ Thị Lan', date: '06/01/2026', mats: [], tag: 'Uploaded by supplier' },
+        { type: 'Mill certificate', name: 'MinhPhat_mill_cert_Q4.pdf', ver: 'v2', by: 'Võ Thị Lan', date: '28/10/2026', mats: ['CON-24015'], tag: 'Uploaded by supplier' }] },
+    { id: 'CT-2025-019', ctype: 'Rate card', vendor: 'V-1006', start: '01/01/2025', end: '31/12/2026', ceiling: 4800000000, vat: 8, owner: 'Trần Bảo Ngọc', esign: 'E-signed v2 · 28/12/2025', minPct: 0, forecast: null,
+      lines: [{ mat: 'LOG-61012', commit: 260, released: 214, q3: 18500000, q4: 18500000 }], adjust: 'Fuel surcharge reviewed quarterly, max ±3%.',
+      terms: [['Payment', '30 days after invoice'], ['Late delivery penalty', '500.000 ₫ per trip per day'], ['Incoterms', 'Door to door']],
+      security: { amount: 240000000, bank: 'BIDV – CN Gia Định', ref: 'BL-BIDV-2025-1172', expiry: '20/11/2026' },
+      releases: [['PO-2026-0874', 'LOG-61012', 12, 18500000, '20/10/2026']],
+      files: [{ type: 'Signed contract', name: 'CT-2025-019_rate_card_v2.pdf', ver: 'v2', by: 'Trần Bảo Ngọc', date: '28/12/2025', mats: ['LOG-61012'], tag: 'Signed' }] },
+    { id: 'CT-2026-011', ctype: 'Service SLA', vendor: 'V-1005', start: '01/04/2026', end: '31/03/2027', ceiling: 576000000, vat: 8, owner: 'Trần Bảo Ngọc', esign: 'E-signed v1 · 25/03/2026', minPct: 0, forecast: null,
+      lines: [{ mat: 'SRV-52003', commit: 12, released: 8, q3: 48000000, q4: 48000000 }], adjust: 'Fixed monthly fee for the term.',
+      terms: [['Payment', 'Monthly, 30 days'], ['Response SLA', '4 hours · penalty 2% of monthly fee per breach'], ['Scope', 'Văn phòng HCM + nhà máy Bình Dương']],
+      security: { amount: 28800000, bank: 'Vietcombank – CN Phú Mỹ Hưng', ref: 'BL-VCB-2026-00131', expiry: '30/04/2027' },
+      releases: [['PO-2026-0870', 'SRV-52003', 1, 48000000, '27/10/2026']],
+      files: [{ type: 'Signed contract', name: 'CT-2026-011_SLA.pdf', ver: 'v1', by: 'Trần Bảo Ngọc', date: '25/03/2026', mats: ['SRV-52003'], tag: 'Signed' }] },
+    { id: 'CT-2026-014', ctype: 'Service SLA', vendor: 'V-1003', start: '01/11/2026', end: '31/10/2027', ceiling: 240000000, vat: 8, owner: 'Lê Quốc Huy', esign: 'Sent for e-signature 28/10/2026 · waiting for vendor', minPct: 0, forecast: null,
+      lines: [{ mat: 'EQP-31007', commit: 4, released: 0, q3: null, q4: 60000000 }], adjust: 'Fixed price per quarterly service visit.',
+      terms: [['Payment', '30 days after each visit'], ['Response SLA', '8 hours on site'], ['Spare parts', 'Billed at list price −10%']],
+      security: { amount: 12000000, bank: 'Techcombank – CN Bình Dương', ref: 'Pending', expiry: '30/11/2027' },
+      releases: [],
+      files: [{ type: 'Draft contract', name: 'CT-2026-014_draft.pdf', ver: 'v2', by: 'Lê Quốc Huy', date: '28/10/2026', mats: ['EQP-31007'], tag: 'Draft' }] },
+    { id: 'CT-2025-007', ctype: 'Fixed price', vendor: 'V-1002', start: '01/10/2025', end: '30/09/2026', ceiling: 1580000000, vat: 8, owner: 'Nguyễn Minh Anh', esign: 'E-signed v1 · 28/09/2025', minPct: 0, forecast: null,
+      lines: [{ mat: 'CON-24102', commit: 1000, released: 940, q3: 1580000, q4: null }], adjust: 'Fixed price for the term.',
+      terms: [['Payment', '45 days'], ['Incoterms', 'DAP site']],
+      security: { amount: 79000000, bank: 'ACB – CN Đồng Nai', ref: 'BL-ACB-2025-0388', expiry: '31/10/2026' },
+      releases: [], files: [{ type: 'Signed contract', name: 'CT-2025-007_signed.pdf', ver: 'v1', by: 'Nguyễn Minh Anh', date: '28/09/2025', mats: ['CON-24102'], tag: 'Signed' }] }
+  ];
+  /* Universe counters for the contract register (sample loaded) */
+  D.contractStats = { total: 17, active: 12, value: 48.6 };
+
+  /* Certificates (F-36..F-39). mats = scope by Material ID. Mandatory = required by a Material ID in scope (F-13). */
+  D.certificates = [
+    { id: 'CERT-0101', type: 'ISO 9001', no: 'BV-VN-9001-18842', vendor: 'V-1001', mats: ['CON-24015', 'CON-24020'], issuer: 'Bureau Veritas Certification', issued: '15/06/2025', expiry: '14/06/2028', status: 'Valid', verified: 'Nguyễn Minh Anh · 20/06/2025' },
+    { id: 'CERT-0102', type: 'Hợp quy QCVN 7:2019/BKHCN', no: 'QC-7-MP-0221', vendor: 'V-1001', mats: ['CON-24015', 'CON-24020'], issuer: 'Quacert', issued: '05/02/2026', expiry: '04/02/2029', status: 'Valid', verified: 'Nguyễn Minh Anh · 06/02/2026' },
+    { id: 'CERT-0115', type: 'Hợp quy QCVN 16:2023/BXD', no: 'QC-16-MP-0310', vendor: 'V-1001', mats: ['CON-24102'], issuer: 'Vinacontrol CE', issued: '16/12/2023', expiry: '15/12/2026', status: 'Valid', verified: 'Nguyễn Minh Anh · 20/12/2023' },
+    { id: 'CERT-0113', type: 'Hợp quy QCVN 16:2023/BXD', no: 'QC-16-AK-1188', vendor: 'V-1002', mats: ['CON-24102'], issuer: 'Vinacontrol CE', issued: '01/07/2024', expiry: '30/06/2027', status: 'Valid', verified: 'Nguyễn Minh Anh · 05/07/2024' },
+    { id: 'CERT-0111', type: 'ISO 9001', no: 'TUV-9001-DP-2023', vendor: 'V-1003', mats: ['EQP-31007', 'EQP-31244'], issuer: 'TÜV Rheinland Việt Nam', issued: '29/11/2023', expiry: '28/11/2026', status: 'Valid', verified: 'Lê Quốc Huy · 02/12/2023' },
+    { id: 'CERT-0112', type: 'ISO 9001', no: 'SGS-9001-HL-0457', vendor: 'V-1005', mats: ['SRV-52003'], issuer: 'SGS Việt Nam', issued: '26/12/2023', expiry: '25/12/2026', status: 'Valid', verified: 'Trần Bảo Ngọc · 03/01/2024' },
+    { id: 'CERT-0108', type: 'ISO 9001', no: 'QV-9001-BS-0912', vendor: 'V-1008', mats: ['CON-24015', 'CON-24020'], issuer: 'Quacert', issued: '16/10/2023', expiry: '15/10/2026', status: 'Valid', verified: 'Nguyễn Minh Anh · 20/10/2023' },
+    { id: 'CERT-0109', type: 'ISO 9001', no: 'QV-9001-BS-1426', vendor: 'V-1008', mats: ['CON-24015', 'CON-24020'], issuer: 'Quacert', issued: '30/10/2026', expiry: '29/10/2029', status: 'Pending review', uploaded: 'Trịnh Văn Hải · 31/10/2026 (supplier)', file: 'ISO9001_BacSon_2026.pdf', replaces: 'CERT-0108' },
+    { id: 'CERT-0114', type: 'ISO 9001', no: 'BV-VN-9001-20117', vendor: 'V-1009', mats: ['CON-24330', 'CON-24325'], issuer: 'Bureau Veritas Certification', issued: '11/01/2024', expiry: '10/01/2027', status: 'Valid', verified: 'Nguyễn Minh Anh · 15/01/2024' },
+    { id: 'CERT-0116', type: 'ISO 45001', no: 'BV-VN-45001-0873', vendor: 'V-1010', mats: ['CON-24330'], issuer: 'Bureau Veritas Certification', issued: '29/09/2023', expiry: '28/09/2026', status: 'Valid', verified: 'Nguyễn Minh Anh · 02/10/2023' },
+    { id: 'CERT-0110', type: 'Hợp quy QCVN 7:2019/BKHCN', no: 'QC-7-TL-0098', vendor: 'V-1011', mats: ['CON-24015'], issuer: 'Quacert', issued: '21/11/2023', expiry: '20/11/2026', status: 'Valid', verified: 'Nguyễn Minh Anh · 25/11/2023' },
+    { id: 'CERT-0117', type: 'ISO 9001', no: 'SGS-9001-PM-0211', vendor: 'V-1007', mats: ['LOG-61045'], issuer: 'SGS Việt Nam', issued: '12/03/2025', expiry: '11/03/2028', status: 'Pending review', uploaded: 'Huỳnh Gia Bảo · 31/10/2026 (supplier)', file: 'ISO9001_PhuMy.pdf' }
+  ];
+  D.certStats = { valid: 214, expiring: 3, expired: 4, pending: 5 };
+
+  /* Vendor evaluation (F-27..F-29). Auto sources use accepted qty for OTIF and NCR rate for Quality (R-07). */
+  const base = [
+    { name: 'Quality', src: 'Auto · NCR rate & accepted qty', w: 30 },
+    { name: 'Delivery (OTIF)', src: 'Auto · PO deliveries (in full = accepted qty)', w: 25 },
+    { name: 'Price competitiveness', src: 'Auto · price by Material ID vs 90-day average', w: 20 },
+    { name: 'Responsiveness', src: 'Auto · tender response time', w: 10 },
+    { name: 'Commercial terms', src: 'Manual', w: 10 },
+    { name: 'HSE', src: 'Manual', w: 5 }
+  ];
+  D.evalTemplates = [
+    { id: 'TPL-CON', name: 'Construction materials', cat: 'CON', criteria: base.map((c) => ({ ...c })) },
+    { id: 'TPL-EQP', name: 'Equipment', cat: 'EQP', criteria: [{ ...base[0] }, { ...base[1] }, { ...base[2], w: 15 }, { name: 'Technical support', src: 'Manual', w: 15 }, { ...base[3] }, { ...base[5] }] },
+    { id: 'TPL-SRV', name: 'Services & logistics', cat: 'SRV', criteria: [{ ...base[0], w: 20 }, { ...base[1], name: 'SLA / on-time service', w: 35 }, { ...base[2] }, { ...base[3], w: 15 }, { ...base[4] }] }
+  ];
+  D.grades = [['A', 4.2, 'Preferred'], ['B', 3.5, 'Approved'], ['C', 3.0, 'Probation'], ['D', 0, 'Blocked']];
+  /* scores in template order; null = not entered yet. basis = evidence line. */
+  D.scorecards = [
+    { vendor: 'V-1001', tpl: 'TPL-CON', period: 'Q3/2026', status: 'Submitted', scores: [4.5, 4.6, 4.2, 4.0, 4.0, 3.6], by: 'Nguyễn Minh Anh', at: '15/10/2026', prev: 4.24, basis: '18 POs · 5 Material IDs',
+      evidence: ['NCR rate 2 / 18 POs · 99,2% accepted qty', 'OTIF 95,8% by accepted qty (23 / 24)', 'CON-24015 −5,3% vs 90-day average', 'Avg. tender response 1,6 days', '', ''], comment: 'Ổn định, giao đúng hạn; cần cải thiện hồ sơ CQ lô 2 (NCR-2026-017).' },
+    { vendor: 'V-1002', tpl: 'TPL-CON', period: 'Q3/2026', status: 'Submitted', scores: [3.8, 4.1, 4.2, 4.0, 4.0, 3.5], by: 'Nguyễn Minh Anh', at: '18/10/2026', prev: 3.92, basis: '14 POs · 3 Material IDs',
+      evidence: ['NCR rate 1 / 14 POs · 97,9% accepted qty', 'OTIF 91,2% by accepted qty', 'CON-24102 +6,4% vs 90-day average', 'Avg. tender response 2,0 days', '', ''], comment: 'Chất lượng bao bì cần cải thiện (NCR-2026-014).' },
+    { vendor: 'V-1009', tpl: 'TPL-CON', period: 'Q3/2026', status: 'Submitted', scores: [4.0, 4.2, 3.6, 3.5, 3.6, 4.4], by: 'Nguyễn Minh Anh', at: '20/10/2026', prev: 3.85, basis: '9 POs · 3 Material IDs',
+      evidence: ['No NCR · 100% accepted qty', 'OTIF 92,4% by accepted qty', 'CON-24330 +1,2% vs 90-day average', 'Avg. tender response 2,6 days', '', ''], comment: 'An toàn công trường tốt.' },
+    { vendor: 'V-1010', tpl: 'TPL-CON', period: 'Q3/2026', status: 'Draft', scores: [3.8, 4.0, 3.5, 3.6, 3.5, null], by: 'Nguyễn Minh Anh', prev: 3.70, basis: '6 POs · 2 Material IDs',
+      evidence: ['No NCR · 100% accepted qty', 'OTIF 90,0% by accepted qty', 'CON-24330 +3,0% vs 90-day average', 'Avg. tender response 2,4 days', '', ''], comment: '' },
+    { vendor: 'V-1011', tpl: 'TPL-CON', period: 'Q3/2026', status: 'Draft', scores: [3.7, 4.0, 3.8, 3.2, null, null], by: 'Nguyễn Minh Anh', prev: 3.66, basis: '5 POs · 1 Material ID',
+      evidence: ['NCR rate 0 / 5 POs · 99,5% accepted qty', 'OTIF 89,1% by accepted qty', 'CON-24015 +1,6% vs 90-day average', 'Avg. tender response 3,1 days', '', ''], comment: '' },
+    { vendor: 'V-1008', tpl: 'TPL-CON', period: 'Q3/2026', status: 'Not started', scores: [3.0, 3.3, 3.6, 3.0, null, null], by: 'Nguyễn Minh Anh', prev: 3.40, basis: '7 POs · 2 Material IDs',
+      evidence: ['NCR rate 2 / 7 POs · 96,4% accepted qty', 'OTIF 84,0% by accepted qty', 'CON-24015 +3,4% vs 90-day average', 'Avg. tender response 3,0 days', '', ''], comment: '' },
+    { vendor: 'V-1003', tpl: 'TPL-EQP', period: 'Q3/2026', status: 'Not started', scores: [4.2, 4.0, 3.9, null, 3.6, null], by: 'Lê Quốc Huy', prev: 4.05, basis: '11 POs · 5 Material IDs',
+      evidence: ['NCR rate 0 / 11 POs · 100% accepted qty', 'OTIF 89,5% by accepted qty', 'EQP-31244 +5,2% vs 90-day average', '', 'Avg. tender response 2,8 days', ''], comment: '' }
+  ];
+  D.scoreHistory = { 'V-1001': [['Q1/2026', 4.18], ['Q2/2026', 4.24], ['Q3/2026', 4.32]], 'V-1002': [['Q1/2026', 3.88], ['Q2/2026', 3.92], ['Q3/2026', 3.98]], 'V-1009': [['Q1/2026', 3.80], ['Q2/2026', 3.85], ['Q3/2026', 3.90]], 'V-1008': [['Q1/2026', 3.62], ['Q2/2026', 3.40]], 'V-1003': [['Q1/2026', 3.98], ['Q2/2026', 4.05]] };
+})(window.DATA);

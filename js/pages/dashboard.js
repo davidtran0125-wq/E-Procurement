@@ -146,10 +146,10 @@
           { h: 'UoM', k: 'uom', w: '90px' }, { h: 'Status', r: (m) => pill(m.status, m.status === 'Active' ? 'success' : m.status === 'Blocked' ? 'danger' : 'warning') }
         ], mats, { min: 560, empty: 'No Material IDs' }))}
         ${card(`Vendors (${vens.length})`, table([
-          { h: 'Vendor', r: (v) => `<span class="mono small">${esc(v.id)}</span> ${esc(v.name)}`, w: 'minmax(240px,2fr)' }, { h: 'Category', k: 'cat' }, { h: 'MST', r: (v) => `<span class="mono small">${esc(v.mst)}</span>` }, { h: 'Status', r: (v) => pill(v.status, v.status === 'Preferred' ? 'success' : v.status === 'Probation' ? 'warning' : v.status === 'Approved' ? 'info' : 'neutral') }
+          { h: 'Vendor', r: (v) => `<a href="#/vendors/${esc(v.id)}"><span class="mono small">${esc(v.id)}</span> ${esc(v.name)}</a>`, w: 'minmax(240px,2fr)' }, { h: 'Category', k: 'cat' }, { h: 'MST', r: (v) => `<span class="mono small">${esc(v.mst)}</span>` }, { h: 'Status', r: (v) => pill(v.status, v.status === 'Preferred' ? 'success' : v.status === 'Probation' ? 'warning' : v.status === 'Approved' ? 'info' : 'neutral') }
         ], vens, { min: 620, empty: 'No vendors' }), '<a class="btn btn-sm" href="#/vendors">Vendors</a>')}
         ${card(`Documents (${docs.length})`, table([
-          { h: 'Number', r: (d) => `<a class="mono" href="#/${route[d.type]}">${esc(d.id)}</a>`, w: '150px' }, { h: 'Title', k: 'title', w: 'minmax(200px,2fr)' }, { h: 'Date', k: 'date', w: '110px' },
+          { h: 'Number', r: (d) => `<a class="mono" href="#/${route[d.type]}${d.type === 'CT' ? '/' + d.id : ''}">${esc(d.id)}</a>`, w: '150px' }, { h: 'Title', k: 'title', w: 'minmax(200px,2fr)' }, { h: 'Date', k: 'date', w: '110px' },
           { h: 'Material IDs', r: (d) => (d.mats || []).map(mid).join(' '), w: 'minmax(160px,1.5fr)' }, { h: 'Status', r: (d) => pill(d.status, 'neutral') }
         ], docs, { min: 760, empty: 'No documents' }))}` : ''}`;
     },

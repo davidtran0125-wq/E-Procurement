@@ -228,7 +228,15 @@
     return `<div data-tabs><div class="tabs" role="tablist">${list.map(([k, l], i) => `<button role="tab" data-act="tab" id="${id}-t-${k}" aria-controls="${id}-${k}" aria-selected="${i === 0}">${esc(l)}</button>`).join('')}</div>${list.map(([k, , html], i) => `<div role="tabpanel" id="${id}-${k}" aria-labelledby="${id}-t-${k}"${i ? ' hidden' : ''}>${html}</div>`).join('')}</div>`;
   }
 
+  /* Dates are dd/mm/yyyy strings; today = DATA.today (02/11/2026). */
+  const dt = (s) => { const [d, m, y] = String(s).split('/').map(Number); return new Date(y, m - 1, d); };
+  const daysTo = (s) => Math.round((dt(s) - dt(window.DATA.today)) / 864e5);
+  const addDays = (s, n) => { const x = dt(s); x.setDate(x.getDate() + n); return [x.getDate(), x.getMonth() + 1].map((v) => String(v).padStart(2, '0')).join('/') + '/' + x.getFullYear(); };
+  // Short vendor name: "Công ty TNHH Thiết bị Công nghiệp Đại Phong" → "Đại Phong"
+  const vshort = (v) => (v ? v.name.split(' ').slice(-2).join(' ') : '');
+
   window.App = {
+    dt, daysTo, addDays, vshort,
     page(key, def) { pages[key] = def; },
     pages, state, render, esc, norm, matches, t, emptyState, loading, errorState, setMenu, vnd, num, pct, ty, mid, pill, docid, table, kpi, card, tabs, toast, HOME,
     login(role, user) { state.role = role; state.user = user || null; ls.set('pl.role', role); if (user) ls.set('pl.user', user.email); else ls.del('pl.user'); location.hash = '#/' + HOME[role]; },

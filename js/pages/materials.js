@@ -123,7 +123,7 @@
         { h: 'VAT', r: (m) => `${esc(m.vat === 8 ? '8%' : m.vat + '%')}${m.vat === 8 ? '<div class="small muted">reduced to 31/12</div>' : ''}${m.vatConfirmed ? '' : '<div class="small tone-warning">Finance pending</div>'}`, w: '110px' },
         { h: 'Last price', r: (m) => (m.last ? vnd(m.last) + `<div class="small muted mono">${esc(m.lastPo)}</div>` : '<span class="muted">—</span>'), cls: 'num', w: '150px' },
         { h: 'Vendors', r: (m) => { const n = eligibleVendors(m).length; return `${n}${m.status === 'Active' && n === 1 ? ' ' + pill('Single source', 'warning') : ''}`; }, w: '130px' },
-        { h: 'Contracts', r: (m) => (m.contracts.length ? m.contracts.map((c) => `<a class="mono small" href="#/contracts">${esc(c)}</a>`).join('<br>') : '<span class="muted">—</span>'), w: '120px' },
+        { h: 'Contracts', r: (m) => (m.contracts.length ? m.contracts.map((c) => `<a class="mono small" href="#/contracts/${esc(c)}">${esc(c)}</a>`).join('<br>') : '<span class="muted">—</span>'), w: '120px' },
         { h: 'Status', r: (m) => pill(m.status, statusTone(m.status)) + (m.step ? `<div class="small muted">${esc(m.step)}</div>` : ''), w: '140px' }
       ], rows, { min: 1180, empty: 'No Material IDs match these filters' })}
       <p class="muted small">Showing ${rows.length} of ${num(D().materialStats.total)} Material IDs (sample loaded) · prices excl. VAT</p>`,

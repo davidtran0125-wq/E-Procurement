@@ -8,7 +8,7 @@
   const ROUTE = { PR: 'pr', TND: 'tenders', PO: 'po', GRN: 'po', CT: 'contracts', INV: 'invoices', NCR: 'po' };
   const vTone = { Preferred: 'success', Approved: 'info', Probation: 'warning', Blocked: 'danger' };
   const dtone = (s) => (/Closed|Awarded|Delivered|Matched|Accepted|Ready/.test(s) ? 'success' : /Blocked|Exception|overdue|Open$/.test(s) ? 'danger' : /Awaiting|Pending|Expiring|Partially|Q&A|Evaluation|not confirmed/.test(s) ? 'warning' : 'info');
-  const docLink = (id) => { const d = D().docs.find((x) => x.id === id); return `<a class="mono" href="#/${d ? ROUTE[d.type] : 'search?q=' + encodeURIComponent(id)}">${esc(id)}</a>`; };
+  const docLink = (id) => { const d = D().docs.find((x) => x.id === id); return `<a class="mono" href="#/${d ? ROUTE[d.type] + (d.type === 'CT' ? '/' + d.id : '') : 'search?q=' + encodeURIComponent(id)}">${esc(id)}</a>`; };
 
   function series(m) {
     if (m.series) return m.series;
@@ -50,7 +50,7 @@
     </div>`;
 
     const tiles = [['Vendors', `${elig.length} approved`, '#/vendors'], ['Tenders', `${openTnd.length} open · ${tnds.length} total`, '#/tenders'], ['PRs', `${openPr.length} open`, '#/pr'], ['POs', `${openPo.length} open · ${pos.length} total`, '#/po'],
-      ['Contracts', cts.length ? cts.map((c) => `${c.status} · ${c.id}`).join(', ') : 'None', '#/contracts'], ['Certificates', `${m.certs.length} required`, '#/certificates'], ['Invoices', `${invs.length}`, '#/invoices'],
+      ['Contracts', cts.length ? cts.map((c) => `${c.status} · ${c.id}`).join(', ') : 'None', cts.length === 1 ? '#/contracts/' + cts[0].id : '#/contracts'], ['Certificates', `${m.certs.length} required`, `#/certificates?mat=${m.id}`], ['Invoices', `${invs.length}`, '#/invoices'],
       ['Price records', ser ? '12 months' : 'None', `#/price?id=${m.id}`], ['OTIF', otifPct != null ? pct(otifPct) : '—', '#/reports'], ['Saving', saving ? vnd(saving) : '—', '#/reports']];
     const linked = card('Linked by Material ID', `<div class="tiles">${tiles.map(([l, v, h]) => `<a class="tile" href="${h}"><span class="small muted">${l}</span><b>${esc(v)}</b></a>`).join('')}</div>`);
 
@@ -68,7 +68,7 @@
       ? `<div class="alert alert-warning" role="status"><b>Single source</b> · only ${elig.length} approved vendor for ${esc(m.id)}. Consider qualifying a second vendor.</div>`
       : `<div class="alert alert-success"><b>Not single source</b> · ${elig.length} eligible vendors.</div>`;
     const vendorsCard = card('Approved vendors & supply risk', risk + table([
-      { h: 'Vendor', r: (v) => `<span class="mono small">${esc(v[0])}</span> ${esc(App.vendor(v[0]).name)}`, w: 'minmax(220px,2fr)' },
+      { h: 'Vendor', r: (v) => `<a href="#/vendors/${esc(v[0])}"><span class="mono small">${esc(v[0])}</span> ${esc(App.vendor(v[0]).name)}</a>`, w: 'minmax(220px,2fr)' },
       { h: 'Status', r: (v) => pill(v[1], vTone[v[1]]) + (v[5] ? `<div class="small tone-danger">${esc(v[5])}</div>` : ''), w: 'minmax(130px,1.2fr)' },
       { h: 'Score', r: (v) => (App.vendor(v[0]).score ? num(App.vendor(v[0]).score, 2) + ' · ' + App.vendor(v[0]).grade : '—'), cls: 'num', w: '90px' },
       { h: 'Last price', r: (v) => vnd(v[2]), cls: 'num' },
@@ -99,7 +99,7 @@
         <dt>Confirmed by Finance</dt><dd>${m.vatConfirmed ? pill('Confirmed', 'success') + ' <span class="small muted">' + esc(m.vatConfirmed) + '</span>' : pill('Pending', 'warning')}</dd>
         <dt>Owner</dt><dd>${esc(m.owner)}</dd><dt>Created</dt><dd>${esc(m.created)}</dd></dl>`, '<button class="btn btn-sm" data-act="toast" data-msg="Edit opens a change request routed to the Material master owner">Edit</button>');
     const uom = card('Alternative UoM', m.alt.length ? table([{ h: 'Alt UoM', r: (a) => esc(a[0]) }, { h: 'Conversion', r: (a) => esc(a[1]) }], m.alt, { min: 280 }) : `<div class="empty">Base UoM only (${esc(m.uom)})</div>`);
-    const certs = card('Required certificates', m.certs.length ? `<ul class="plain">${m.certs.map(([c, w]) => `<li><b>${esc(c)}</b> <span class="small muted">· checked: ${esc(w)}</span></li>`).join('')}</ul>` : '<div class="empty">None required</div>', '<a class="btn btn-sm" href="#/certificates">Certificate register</a>');
+    const certs = card('Required certificates', m.certs.length ? `<ul class="plain">${m.certs.map(([c, w]) => `<li><b>${esc(c)}</b> <span class="small muted">· checked: ${esc(w)}</span></li>`).join('')}</ul>` : '<div class="empty">None required</div>', `<a class="btn btn-sm" href="#/certificates?mat=${esc(m.id)}">Certificate register</a>`);
 
     return `${header}${kpis}${linked}
       <div class="grid-2"><div class="stack">${chain}${chart}${vendorsCard}${openCard}${ctCard}${ncrCard}${docsCard}</div><div class="stack">${master}${uom}${certs}</div></div>`;

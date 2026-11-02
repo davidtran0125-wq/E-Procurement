@@ -204,3 +204,8 @@ svg.chart { width: 100%; height: auto; }
 .lang span { color: var(--muted); }
 .lang span.on { color: var(--ink); font-weight: 700; }
 @media (max-width: 480px) { .top-r { gap: 8px; } .lang { padding: 0 8px; } }
+
+/* Phase 2 */
+.bar > span.warn { background: var(--warn); }
+.dl dd { min-width: 0; overflow-wrap: anywhere; }
+.tbl-wrap { position: relative; }
