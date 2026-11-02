@@ -2,7 +2,7 @@
 (function () {
   const { esc, num, mid, pill, table, card } = App;
   const D = () => window.DATA;
-  const me = () => (App.state.user && App.state.user.name) || (App.state.role === 'admin' ? 'Phạm Thu Trang' : 'Nguyễn Minh Anh');
+  const me = () => (App.state.user && App.state.user.name) || (App.state.role === 'admin' ? 'Phạm Thu Trang' : App.state.role === 'supplier' ? 'Võ Thị Lan' : 'Nguyễn Minh Anh');
   const vatLabel = (v) => (+v === 8 ? '8% (reduced, until 31/12/2026)' : v + '%');
   const validDate = (s) => { if (!/^\d{2}\/\d{2}\/\d{4}$/.test(s || '')) return false; const [d, m, y] = s.split('/').map(Number); const x = new Date(y, m - 1, d); return x.getDate() === d && x.getMonth() === m - 1; };
   const money = (s) => Number(String(s).replace(/[.\s₫]/g, '').replace(',', '.'));
@@ -67,6 +67,8 @@
       return exp ? { d, m, c: exp, why: `${exp.id} expired ${exp.end}` } : null;
     })).filter(Boolean);
   }
-  App.src = { me, offContract, vatLabel, validDate, money, read, field, focusErr, docOf, prLink, tndLink, files, upload, nextVer, assignee, myQueue, dlgActive, delegable,
+  /* Audit log writer (F-108): every admin setting change, supplier bid action and override lands here */
+  const audit = (type, action, ref) => { (D().audit = D().audit || []).unshift({ at: D().today + ' ' + new Date().toTimeString().slice(0, 5), user: me() + (App.state.user && App.state.user.vendor ? ` (${App.state.user.vendor})` : ''), type, action, ref: ref || '' }); if (D().auditStats) D().auditStats.total++; };
+  App.src = { me, offContract, audit, vatLabel, validDate, money, read, field, focusErr, docOf, prLink, tndLink, files, upload, nextVer, assignee, myQueue, dlgActive, delegable,
     bar: (p, tone) => `<div class="bar" role="img" aria-label="${esc(num(p, 0))}%"><span class="${tone || ''}" style="width:${Math.max(0, Math.min(100, p)).toFixed(1)}%"></span></div>` };
 })();

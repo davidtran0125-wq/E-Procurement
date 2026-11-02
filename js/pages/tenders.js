@@ -213,10 +213,11 @@
     if (!t.qa) return '';
     const f = st.qa; const e = st.qaErr;
     const add = (t.addenda || []).map((a) => `<div class="alert alert-info mt" role="status"><b>Addendum No. ${a.no} · ${esc(a.at)}</b> <span class="chips chips-inline">${a.lines.map(mid).join('')}</span><div>${esc(a.summary)}</div>
-      <div class="small mt-s">Acknowledged ${a.acks.length} / ${a.acks.length} · sent by Gmail and portal · ${a.acks.map(([v, at]) => `${esc(App.vendor(v) ? App.vshort(App.vendor(v)) : v)} ${esc(at)}`).join(' · ')}</div></div>`).join('');
+      <div class="small mt-s">Acknowledged ${a.acks.length} / ${(t.bidders || []).filter((b) => b.vid).length || a.acks.length} · sent by Gmail and portal · ${a.acks.map(([v, at]) => `${esc(App.vendor(v) ? App.vshort(App.vendor(v)) : v)} ${esc(at)}`).join(' · ')}</div></div>`).join('');
     const form = f ? `<form id="tn-qa" class="stack mt" novalidate><div class="form-grid">${S.field('tq', e, 'line', 'Material ID line', f.line, { options: t.lines.map((l) => l.mat) })}${S.field('tq', e, 'q', 'Question (as received)', f.q, { req: true, area: true })}${S.field('tq', e, 'a', 'Answer', f.a, { req: true, area: true })}</div>
       <p class="small muted mt-0">Published to all invited bidders without naming who asked.</p><div class="row-acts"><button type="button" class="btn btn-sm" data-tn="qa-cancel">Cancel</button><button type="submit" class="btn btn-sm btn-p">Publish answer</button></div></form>` : '';
-    return card(`Q&A (${t.qa.length})`, `${t.qa.length ? `<ul class="plain">${t.qa.map((x) => `<li><span class="small muted">Q${x.no} · ${esc(x.at)} · Bidder (anonymous)</span> ${mid(x.line)}<div><b>${esc(x.q)}</b></div><div class="small">Answer: ${esc(x.a)}</div></li>`).join('')}</ul>` : '<p class="muted small mt-0">No questions yet.</p>'}${add}${form}`,
+    const pend = (t.questions || []).length ? `<div class="alert alert-warning" role="status"><b>${t.questions.length} question(s) from bidders waiting for an answer</b><ul class="plain small">${t.questions.map((x, i) => `<li class="row-acts between"><span>${mid(x.line)} ${esc(x.q)} <span class="muted">· ${esc(x.at)} · bidder (anonymous)</span></span><button class="btn btn-sm" data-tn="qa-new" data-pq="${i}">Answer</button></li>`).join('')}</ul></div>` : '';
+    return card(`Q&A (${t.qa.length})`, pend + `${t.qa.length ? `<ul class="plain">${t.qa.map((x) => `<li><span class="small muted">Q${x.no} · ${esc(x.at)} · Bidder (anonymous)</span> ${mid(x.line)}<div><b>${esc(x.q)}</b></div><div class="small">Answer: ${esc(x.a)}</div></li>`).join('')}</ul>` : '<p class="muted small mt-0">No questions yet.</p>'}${add}${form}`,
       f ? '' : `<button class="btn btn-sm" data-act="toast" data-msg="Q&A log exported with timestamps (audit)">Open Q&A log</button><button class="btn btn-sm" data-tn="qa-new">Answer a question</button>`);
   }
 
@@ -381,7 +382,7 @@
           const f = Object.assign(st.qa, S.read(root, '#tn-qa')); st.qaErr = {};
           if (f.q.length < 10) st.qaErr.q = 'Enter the question (at least 10 characters).'; if (f.a.length < 10) st.qaErr.a = 'Enter the answer (at least 10 characters).';
           if (Object.keys(st.qaErr).length) { App.render(); S.focusErr('#tn-qa'); return; }
-          t.qa.push({ no: t.qa.length + 1, line: f.line, q: f.q, a: f.a, at: D().today + ' 10:30' }); st.qa = null; App.render(); App.toast(`Answer published to ${doc.invited} bidders (anonymous)`);
+          t.qa.push({ no: t.qa.length + 1, line: f.line, q: f.q, a: f.a, at: D().today + ' 10:30' }); if (f.pq != null && t.questions) t.questions.splice(f.pq, 1); st.qa = null; App.render(); App.toast(`Answer published to ${doc.invited} bidders (anonymous)`);
         }
       });
       root.addEventListener('click', (e) => {
@@ -393,7 +394,7 @@
         if (a === 'tab') { st.tab = b.dataset.k; App.render(); }
         else if (a === 'set-edit') { st.set = { envelopes: t.envelopes, secPct: String(t.secPct).replace('.', ','), validity: String(t.validity), currency: t.currency === 'VND or USD' ? 'VND or USD' : 'VND', wt: String((t.weights || [40, 60])[0]), wp: String((t.weights || [40, 60])[1]) }; st.serr = {}; App.render(); document.getElementById('ts-envelopes').focus(); }
         else if (a === 'set-cancel') { st.set = null; App.render(); }
-        else if (a === 'qa-new') { st.qa = { line: t.lines[0].mat, q: '', a: '' }; st.qaErr = {}; App.render(); document.getElementById('tq-q').focus(); }
+        else if (a === 'qa-new') { const pq = b.dataset.pq != null && (t.questions || [])[+b.dataset.pq]; st.qa = pq ? { line: pq.line, q: pq.q, a: '', pq: +b.dataset.pq } : { line: t.lines[0].mat, q: '', a: '' }; st.qaErr = {}; App.render(); document.getElementById('tq-q').focus(); }
         else if (a === 'qa-cancel') { st.qa = null; App.render(); }
         else if (a === 'remind') App.toast(`COI reminder sent to ${b.dataset.n}`);
         else if (a === 'open-bids') App.toast('Bid opening needs Nguyễn Minh Anh + Đỗ Hoàng Nam to confirm');

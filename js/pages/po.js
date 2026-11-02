@@ -56,10 +56,10 @@
   function sched(p) {
     const rows = [];
     p.lines.forEach((l, li) => l.sched.forEach((s, si) => {
-      const [qty, due, gid, cx, ncr] = s; const g = gid && D().grns[gid]; const gl = g && g.lines.find((x) => x[0] === li && x[1] === si);
+      const [qty, due, gid, cx, ncr, asn, req] = s; const g = gid && D().grns[gid]; const gl = g && g.lines.find((x) => x[0] === li && x[1] === si);
       const arch = gid === 'archived'; const rec = !!(gl || arch);
       const delivered = arch ? qty : gl ? gl[2] : 0, accepted = arch ? qty : gl ? gl[3] : 0, rejected = gl ? gl[4] : 0;
-      rows.push({ li, si, mat: l.mat, qty, due, gid, g, rec, cx, ncr, delivered, accepted, rejected, reason: gl ? gl[5] : '', date: g ? g.date : arch ? due : '', onTime: rec ? (arch || App.dt(g.date) <= App.dt(due)) : null, inFull: rec ? accepted >= qty : null });
+      rows.push({ li, si, mat: l.mat, qty, due, gid, g, rec, cx, ncr, asn, req, delivered, accepted, rejected, reason: gl ? gl[5] : '', date: g ? g.date : arch ? due : '', onTime: rec ? (arch || App.dt(g.date) <= App.dt(due)) : null, inFull: rec ? accepted >= qty : null });
     }));
     return rows;
   }
@@ -241,7 +241,7 @@
       { h: 'Material ID', r: (r) => mid(r.mat), w: '120px' },
       { h: 'Scheduled', r: (r) => `${num(r.qty)} ${esc(mat(r.mat).uom)}`, cls: 'num', w: '100px' },
       { h: 'Promised', r: (r) => `${esc(r.due)}${r.ncr ? `<div class="small muted">${esc(r.ncr)}</div>` : ''}${r.cx ? `<div>${pill('Cancelled', 'danger')}</div>` : ''}`, w: '110px' },
-      { h: 'GRN', r: (r) => (r.g ? `<span class="mono">${esc(r.gid)}</span><div class="small muted">${esc(r.date)}</div>` : r.rec ? '<span class="small muted">Archived</span>' : r.cx ? '—' : `<span class="small muted">${App.daysTo(r.due) < 0 ? 'Late · not received' : 'Open'}</span>`), w: '130px' },
+      { h: 'GRN', r: (r) => (r.g ? `<span class="mono">${esc(r.gid)}</span><div class="small muted">${esc(r.date)}</div>` : r.rec ? '<span class="small muted">Archived</span>' : r.cx ? '—' : `<span class="small muted">${App.daysTo(r.due) < 0 ? 'Late · not received' : 'Open'}</span>${r.asn ? `<div class="small">${pill('ASN ' + r.asn.id, 'info')} ship ${esc(r.asn.ship)} · ${num(r.asn.qty)}</div>` : ''}${r.req && /Pending/.test(r.req.status) ? `<div class="small tone-warning">Supplier asks ${esc(r.req.to)} · <a href="#/approvals?id=${encodeURIComponent(r.req.id)}">review</a></div>` : ''}`), w: '150px' },
       { h: 'Received · accepted · rejected', r: (r) => (r.rec ? `${num(r.delivered)} · <b>${num(r.accepted)}</b> · ${r.rejected ? `<span class="tone-danger">${num(r.rejected)}</span>` : '0'}` : '—'), cls: 'num', w: '180px' },
       { h: 'On time', r: (r) => (r.onTime == null ? '—' : pill(r.onTime ? 'Yes' : 'No', r.onTime ? 'success' : 'danger')), w: '90px' },
       { h: 'In full', r: (r) => (r.inFull == null ? '—' : pill(r.inFull ? 'Yes' : 'No', r.inFull ? 'success' : 'danger')), w: '90px' }
@@ -408,9 +408,9 @@
   }
 
   /* ---------- F-69 printable PO (R-21) ---------- */
-  function printPage(d) {
+  function printPage(d, base = '#/po') {
     const p = det(d.id); const v = App.vendor(p.vendor); const C = D().company; const tt = vatSplit(p);
-    return `<div class="page-h no-print"><div><div class="crumbs small muted"><a href="#/po">Purchase orders</a> / <a href="#/po/${esc(d.id)}">${esc(d.id)}</a> / Print</div><h1>Print preview · <span class="mono">${esc(d.id)}</span> Rev.${p.rev}</h1><div class="sub">Đơn đặt hàng · the revision number matches the PO</div></div>
+    return `<div class="page-h no-print"><div><div class="crumbs small muted"><a href="${base}">Purchase orders</a> / <a href="${base}/${esc(d.id)}">${esc(d.id)}</a> / Print</div><h1>Print preview · <span class="mono">${esc(d.id)}</span> Rev.${p.rev}</h1><div class="sub">Đơn đặt hàng · the revision number matches the PO</div></div>
       <div class="acts"><button class="btn" data-po="print">Print</button><button class="btn btn-p" data-act="toast" data-msg="${esc(d.id)}_Rev${p.rev}.pdf downloaded">Download PDF</button></div></div>
       <article class="card po-doc" aria-label="Purchase order document"><div class="row-acts between"><div><b>${esc(C.name)}</b><div class="small">MST ${esc(C.mst)} · ${esc(C.address)}</div></div><div class="num"><b class="mono">${esc(d.id)} · Rev.${p.rev}</b><div class="small">Ngày ${esc(d.date)}</div></div></div>
         <h2 class="po-title">ĐƠN ĐẶT HÀNG <span class="muted">/ PURCHASE ORDER</span></h2>
@@ -425,8 +425,27 @@
   }
 
   /* Hook used by My approvals (PO approval / PO change order) */
+  /* Supplier confirmation shared by the PO screen and the supplier portal (F-92). A contract release is drawn from the contract on confirmation. */
+  function confirmPo(id, by) {
+    const p = det(id); const d = S.docOf(id); const v = App.vendor(p.vendor); const re = p.confirm && p.confirm.status === 'Awaiting re-confirmation';
+    p.confirm = { status: 'Confirmed', by: by || v.contact + ' (portal)', at: NOW, note: re ? `Rev.${p.rev} re-confirmed` : '' };
+    if (/^Sent/.test(d.status)) d.status = 'Confirmed';
+    p.revs.forEach((r) => { if (/awaiting supplier re-confirmation/.test(r.status)) r.status = 'Current · re-confirmed by supplier ' + D().today; });
+    if (/overdue|Confirm within/.test(d.note || '')) d.note = '';
+    D().notifications.filter((n) => n.doc === id).forEach((n) => { n.read = true; });
+    const c = p.contract && D().contracts.find((x) => x.id === p.contract);
+    if (c && !re && !c.releases.some((r) => r[0] === id)) p.lines.forEach((l) => { const cl = c.lines.find((x) => x.mat === l.mat); if (cl) { cl.released += l.qty; c.releases.push([id, l.mat, l.qty, l.price, d.date]); } });
+    return v;
+  }
+  function declinePo(id, reason, by) {
+    const p = det(id); const d = S.docOf(id);
+    p.confirm = { status: 'Declined', sent: (p.confirm && p.confirm.sent) || NOW, note: `Declined by ${by} · ${reason}` }; d.status = 'Sent · declined by supplier'; d.note = 'Declined: ' + reason;
+    D().notifications.unshift({ id: 'N-' + (900 + D().notifications.length), type: 'PO declined', text: `${id} declined by ${App.vshort(App.vendor(p.vendor))}: ${reason}`, doc: id, mats: d.mats, at: NOW, read: false, action: 'Open', href: '#/po/' + id });
+  }
   App.po = {
+    det, sched: (id) => sched(det(id)), openSlots: (id) => openSlots(det(id)), invoicesOf, vatSplit: (id) => vatSplit(det(id)), print: printPage, confirm: confirmPo, decline: declinePo, ncrsOf,
     onDecide(a, dcs) {
+      if (a.type === 'Delivery date change') { const r = a.req; const p = det(r.po); if (p && dcs === 'Approved') { p.lines[r.li].sched[r.si][1] = r.to; } r.status = dcs === 'Approved' ? 'Accepted by buyer ' + D().today : dcs; return; }
       if (a.type === 'PO approval') { const d = S.docOf(a.id); if (d) d.status = dcs === 'Approved' ? 'Approved' : 'Draft'; return; }
       if (a.type !== 'PO change order') return;
       const [id, r] = a.id.split(' Rev.'); const p = det(id); const d = S.docOf(id); if (!p) return; const rev = p.revs.find((x) => x.no === +r); if (!rev) return;
@@ -487,7 +506,7 @@
         else if (a === 'cx-open') { st.cx = { scope: 'all', reason: '' }; st.cxErr = {}; App.render(); focus('#px-scope'); }
         else if (a === 'cx-cancel') { st.cx = null; App.render(); }
         else if (a === 'send') { d.status = 'Sent · not confirmed'; p.confirm = { status: 'Not confirmed', sent: NOW, note: 'Reminder at 48 h · escalation to the buyer at 72 h' }; if (!p.revs.length) p.revs = [{ no: 0, status: 'Current', at: NOW, by: S.me(), diff: 'Original issue', reason: '' }]; App.render(); App.toast(`${id} sent to ${App.vshort(App.vendor(p.vendor))} by Gmail + portal · PDF Rev.${p.rev} attached`); }
-        else if (a === 'confirm') { const v = App.vendor(p.vendor); const re = p.confirm && p.confirm.status === 'Awaiting re-confirmation'; p.confirm = { status: 'Confirmed', by: v.contact + ' (portal)', at: NOW, note: re ? `Rev.${p.rev} re-confirmed` : '' }; if (/^Sent/.test(d.status)) d.status = 'Confirmed'; p.revs.forEach((r) => { if (/awaiting supplier re-confirmation/.test(r.status)) r.status = 'Current · re-confirmed by supplier ' + D().today; }); if (/3 days overdue/.test(d.note || '')) d.note = ''; D().notifications.filter((n) => n.doc === id).forEach((n) => { n.read = true; }); App.render(); App.toast(`${id} confirmed by ${v.contact}`); }
+        else if (a === 'confirm') { const v = confirmPo(id); App.render(); App.toast(`${id} confirmed by ${v.contact}`); }
         else if (a === 'ncr-close') { const n = D().ncrs[b.dataset.id]; n.status = 'Closed'; n.supplier += ' · closed ' + D().today; const nd = S.docOf(b.dataset.id); if (nd) nd.status = n.action === 'Accept with discount' ? 'Closed · accepted with discount' : 'Closed'; if (n.action === 'Accept with discount') { const g = D().grns[n.grn]; const gl = g && g.lines.find((x) => x[4]); if (gl) { gl[3] += gl[4]; gl[4] = 0; } } syncNcrSlots(id, p); if (/Partially/.test(d.status) && !openSlots(p).length) d.status = 'Delivered'; d.note = noteFrom(p, d); App.render(); App.toast(`${b.dataset.id} closed · OTIF, NCR rate and Material 360° updated`); }
       });
     }

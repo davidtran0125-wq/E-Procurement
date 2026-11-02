@@ -17,7 +17,7 @@
     'Purchase requests': 'Đề nghị mua hàng', 'Purchase orders': 'Đơn đặt hàng', 'Invoices & matching': 'Hóa đơn & đối chiếu', Insights: 'Phân tích', 'Price history': 'Lịch sử giá', Reports: 'Báo cáo',
     'Supplier portal': 'Cổng nhà cung cấp', 'Invitations to bid': 'Thư mời thầu', 'My quotations': 'Báo giá của tôi', Deliveries: 'Giao hàng', Invoices: 'Hóa đơn', Scorecard: 'Bảng điểm', 'Company profile': 'Hồ sơ công ty',
     'Admin console': 'Quản trị hệ thống', 'Users & roles': 'Người dùng & vai trò', 'Access policy': 'Chính sách truy cập', 'Approval matrix': 'Ma trận phê duyệt', 'Material master': 'Danh mục vật tư', Categories: 'Nhóm hàng',
-    'Evaluation templates': 'Mẫu tiêu chí đánh giá', 'Numbering & ID rules': 'Quy tắc đánh số', Integrations: 'Tích hợp', 'Notification rules': 'Quy tắc thông báo', 'SoD rules': 'Quy tắc SoD', 'Audit log': 'Nhật ký',
+    'Evaluation templates': 'Mẫu tiêu chí đánh giá', 'Numbering & ID rules': 'Quy tắc đánh số', Integrations: 'Tích hợp', 'Notification rules': 'Quy tắc thông báo', 'SoD rules': 'Quy tắc SoD', 'Audit log': 'Nhật ký', 'Match tolerances': 'Dung sai đối chiếu',
     'Back to Procurement': 'Về Mua sắm', 'Switch workspace': 'Đổi không gian làm việc', 'Skip to content': 'Bỏ qua đến nội dung', Search: 'Tìm kiếm', Procurement: 'Mua sắm', Supplier: 'Nhà cung cấp', Admin: 'Quản trị',
     'Search Material ID, PR, PO, tender, vendor…  ( / )': 'Tìm mã vật tư, PR, PO, gói thầu, NCC…  ( / )', 'Open menu': 'Mở menu', 'Close menu': 'Đóng menu', Notifications: 'Thông báo', unread: 'chưa đọc', waiting: 'đang chờ',
     'Language: English. Switch to Vietnamese': 'Ngôn ngữ: Tiếng Việt. Chuyển sang tiếng Anh', 'No access': 'Không có quyền truy cập', 'Not built yet': 'Chưa xây dựng', 'New tender': 'Gói thầu mới', 'Create PR': 'Tạo đề nghị mua hàng'
@@ -88,7 +88,7 @@
       ['Insights', [['price', 'Price history'], ['reports', 'Reports']]]
     ],
     supplier: [['Supplier portal', [['supplier', 'Overview'], ['supplier/invitations', 'Invitations to bid'], ['supplier/quotations', 'My quotations'], ['supplier/pos', 'Purchase orders'], ['supplier/deliveries', 'Deliveries'], ['supplier/invoices', 'Invoices'], ['supplier/contracts', 'Contracts'], ['supplier/certificates', 'Certificates'], ['supplier/scorecard', 'Scorecard'], ['supplier/profile', 'Company profile']]]],
-    admin: [['Admin console', [['admin/users', 'Users & roles'], ['admin/access', 'Access policy'], ['admin/matrix', 'Approval matrix'], ['materials', 'Material master'], ['admin/categories', 'Categories'], ['admin/templates', 'Evaluation templates'], ['admin/numbering', 'Numbering & ID rules'], ['admin/integrations', 'Integrations'], ['admin/rules', 'Notification rules'], ['admin/sod', 'SoD rules'], ['admin/audit', 'Audit log']]]]
+    admin: [['Admin console', [['admin/users', 'Users & roles'], ['admin/access', 'Access policy'], ['admin/matrix', 'Approval matrix'], ['materials', 'Material master'], ['admin/categories', 'Categories'], ['admin/templates', 'Evaluation templates'], ['admin/numbering', 'Numbering & ID rules'], ['admin/tolerances', 'Match tolerances'], ['admin/integrations', 'Integrations'], ['admin/rules', 'Notification rules'], ['admin/sod', 'SoD rules'], ['admin/audit', 'Audit log']]]]
   };
   const USERS = {
     procurement: ['Nguyễn Minh Anh', 'Procurement Lead'],
@@ -96,7 +96,7 @@
     admin: ['Phạm Thu Trang', 'System Admin']
   };
   const HOME = { procurement: 'dashboard', supplier: 'supplier', admin: 'admin/users' };
-  const icon = (k) => `<svg aria-hidden="true" viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="${ICON[k.split('/')[0]] || ICON.dot}"/></svg>`;
+  const icon = (k) => `<svg aria-hidden="true" viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="${ICON[k.split('/').pop()] || ICON[{ pos: 'po', invitations: 'tenders', quotations: 'pr', deliveries: 'po', scorecard: 'evaluation', profile: 'vendors', supplier: 'dashboard', users: 'vendors', access: 'certificates', matrix: 'approvals', categories: 'materials', numbering: 'pr', integrations: 'material360', rules: 'approvals', sod: 'certificates', audit: 'reports', tolerances: 'invoices' }[k.split('/').pop()]] || ICON[k.split('/')[0]] || ICON.dot}"/></svg>`;
 
   function shell(route, inner, ws) {
     const groups = NAV[ws].map(([g, items]) => `<div class="nav-g"><div class="nav-gt">${esc(t(g))}</div>${items.map(([k, label, badge]) => {
@@ -108,7 +108,8 @@
     const foot = ws === 'procurement' ? `<a class="nav-i" href="#/admin/users">${icon('admin')}<span>${esc(t('Admin console'))}</span></a>`
       : ws === 'admin' ? `<a class="nav-i" href="#/dashboard">${icon('dashboard')}<span>${esc(t('Back to Procurement'))}</span></a>` : '';
     const u = state.user; const [uname, urole] = u ? [u.name, u.vendor ? ((window.DATA.vendors.find((v) => v.id === u.vendor) || {}).name || u.title) : u.title] : USERS[ws];
-    const unread = window.DATA.notifications.filter((n) => !n.read).length;
+    const sp = ws === 'supplier' && window.DATA.portal && window.DATA.portal[(u && u.vendor) || 'V-1001'];
+    const unread = sp ? sp.notices.length : window.DATA.notifications.filter((n) => !n.read).length;
     return `<a class="skip" href="#main" data-act="skip">${esc(t('Skip to content'))}</a><div class="layout">
       <div class="scrim" data-act="menu-close" hidden></div>
       <aside class="side" id="side">
@@ -122,7 +123,7 @@
           ${ws === 'supplier' ? '' : `<form class="search" role="search" data-act="search"><label class="sr" for="gsearch">${esc(t('Search'))}</label><input id="gsearch" type="search" placeholder="${esc(t('Search Material ID, PR, PO, tender, vendor…  ( / )'))}"></form>`}
           <div class="top-r">
             <button class="btn btn-sm lang" data-act="lang" aria-pressed="${state.lang === 'vi'}" aria-label="${esc(t('Language: English. Switch to Vietnamese'))}"><span${state.lang === 'en' ? ' class="on"' : ''}>EN</span> · <span${state.lang === 'vi' ? ' class="on"' : ''}>VI</span></button>
-            <a class="icon-btn bell" href="#/notifications" aria-label="${esc(t('Notifications'))}, ${unread} ${esc(t('unread'))}"><svg aria-hidden="true" viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M18 8a6 6 0 1 0-12 0c0 7-3 9-3 9h18s-3-2-3-9M13.7 21a2 2 0 0 1-3.4 0"/></svg>${unread ? `<span class="dotc">${unread}</span>` : ''}</a>
+            <a class="icon-btn bell" href="${sp ? '#/supplier' : '#/notifications'}" aria-label="${esc(t('Notifications'))}, ${unread} ${esc(t('unread'))}"><svg aria-hidden="true" viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M18 8a6 6 0 1 0-12 0c0 7-3 9-3 9h18s-3-2-3-9M13.7 21a2 2 0 0 1-3.4 0"/></svg>${unread ? `<span class="dotc">${unread}</span>` : ''}</a>
             <div class="user"><span class="av" aria-hidden="true">${esc(uname.split(' ').pop()[0])}</span><span class="un"><b>${esc(uname)}</b><small>${esc(urole)}</small></span></div>
           </div>
         </header>
