@@ -48,19 +48,21 @@
       ${kpi('12-month average', m.avg12 ? vnd(m.avg12) : '—', `Weighted by quantity · ${rows.length} records in view`)}
       ${kpi('Min – max', prices.length ? `${num(Math.min(...prices) / 1e6, 2)} – ${num(Math.max(...prices) / 1e6, 2)} tr` : '—', 'Records and monthly averages')}
       ${kpi('vs 90-day average', d90 != null ? sg(d90) : '—', m.avg90 ? `90-day avg ${vnd(m.avg90)}${Math.abs(d90) > thr ? ' · price alert' : ''}` : '', d90 != null && Math.abs(d90) > thr ? (d90 > 0 ? 'danger' : 'success') : '')}</div>`;
-    const chart = card(`Monthly average price · ${m.id}`, ser ? App.chart.line({ labels: MONTHS, values: ser, fmt: (v, axis) => (axis ? num(v / 1e6, v < 1e7 ? 2 : 1) + ' tr' : vnd(v)), label: `Monthly weighted average price of ${m.id} from ${vnd(ser[0])} to ${vnd(ser[11])}, excl. VAT` }) + `<p class="small muted">Weighted average per ${esc(m.uom)}, excl. VAT, all vendors.</p>` : App.emptyState('No price records yet'));
+    const mk = (dt) => dt.slice(3, 5) + '/' + dt.slice(8, 10);
+    const vSeries = ser ? (st.vendor === 'all' ? vendors : [st.vendor]).map((vid) => { const vals = MONTHS.map((mo) => { const xs = all.filter((r) => r.vendor === vid && mk(r.date) === mo && (st.src === 'all' || r.src === st.src)); return xs.length ? xs.reduce((a, r) => a + r.price, 0) / xs.length : null; }); return { name: App.vshort(App.vendor(vid)), values: vals }; }).filter((x) => x.values.some((v) => v != null)).slice(0, 3) : [];
+    const chart = card(`Monthly average price · ${m.id}`, ser ? App.chart.line({ labels: MONTHS, values: ser, name: 'All vendors (weighted avg)', series: vSeries, fmt: (v, axis) => (axis ? num(v / 1e6, v < 1e7 ? 2 : 1) + ' tr' : vnd(v)), label: `Monthly weighted average price of ${m.id} from ${vnd(ser[0])} to ${vnd(ser[11])}, excl. VAT${vSeries.length ? '; vendor prices: ' + vSeries.map((x) => x.name + ' ' + x.values.map((v, i) => (v == null ? '' : MONTHS[i] + ' ' + vnd(v))).filter(Boolean).join(', ')).join('; ') : ''}` }) + `<p class="small muted">Weighted average per ${esc(m.uom)}, excl. VAT, all vendors (blue line)${vSeries.length ? ' · vendor dots = recorded prices that month (PO, bid, quotation, invoice, contract)' : ''}.</p>` : App.emptyState('No price records yet'));
     const cheapest = Math.min(...m.vendors.map((v) => v[2]));
     const cmp = card('Vendor comparison', m.vendors.length ? table([
-      { h: 'Vendor', r: (v) => `<a href="#/vendors/${esc(v[0])}">${esc(App.vshort(App.vendor(v[0])))}</a> ${pill(v[1], v[1] === 'Blocked' ? 'danger' : v[1] === 'Preferred' ? 'success' : 'neutral')}`, w: 'minmax(170px,2fr)' },
+      { h: 'Vendor', r: (v) => `<a href="#/vendors/${esc(v[0])}">${esc(App.vshort(App.vendor(v[0])))}</a> ${pill(v[1], v[1] === 'Blocked' ? 'danger' : v[1] === 'Preferred' ? 'success' : 'neutral')}`, w: 'minmax(150px,2fr)' },
       { h: 'Records', r: (v) => String(all.filter((r) => r.vendor === v[0]).length), cls: 'num', w: '80px' },
       { h: 'Latest price', r: (v) => vnd(v[2]), cls: 'num', w: '140px' },
       { h: 'vs cheapest', r: (v) => (v[2] === cheapest ? pill('Cheapest', 'success') : '+' + pct((v[2] - cheapest) / cheapest * 100)), cls: 'num', w: '110px' }
-    ], m.vendors, { min: 520, label: 'Vendor comparison' }) : App.emptyState('No approved vendors'));
+    ], m.vendors, { min: 380, label: 'Vendor comparison' }) : App.emptyState('No approved vendors'));
     const rule = st.rule != null ? `<form id="ph-rule" class="stack" novalidate><div class="field"><label for="ph-thr">Threshold (± %)</label><input id="ph-thr" class="inp" inputmode="decimal" value="${esc(st.rule)}"${st.rerr ? ' aria-invalid="true" aria-describedby="ph-thr-e"' : ''}>${st.rerr ? `<span class="err" id="ph-thr-e" role="alert">${esc(st.rerr)}</span>` : ''}<span class="hint">Between 1 and 20%</span></div><div class="row-acts"><button type="button" class="btn btn-sm" data-ph="rule-cancel">Cancel</button><button type="submit" class="btn btn-sm btn-p">Save rule</button></div></form>`
       : `<p class="mt-0">Notify Procurement when a new price differs from its 90-day average by more than <b>±${num(thr, 1)}%</b>.</p><p class="small muted">Applies to every Material ID; alerts appear on the Dashboard ("Price alerts by Material ID") and in notifications for the category buyer.</p>`;
     const ruleCard = card('Price alert rule', rule, st.rule != null ? '' : '<button class="btn btn-sm" data-ph="rule-edit">Edit rule</button>');
     const recs = card(`Price records (${rows.length})`, table([
-      { h: 'Date', k: 'date', w: '100px' },
+      { h: 'Date', r: (r) => `<span class="nowrap">${esc(r.date)}</span>`, w: '100px' },
       { h: 'Source', r: (r) => pill(r.src, r.src === 'PO' ? 'info' : r.src === 'Invoice' ? 'warning' : 'neutral'), w: '100px' },
       { h: 'Document', r: (r) => `<span class="mono small">${esc(r.doc)}</span>`, w: 'minmax(130px,1.2fr)' },
       { h: 'Vendor', r: (r) => esc(vname(r)), w: 'minmax(130px,1.3fr)' },

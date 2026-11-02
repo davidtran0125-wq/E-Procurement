@@ -286,3 +286,49 @@ ul.plain > li.row-acts { padding: 6px 0; border-top: 1px solid var(--divider); }
   .po-doc { border: 0; max-width: none; } .tbl-wrap { overflow: visible; }
 }
 .filters select.inp { max-width: 100%; min-width: 0; text-overflow: ellipsis; }
+
+/* ---- Phase 4 UI polish (Agent 3) ---- */
+.nowrap { white-space: nowrap; }
+/* KPI money tiles: smaller value so "₫" never orphans; wraps between number groups only when it must */
+.kpi-money .kpi-v { font-size: clamp(18px, .6vw + 10px, 22px); }
+/* Totals block: label left, figures right-aligned, total row ruled */
+.dl-tot, .dl-num { grid-template-columns: minmax(0, 1fr) max-content; } .dl-tot dd, .dl-num dd { text-align: right; font-variant-numeric: tabular-nums; }
+.dl-tot dt.tot, .dl-tot dd.tot, .dl-num dt.tot, .dl-num dd.tot { border-top: 1px solid var(--border); padding-top: 8px; }
+.dl-tot dt.tot { color: var(--ink); font-weight: 600; }
+@media (max-width: 480px) { .dl-tot, .dl-num { grid-template-columns: minmax(0, 1fr) max-content; } .dl-tot dd, .dl-num dd { margin-bottom: 0; } }
+.sw { display: inline-block; width: 10px; height: 10px; border-radius: 2px; margin-right: 6px; vertical-align: -1px; }
+/* PO detail lists */
+.grn-list > li, .ncr-list > li { padding: 10px 0; border-top: 1px solid var(--divider); } .grn-list > li:first-child, .ncr-list > li:first-child { border-top: 0; padding-top: 0; }
+.grn-list .chips { margin-top: 6px; align-items: center; }
+ol.plain.rev-list { list-style: none; margin: 0; padding: 0 0 0 22px; position: relative; }
+.rev-list::before { content: ""; position: absolute; left: 5px; top: 6px; bottom: 6px; width: 2px; background: var(--divider); }
+.rev-list > li { position: relative; padding: 0 0 14px; } .rev-list > li:last-child { padding-bottom: 0; }
+.rev-list > li::before { content: ""; position: absolute; left: -22px; top: 5px; width: 12px; height: 12px; border-radius: 50%; background: var(--surface); border: 2px solid var(--input); }
+.rev-list > li:first-child::before { border-color: var(--primary); background: var(--primary-soft); }
+/* Invoice match grid: out-of-tolerance figures are boxed in danger, within tolerance in success (text + sign, never colour alone) */
+.var { display: inline-block; font-weight: 600; border-radius: 6px; padding: 1px 6px; }
+.var-ok { color: var(--ok); background: var(--ok-bg); } .var-bad { color: var(--bad); background: var(--bad-bg); box-shadow: inset 0 0 0 1px #F2B8B3; }
+.var-cell { color: var(--bad); font-weight: 700; text-decoration: underline wavy var(--bad); text-underline-offset: 3px; }
+.match-grid .tr:has(.var-bad) { background: #FFF8F7; }
+.legal-list > li > span { min-width: 0; }
+.dl-inv dd.mono { overflow-wrap: anywhere; }
+/* Charts: legend for multi-series lines */
+.chart-legend { list-style: none; display: flex; flex-wrap: wrap; gap: 4px 16px; margin: 0 0 8px; padding: 0; font-size: 12px; color: var(--ink2); }
+.chart-legend li { display: flex; align-items: center; gap: 6px; }
+.lg-sw { width: 12px; height: 12px; border-radius: 50%; flex: none; } .lg-0 { background: #2a78d6; } .lg-1 { background: #eb6834; } .lg-2 { background: #1baf7a; } .lg-3 { background: #eda100; }
+/* Bars: "other" row muted by colour (opacity would drop text contrast) */
+.hbar.dim { opacity: 1; } .hbar.dim .bar span { background: var(--input); } .hbar.dim .hbar-l, .hbar.dim .hbar-v { color: var(--muted); }
+.seg-nw button { white-space: nowrap; }
+/* Print: A4, white page, no app chrome, colours kept for pills */
+@page { size: A4; margin: 14mm 12mm; }
+@media print {
+  body, .content { background: #fff !important; }
+  .crumbs, .sec-nav { display: none !important; }
+  .po-doc { padding: 0; box-shadow: none; } .po-doc .tbl { min-width: 0 !important; } .po-doc .tbl-wrap { border-color: #999; }
+  .po-doc .tr { break-inside: avoid; } .po-sign { break-inside: avoid; margin-top: 24px; }
+  .po-doc .grid { grid-template-columns: 1fr 1fr; }
+  .pill, .chip, .mid { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+  a { color: inherit; text-decoration: none; }
+}
+.po-tot { max-width: 420px; margin-left: auto; }
+.po-sign > div { border-top: 1px solid var(--border); padding-top: 8px; }

@@ -52,6 +52,7 @@
     });
   }
   const totals = (v) => { const by = {}; v.lines.forEach((l) => { const r = l[0] ? mat(l[0]).vat : 8; by[r] = (by[r] || 0) + l[2] * l[3]; }); const net = Object.values(by).reduce((a, x) => a + x, 0); const vat = Object.entries(by).reduce((a, [r, x]) => a + x * r / 100, 0); return { by, net, vat, gross: net + vat }; };
+  const vb = (t, ok) => `<span class="var ${ok ? 'var-ok' : 'var-bad'}">${t}<span class="sr">${ok ? ' within tolerance' : ' outside tolerance'}</span></span>`;
   const sg = (x) => `${x > 0 ? '+' : x < 0 ? '−' : '±'}${pct(Math.abs(x))}`;
   const banner = () => `<div class="alert alert-info" role="status">Tolerances: <b>price ±${num(D().tolerance.price, 1)}%</b> vs PO · <b>quantity ±${D().tolerance.qty}%</b> vs GRN accepted qty for weight/volume units (tấn, m³), exact for count units · SRV- uses 2-way match with the service entry sheet. ${App.state.role === 'admin' ? '<a href="#/admin/rules">Edit in Admin</a>' : 'Edited in Admin.'}</div>`;
 
@@ -82,19 +83,19 @@
     const stage = Math.min(v.stage, 4);
     const steps = `<ol class="steps" aria-label="Invoice status">${STAGES.map((s, k) => { const dn = k < stage || (k === stage && k === 4); const cu = k === stage && !dn; return `<li class="${dn ? 'done' : cu ? 'cur' : ''}"${cu ? ' aria-current="step"' : ''}><span class="st-n" aria-hidden="true">${dn ? '✓' : k + 1}</span><span class="st-l">${s}${cu && v.hold ? ' · on hold' : ''}</span>${dn ? '<span class="sr"> (done)</span>' : ''}</li>`; }).join('')}</ol>`;
     const isSrv = M.some((r) => r.ses);
-    const fields = card('E-invoice fields (parsed from XML)', `<dl class="dl"><dt>Mẫu số</dt><dd>${esc(v.mau)}</dd><dt>Ký hiệu</dt><dd class="mono">${esc(v.kh)}</dd><dt>Số hóa đơn</dt><dd class="mono">${esc(v.no)}</dd><dt>Ngày lập</dt><dd>${esc(d.date)}</dd>
+    const fields = card('E-invoice fields (parsed from XML)', `<dl class="dl dl-inv"><dt>Mẫu số</dt><dd>${esc(v.mau)}</dd><dt>Ký hiệu</dt><dd class="mono">${esc(v.kh)}</dd><dt>Số hóa đơn</dt><dd class="mono">${esc(v.no)}</dd><dt>Ngày lập</dt><dd>${esc(d.date)}</dd>
       <dt>MST người bán</dt><dd><span class="mono">${esc(ven.mst)}</span> · ${esc(ven.name)}</dd><dt>MST người mua</dt><dd><span class="mono">${esc(D().company.mst)}</span> · ${esc(D().company.name)}</dd><dt>Mã CQT</dt><dd class="mono">${v.cqt ? esc(v.cqt) : '<span class="tone-danger">— missing —</span>'}</dd>
       <dt>Type</dt><dd>${esc(v.type)}${v.orig ? ` · replaces ${esc(v.orig)}` : ''}</dd><dt>Source</dt><dd>${esc(v.src)} · XML + PDF</dd><dt>Subtotal</dt><dd>${vnd(tt.net)}</dd><dt>VAT</dt><dd>${Object.entries(tt.by).map(([r, x]) => `${r}% on ${vnd(x)} = ${vnd(x * r / 100)}`).join(' · ')}</dd><dt>Total</dt><dd><b>${vnd(tt.gross)}</b></dd></dl>`);
-    const legal = card(`Legal checks (${C.filter((c) => c[1]).length} / ${C.length})`, `<ul class="plain">${C.map(([n, ok, note, hard]) => `<li class="row-acts between"><span>${esc(n)}<div class="small muted">${esc(note)}</div></span>${pill(ok ? 'Pass' : hard ? 'Fail · blocks matching' : 'Fail · map before match', ok ? 'success' : hard ? 'danger' : 'warning')}</li>`).join('')}</ul>`);
+    const legal = card(`Legal checks (${C.filter((c) => c[1]).length} / ${C.length})`, `<ul class="plain legal-list">${C.map(([n, ok, note, hard]) => `<li class="row-acts between"><span>${esc(n)}<div class="small muted">${esc(note)}</div></span>${pill(ok ? 'Pass' : hard ? 'Fail · blocks matching' : 'Fail · map before match', ok ? 'success' : hard ? 'danger' : 'warning')}</li>`).join('')}</ul>`);
     const grid = lok ? table([
       { h: 'Material ID line', r: (r) => (r.m ? `${mid(r.m)}<div class="small">${esc(r.desc)}</div>` : `<span class="small">${esc(r.desc)}</span><div>${pill('No Material ID', 'danger')}</div>${mapper(d, r)}`), w: 'minmax(200px,2fr)' },
       { h: 'PO qty · price', r: (r) => (r.poQty != null ? `${num(r.poQty)} · ${vnd(r.poPrice)}` : '—'), cls: 'num', w: '170px' },
       { h: isSrv ? 'SES accepted' : 'GRN accepted', r: (r) => (r.acc != null ? `${num(r.acc)}${r.avail !== r.acc ? `<div class="small muted">${num(r.acc - r.avail)} already invoiced</div>` : ''}${r.ncr ? `<div class="small tone-danger">${num(r.ncr[1])} blocked · ${esc(r.ncr[0])} open</div>` : ''}${r.ses ? `<div class="small muted">SLA ${pct(r.ses[0])} ≥ ${pct(r.ses[1])}</div>` : ''}` : '—'), cls: 'num', w: '150px' },
-      { h: 'Invoice qty · price', r: (r) => `${num(r.qty)} · ${vnd(r.price)}`, cls: 'num', w: '170px' },
-      { h: 'Qty var.', r: (r) => (r.qd != null ? `${sg(r.qd)}<div class="small muted">tol. ${r.qTol ? '±' + r.qTol + '%' : 'exact'}</div>` : '—'), cls: 'num', w: '100px' },
-      { h: 'Price var.', r: (r) => (r.pd != null ? `${sg(r.pd)}<div class="small muted">tol. ±${num(D().tolerance.price, 1)}%</div>${Math.abs(r.pd) > D().tolerance.price ? `<div class="small tone-danger">${vnd(r.over)} over PO</div>` : ''}` : '—'), cls: 'num', w: '130px' },
-      { h: 'Result', r: (r) => pill(r.res, r.tone), w: '130px' }
-    ], M, { min: 1080, label: 'Match by Material ID line' }) : App.errorState('Matching is blocked until the legal checks pass. Ask the supplier for a replacement invoice with a valid Mã CQT.');
+      { h: 'Invoice qty · price', r: (r) => `${r.qd != null && Math.abs(r.qd) > r.qTol + 1e-9 ? `<span class="var-cell">${num(r.qty)}</span>` : num(r.qty)} · ${r.pd != null && Math.abs(r.pd) > D().tolerance.price + 1e-9 ? `<span class="var-cell">${vnd(r.price)}</span>` : vnd(r.price)}`, cls: 'num', w: '170px' },
+      { h: 'Qty var.', r: (r) => (r.qd != null ? `${vb(sg(r.qd), Math.abs(r.qd) <= r.qTol + 1e-9)}<div class="small muted">tol. ${r.qTol ? '±' + r.qTol + '%' : 'exact'}</div>` : '—'), cls: 'num', w: '100px' },
+      { h: 'Price var.', r: (r) => (r.pd != null ? `${vb(sg(r.pd), Math.abs(r.pd) <= D().tolerance.price + 1e-9)}<div class="small muted">tol. ±${num(D().tolerance.price, 1)}%</div>${Math.abs(r.pd) > D().tolerance.price ? `<div class="small tone-danger">${vnd(r.over)} over PO</div>` : ''}` : '—'), cls: 'num', w: '130px' },
+      { h: 'Result', r: (r) => pill((r.tone === 'danger' ? '! ' : '✓ ') + r.res, r.tone), w: '150px' }
+    ], M, { min: 1000, label: 'Match by Material ID line', cls: 'match-grid' }) : App.errorState('Matching is blocked until the legal checks pass. Ask the supplier for a replacement invoice with a valid Mã CQT.');
     const allOk = lok && M.length && M.every((r) => r.res === 'Matched');
     const priceExc = M.find((r) => r.res === 'Price mismatch');
     const exc = /Exception|No Material ID|hold|credit/i.test(d.status) ? `<div class="alert alert-warning" role="status"><b>${esc(v.hold || 'On hold')}.</b> Assigned to buyer <b>${esc(v.assigned || '—')}</b>${v.resolveBy ? ` · resolve by ${esc(v.resolveBy)} (escalates after 3 working days)` : ''}.${priceExc ? ` Invoice price ${vnd(priceExc.price)} vs PO ${vnd(priceExc.poPrice)} (${sg(priceExc.pd)}) — written to Price history as source Invoice.` : ''} Release needs the Procurement Lead.</div>` : '';
@@ -110,7 +111,7 @@
     const head = `<div class="page-h"><div><div class="crumbs small muted"><a href="#/invoices">Invoices & matching</a> / ${esc(d.id)}</div><h1><span class="mono">${esc(d.id)}</span> ${esc(d.title)}</h1>
       <div class="sub">${esc(ven.name)} · ${pill(d.status, sTone(d.status))} · PO <a class="mono" href="#/po/${esc(v.po)}">${esc(v.po)}</a> · ${esc(v.grn)}</div></div>
       <div class="acts"><button class="btn" data-act="toast" data-msg="${esc(v.kh)}-${esc(v.no)}.pdf opened">View PDF</button></div></div>`;
-    return `${head}${steps}${exc}<div class="grid-2"><div class="stack">${card(isSrv ? '2-way match · PO → service entry sheet' : '3-way match · PO → GRN → e-invoice', `<ol class="chain"><li><span class="small muted">PO</span><a class="mono" href="#/po/${esc(v.po)}">${esc(v.po)}</a></li><li><span class="small muted">${isSrv ? 'Service entry sheet' : 'GRN'}</span><span class="mono">${esc(v.grn)}</span></li><li><span class="small muted">E-invoice</span><span class="mono">${esc(v.kh)} · ${esc(v.no)}</span></li></ol>${grid}`)}${fields}</div>
+    return `${head}${steps}${exc}${card(isSrv ? '2-way match · PO → service entry sheet' : '3-way match · PO → GRN → e-invoice', `<ol class="chain"><li><span class="small muted">PO</span><a class="mono" href="#/po/${esc(v.po)}">${esc(v.po)}</a></li><li><span class="small muted">${isSrv ? 'Service entry sheet' : 'GRN'}</span><span class="mono">${esc(v.grn)}</span></li><li><span class="small muted">E-invoice</span><span class="mono">${esc(v.kh)} · ${esc(v.no)}</span></li></ol>${grid}`)}<div class="grid-2"><div class="stack">${fields}</div>
       <div class="stack">${legal}${pay}</div></div>`;
   }
   function mapper(d, r) {

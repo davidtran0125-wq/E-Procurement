@@ -197,13 +197,13 @@
   function linesCard(id, p) {
     const tt = vatSplit(p);
     return card(`Lines by Material ID (${p.lines.length})`, table([
-      { h: 'Material ID', r: (l) => `${mid(l.mat)}<div class="small">${esc(mat(l.mat).name)}</div>`, w: 'minmax(180px,2fr)' },
-      { h: 'Qty', r: (l) => `${num(l.qty)} ${esc(mat(l.mat).uom)}${l.cancelled ? `<div class="small tone-danger">−${num(l.cancelled)} cancelled</div>` : ''}`, cls: 'num', w: '120px' },
-      { h: 'Unit price excl. VAT', r: (l) => vnd(l.price), cls: 'num', w: '150px' },
-      { h: 'VAT', r: (l) => esc(S.vatLabel(mat(l.mat).vat)), w: 'minmax(120px,1.2fr)' },
-      { h: 'VAT amount', r: (l) => vnd(lineNet(l) * mat(l.mat).vat / 100), cls: 'num', w: '140px' },
-      { h: 'Amount excl. VAT', r: (l) => vnd(lineNet(l)), cls: 'num', w: '160px' }
-    ], p.lines, { min: 900, label: 'PO lines' }) + `<dl class="dl mt">${Object.entries(tt.by).sort((a, b) => b[0] - a[0]).map(([r, x]) => `<dt>VAT ${esc(S.vatLabel(r))}</dt><dd>${vnd(x)} + VAT ${vnd(x * r / 100)}</dd>`).join('')}<dt>Total</dt><dd><b>${vnd(tt.net)} + VAT ${vnd(tt.vat)} = ${vnd(tt.gross)}</b></dd></dl>`);
+      { h: 'Material ID', r: (l) => `${mid(l.mat)}<div class="small">${esc(mat(l.mat).name)}</div>`, w: 'minmax(160px,2fr)' },
+      { h: 'Qty', r: (l) => `<span class="nowrap">${num(l.qty)} ${esc(mat(l.mat).uom)}</span>${l.cancelled ? `<div class="small tone-danger">−${num(l.cancelled)} cancelled</div>` : ''}`, cls: 'num', w: '120px' },
+      { h: 'Unit price excl. VAT', r: (l) => vnd(l.price), cls: 'num', w: '130px' },
+      { h: 'VAT', r: (l) => esc(S.vatLabel(mat(l.mat).vat)), w: 'minmax(64px,.6fr)' },
+      { h: 'VAT amount', r: (l) => vnd(lineNet(l) * mat(l.mat).vat / 100), cls: 'num', w: '125px' },
+      { h: 'Amount excl. VAT', r: (l) => vnd(lineNet(l)), cls: 'num', w: '140px' }
+    ], p.lines, { min: 700, label: 'PO lines' }) + `<dl class="dl dl-tot mt">${Object.entries(tt.by).sort((a, b) => b[0] - a[0]).map(([r, x]) => `<dt>VAT ${esc(S.vatLabel(r))}</dt><dd>${vnd(x)} + VAT ${vnd(x * r / 100)}</dd>`).join('')}<dt class="tot">Total incl. VAT</dt><dd class="tot"><b>${vnd(tt.gross)}</b><div class="small muted">${vnd(tt.net)} + VAT ${vnd(tt.vat)}</div></dd></dl>`);
   }
   function schedCard(id, p, d) {
     const rows = sched(p);
@@ -221,7 +221,7 @@
       { h: 'On time', r: (r) => (r.onTime == null ? '—' : pill(r.onTime ? 'Yes' : 'No', r.onTime ? 'success' : 'danger')), w: '90px' },
       { h: 'In full', r: (r) => (r.inFull == null ? '—' : pill(r.inFull ? 'Yes' : 'No', r.inFull ? 'success' : 'danger')), w: '90px' }
     ], rows, { min: 880, label: 'Delivery schedule' })
-      + `<p class="small muted">OTIF: a delivery is on time when received ≤ promised date (as last accepted by the buyer, incl. revisions) and in full when the <b>accepted</b> qty ≥ scheduled qty.</p>${gBlocks ? `<h3 class="h-sub">Receipts & inspection</h3><ul class="plain">${gBlocks}</ul>` : ''}${st.grn ? grnForm(p, rows) : ''}`,
+      + `<p class="small muted">OTIF: a delivery is on time when received ≤ promised date (as last accepted by the buyer, incl. revisions) and in full when the <b>accepted</b> qty ≥ scheduled qty.</p>${gBlocks ? `<h3 class="h-sub">Receipts & inspection</h3><ul class="plain grn-list">${gBlocks}</ul>` : ''}${st.grn ? grnForm(p, rows) : ''}`,
     canRecv && !st.grn ? '<button class="btn btn-sm btn-p" data-po="grn-open">Record goods receipt</button>' : '');
   }
   function grnForm(p, rows) {
@@ -268,7 +268,7 @@
   }
   function ncrCard(id) {
     const list = ncrsOf(id); if (!list.length) return '';
-    return card(`Non-conformance (${list.length})`, `<ul class="plain">${list.map((n) => `<li class="row-acts between"><span><b class="mono">${esc(n.id)}</b> ${mid(n.mat)} ${pill(n.status, n.status === 'Closed' ? 'success' : 'warning')}
+    return card(`Non-conformance (${list.length})`, `<ul class="plain ncr-list">${list.map((n) => `<li class="row-acts between"><span><b class="mono">${esc(n.id)}</b> ${mid(n.mat)} ${pill(n.status, n.status === 'Closed' ? 'success' : 'warning')}
       <div class="small">${num(n.qty)} ${esc(mat(n.mat).uom)} · ${esc(n.action)}${n.discount ? ` ${num(n.discount)}%` : ''} · ${esc(n.grn)} · raised ${esc(n.raised)} by ${esc(n.by)}</div><div class="small muted">Supplier: ${esc(n.supplier)}</div>
       ${n.status !== 'Closed' ? `<div class="small tone-warning">Open NCR blocks invoice matching for ${num(n.qty)} ${esc(mat(n.mat).uom)}; the quantity stays open on the PO.</div>` : ''}</span>
       ${n.status !== 'Closed' ? `<button class="btn btn-sm" data-po="ncr-close" data-id="${esc(n.id)}">Close NCR</button>` : ''}</li>`).join('')}</ul>`);
@@ -294,7 +294,7 @@
   }
   function revCard(id, p, d) {
     const pend = p.revs.find((r) => /Pending/.test(r.status)); const canCo = !/Draft|Pending|Cancelled|Closed/.test(d.status) && !pend;
-    const list = p.revs.length ? `<ol class="plain">${p.revs.map((r) => `<li><b>Rev.${r.no}</b> ${pill(r.status, /Pending/.test(r.status) ? 'warning' : /Current|Approved/.test(r.status) ? 'success' : /Reject/.test(r.status) ? 'danger' : 'neutral')} <span class="small muted">${esc(r.at)} · ${esc(r.by)}</span><div class="small">${esc(r.diff)}</div>${r.reason ? `<div class="small muted">“${esc(r.reason)}”</div>` : ''}${r.approval && /Pending/.test(r.status) ? `<div class="small"><a href="#/approvals?id=${encodeURIComponent(r.approval)}">Open in My approvals</a> · approver Đỗ Hoàng Nam (SoD: raiser cannot approve)</div>` : ''}</li>`).join('')}</ol>` : '<p class="small muted mt-0">No revisions yet.</p>';
+    const list = p.revs.length ? `<ol class="plain rev-list">${p.revs.map((r) => `<li><b>Rev.${r.no}</b> ${pill(r.status, /Pending/.test(r.status) ? 'warning' : /Current|Approved/.test(r.status) ? 'success' : /Reject/.test(r.status) ? 'danger' : 'neutral')} <span class="small muted">${esc(r.at)} · ${esc(r.by)}</span><div class="small">${esc(r.diff)}</div>${r.reason ? `<div class="small muted">“${esc(r.reason)}”</div>` : ''}${r.approval && /Pending/.test(r.status) ? `<div class="small"><a href="#/approvals?id=${encodeURIComponent(r.approval)}">Open in My approvals</a> · approver Đỗ Hoàng Nam (SoD: raiser cannot approve)</div>` : ''}</li>`).join('')}</ol>` : '<p class="small muted mt-0">No revisions yet.</p>';
     let form = '';
     if (st.co) {
       const f = st.co; const e = st.coErr;
@@ -371,7 +371,7 @@
       <div class="acts"><a class="btn" href="#/po/${esc(id)}/print">Print preview</a>${/Sent|Confirmed|Partially/.test(d.status) && sched(p).some((r) => !r.rec && !r.cx) ? '<button class="btn btn-p" data-po="grn-open">Record goods receipt</button>' : ''}</div></div>`;
     const alerts = (v && v.risk === 'High' ? `<div class="alert alert-warning" role="status"><b>High-risk vendor.</b> ${(v.riskReasons || []).map(esc).join(' · ')}</div>` : '')
       + (p.confirm && p.confirm.status === 'Not confirmed' ? `<div class="alert alert-danger" role="alert"><b>Not confirmed by ${esc(App.vshort(v))}.</b> ${esc(p.confirm.note || '')}</div>` : '');
-    const kpis = `<div class="grid-k">${kpi('Value excl. VAT', vnd(tt.net), `Rev.${p.rev}`)}${kpi('VAT', vnd(tt.vat), Object.keys(tt.by).map((r) => r + '%').join(' + '))}${kpi('Total incl. VAT', vnd(tt.gross), ty(tt.gross))}${kpi('Accepted', pct(tt.net ? acc / tt.net * 100 : 0, 0), vnd(acc))}${kpi('Invoiced', pct(tt.net ? inv / tt.net * 100 : 0, 0), vnd(inv))}</div>`;
+    const kpis = `<div class="grid-k kpi-money">${kpi('Value excl. VAT', vnd(tt.net), `Rev.${p.rev}`)}${kpi('VAT', vnd(tt.vat), Object.keys(tt.by).map((r) => r + '%').join(' + '))}${kpi('Total incl. VAT', vnd(tt.gross), ty(tt.gross))}${kpi('Accepted', pct(tt.net ? acc / tt.net * 100 : 0, 0), vnd(acc))}${kpi('Invoiced', pct(tt.net ? inv / tt.net * 100 : 0, 0), vnd(inv))}</div>`;
     const files = S.files('pof', p.files, d.mats, st.up, ['Signed PO', 'Mill certificate', 'Biên bản giao nhận', 'Specification / drawing', 'Other']);
     return `${head}${alerts}${progress(stepOf(d.status), d.status)}${kpis}<div class="grid-2"><div class="stack">${linesCard(id, p)}${schedCard(id, p, d)}${ncrCard(id)}${matchCard(id, p)}${files}</div>
       <div class="stack">${header(id, p, d)}${confirmCard(id, p, d)}${revCard(id, p, d)}${cancelCard(id, p, d)}</div></div>`;
@@ -387,10 +387,10 @@
         <div class="grid"><div><h3 class="h-sub mt-0">Bên bán / Supplier</h3><p class="small mt-0"><b>${esc(v.name)}</b><br>MST ${esc(v.mst)}<br>${esc(v.address || '')}<br>${esc(v.contact)} · ${esc(v.email)}</p></div>
           <div><h3 class="h-sub mt-0">Giao hàng / Delivery</h3><p class="small mt-0">${esc(p.site)}<br>${sched(p).filter((r) => !r.cx).map((r) => `${esc(r.mat)}: ${num(r.qty)} ${esc(mat(r.mat).uom)} · ${esc(r.due)}`).join('<br>')}</p></div></div>
         ${table([{ h: 'Mã vật tư', r: (l) => `<span class="mono">${esc(l.mat)}</span>`, w: '110px' }, { h: 'Diễn giải', r: (l) => esc(mat(l.mat).name), w: 'minmax(160px,2fr)' }, { h: 'ĐVT', r: (l) => esc(mat(l.mat).uom), w: '70px' },
-          { h: 'Số lượng', r: (l) => num(l.qty - (l.cancelled || 0)), cls: 'num', w: '90px' }, { h: 'Đơn giá', r: (l) => vnd(l.price), cls: 'num', w: '130px' }, { h: 'VAT', r: (l) => mat(l.mat).vat + '%', cls: 'num', w: '60px' }, { h: 'Thành tiền', r: (l) => vnd(lineNet(l)), cls: 'num', w: '150px' }], p.lines, { min: 760, label: 'PO lines' })}
-        <dl class="dl mt">${Object.entries(tt.by).map(([r, x]) => `<dt>Tiền thuế GTGT ${r}% trên ${vnd(x)}</dt><dd>${vnd(x * r / 100)}</dd>`).join('')}<dt>Tổng tiền trước thuế</dt><dd>${vnd(tt.net)}</dd><dt>Tổng thanh toán</dt><dd><b>${vnd(tt.gross)}</b></dd></dl>
+          { h: 'Số lượng', r: (l) => num(l.qty - (l.cancelled || 0)), cls: 'num', w: '90px' }, { h: 'Đơn giá', r: (l) => vnd(l.price), cls: 'num', w: '130px' }, { h: 'VAT', r: (l) => mat(l.mat).vat + '%', cls: 'num', w: '60px' }, { h: 'Thành tiền', r: (l) => vnd(lineNet(l)), cls: 'num', w: '150px' }], p.lines, { min: 760, label: 'PO lines', cls: 'po-print-tbl' })}
+        <dl class="dl dl-tot po-tot mt">${Object.entries(tt.by).map(([r, x]) => `<dt>Tiền thuế GTGT ${r}% trên ${vnd(x)}</dt><dd>${vnd(x * r / 100)}</dd>`).join('')}<dt>Tổng tiền trước thuế</dt><dd>${vnd(tt.net)}</dd><dt>Tổng thanh toán</dt><dd><b>${vnd(tt.gross)}</b></dd></dl>
         <h3 class="h-sub">Điều khoản / Terms</h3><p class="small mt-0">Thanh toán: ${esc(p.terms)}. Giao hàng kèm CO/CQ theo lô và biên bản giao nhận. Phạt chậm giao theo hợp đồng / điều kiện chung.</p>
-        <div class="grid"><div class="small"><b>Đại diện bên mua</b><br>${esc(p.buyer)}<br>${pill(stepOf(d.status) >= 2 ? 'Digitally signed ' + d.date : 'Not signed yet', stepOf(d.status) >= 2 ? 'success' : 'neutral')}</div>
+        <div class="grid po-sign"><div class="small"><b>Đại diện bên mua</b><br>${esc(p.buyer)}<br>${pill(stepOf(d.status) >= 2 ? 'Digitally signed ' + d.date : 'Not signed yet', stepOf(d.status) >= 2 ? 'success' : 'neutral')}</div>
           <div class="small"><b>Đại diện bên bán</b><br>${esc(v.contact)}<br>${pill(p.confirm && p.confirm.status === 'Confirmed' ? 'Confirmed ' + p.confirm.at.slice(0, 10) : 'Awaiting confirmation', p.confirm && p.confirm.status === 'Confirmed' ? 'success' : 'warning')}</div></div></article>`;
   }
 

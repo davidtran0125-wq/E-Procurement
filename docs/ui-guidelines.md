@@ -50,3 +50,13 @@ Visual source of truth: `docs/04-design-brief.md` §3. Use tokens in `css/styles
 - Decisions: wrap in `.decide-panel` with an `h3` "Your decision"; the comment always has a `.hint` explaining when it is required, the `.err` is appended to `aria-describedby`; primary action last in `.decide-acts`.
 - Validation: `.err` text is prefixed with "!" via CSS; invalid textarea/select/`.inp` get the danger border through `aria-invalid="true"`.
 - Empty states (`.state`) render as a dashed, tinted box so they read as intentional. `.dl` stacks to one column under 480px.
+
+## Documents, matching & insights (Phase 4)
+- Money KPI rows (PO detail): `.grid-k.kpi-money` scales the value so "₫" never orphans.
+- Totals: `dl.dl-tot` (or `.dl-num` for budget figures) — labels left, figures right/tabular; mark the grand total `dt.tot` + `dd.tot` (ruled). Print totals add `.po-tot` (right-aligned block).
+- Legend swatches inside text: `<span class="sw sb-inv|sb-warn|sb-pr|sb-rest" aria-hidden="true">` matching the `.stack-bar` segments (PR budget card).
+- PO detail lists: `ul.plain.grn-list` (receipts + QC pills), `ul.plain.ncr-list`, `ol.plain.rev-list` (revision timeline, newest first, current dot in primary).
+- Match grids: wrap variances with `.var.var-ok` / `.var.var-bad` (always the signed % text + `.sr` "within/outside tolerance"); the offending invoice figure gets `.var-cell`; result pills are prefixed "✓"/"!". Pass `cls: 'match-grid'` so rows with an exception get a light danger tint. The match card spans the full width above the 2-column area so variance columns are visible without scrolling at 1440.
+- Charts: `App.chart.line({... name, series: [{name, values (null = gap)}]})` adds up to 3 extra series in brief order (orange, aqua, yellow) with an HTML legend (`.chart-legend`) and direct end labels in ink; put the series values in the `label` too. `bars` rows with `dim` render a grey bar with muted text (no opacity).
+- Segmented controls whose labels must not wrap: `.seg.seg-nw`. Dates in tables: `<span class="nowrap">`.
+- Print (`@media print`, `@page A4 14mm/12mm`): app chrome, crumbs and `.no-print` hidden, white page, table min-widths dropped, rows/signature block don't split, pill colours kept (`print-color-adjust: exact`).
