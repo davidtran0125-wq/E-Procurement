@@ -22,11 +22,16 @@
     const body = rows.length
       ? rows.map((r) => `<div class="tr" role="row" style="grid-template-columns:${tpl}">${cols.map((c) => `<div class="td ${c.cls || ''}" role="cell">${c.r ? c.r(r) : esc(r[c.k])}</div>`).join('')}</div>`).join('')
       : `<div class="empty">${esc(opts.empty || 'No records')}</div>`;
-    return `<div class="tbl-wrap"><div class="tbl" role="table" style="min-width:${min}px"><div class="tr thead" role="row" style="grid-template-columns:${tpl}">${head}</div>${body}</div></div>`;
+    return `<div class="tbl-wrap" tabindex="0" role="region" aria-label="${esc(opts.label || 'Table')}, scrolls horizontally"><div class="tbl" role="table" style="min-width:${min}px"><div class="tr thead" role="row" style="grid-template-columns:${tpl}">${head}</div>${body}</div></div>`;
   }
 
   const kpi = (label, value, note, tone) => `<div class="card kpi"><div class="kpi-l">${esc(label)}</div><div class="kpi-v">${value}</div>${note ? `<div class="kpi-n ${tone ? 'tone-' + tone : ''}">${note}</div>` : ''}</div>`;
   const card = (title, body, actions = '') => `<section class="card"><div class="card-h"><h2>${esc(title)}</h2><div class="card-a">${actions}</div></div>${body}</section>`;
+
+  /* State blocks (additive helpers): empty / loading / error */
+  const emptyState = (title, note = '', action = '') => `<div class="state" role="status"><b>${esc(title)}</b>${note ? `<span class="muted">${esc(note)}</span>` : ''}${action}</div>`;
+  const loading = (label = 'Loading…') => `<div class="state" role="status" aria-live="polite"><span class="spin" aria-hidden="true"></span><span class="muted">${esc(label)}</span></div>`;
+  const errorState = (msg, retry = '') => `<div class="alert alert-danger" role="alert">${esc(msg)}${retry}</div>`;
 
   function toast(msg) {
     const el = document.createElement('div');
@@ -82,7 +87,8 @@
       : ws === 'admin' ? `<a class="nav-i" href="#/dashboard">${icon('dashboard')}<span>Back to Procurement</span></a>` : '';
     const [uname, urole] = USERS[ws];
     const unread = window.DATA.notifications.filter((n) => !n.read).length;
-    return `<div class="layout">
+    return `<a class="skip" href="#main" data-act="skip">Skip to content</a><div class="layout">
+      <div class="scrim" data-act="menu-close" hidden></div>
       <aside class="side" id="side">
         <div class="brand"><span class="logo" aria-hidden="true">PL</span><span>ProcureLink</span><span class="ws">${esc(ws[0].toUpperCase() + ws.slice(1))}</span></div>
         <nav aria-label="Main">${groups}</nav>
@@ -90,7 +96,7 @@
       </aside>
       <div class="main-col">
         <header class="top">
-          <button class="icon-btn menu-btn" aria-label="Open menu" data-act="menu"><svg aria-hidden="true" viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 6h16M4 12h16M4 18h16"/></svg></button>
+          <button class="icon-btn menu-btn" aria-label="Open menu" aria-controls="side" aria-expanded="false" data-act="menu"><svg aria-hidden="true" viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 6h16M4 12h16M4 18h16"/></svg></button>
           <form class="search" role="search" data-act="search"><label class="sr" for="gsearch">Search</label><input id="gsearch" type="search" placeholder="Search Material ID, PR, PO, tender, vendor…  ( / )"></form>
           <div class="top-r">
             <a class="icon-btn bell" href="#/notifications" aria-label="Notifications, ${unread} unread"><svg aria-hidden="true" viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M18 8a6 6 0 1 0-12 0c0 7-3 9-3 9h18s-3-2-3-9M13.7 21a2 2 0 0 1-3.4 0"/></svg>${unread ? `<span class="dotc">${unread}</span>` : ''}</a>
@@ -134,7 +140,7 @@
     if (!found) inner = `<div class="page-h"><h1>Not built yet</h1></div><div class="card">Screen <code>${esc(route)}</code> is not available yet.</div>`;
     else {
       try { inner = found.p.render(params, found.sub); }
-      catch (e) { console.error(e); inner = `<div class="alert alert-danger">Error rendering ${esc(route)}: ${esc(e.message)}</div>`; }
+      catch (e) { console.error(e); inner = errorState(`This screen could not be displayed (${route}): ${e.message}`); }
     }
     app.innerHTML = shell(route, inner, ws);
     document.title = ((found && found.p.title) || 'ProcureLink') + ' · ProcureLink';
@@ -142,13 +148,26 @@
     window.scrollTo(0, 0);
   }
 
+  /* Mobile drawer */
+  function setMenu(open) {
+    const side = document.getElementById('side'); if (!side) return;
+    side.classList.toggle('open', open);
+    const btn = document.querySelector('[data-act=menu]'), scrim = document.querySelector('.scrim');
+    if (btn) { btn.setAttribute('aria-expanded', String(open)); btn.setAttribute('aria-label', open ? 'Close menu' : 'Open menu'); }
+    if (scrim) scrim.hidden = !open;
+    if (open) { const f = side.querySelector('.nav-i.on, .nav-i'); f && f.focus(); } else if (btn && side.contains(document.activeElement)) btn.focus();
+  }
+  document.addEventListener('click', (e) => { if (e.target.closest('#side a[href]')) setMenu(false); }, true);
+
   /* Global delegated events */
   document.addEventListener('click', (e) => {
     const t = e.target.closest('[data-act]');
     if (!t) return;
     const a = t.dataset.act;
     if (a === 'switch') { localStorage.removeItem('pl.role'); state.role = null; location.hash = '#/login'; }
-    else if (a === 'menu') document.getElementById('side').classList.toggle('open');
+    else if (a === 'menu') setMenu(!document.getElementById('side').classList.contains('open'));
+    else if (a === 'menu-close') setMenu(false);
+    else if (a === 'skip') { e.preventDefault(); const m = document.getElementById('main'); m && m.focus(); }
     else if (a === 'toast') toast(t.dataset.msg || 'Done');
     else if (a === 'tab') {
       const box = t.closest('[data-tabs]');
@@ -165,6 +184,7 @@
     }
   });
   document.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape') { const sd = document.getElementById('side'); if (sd && sd.classList.contains('open')) { setMenu(false); return; } }
     if (e.key === '/' && !/input|textarea|select/i.test(document.activeElement.tagName)) {
       const s = document.getElementById('gsearch'); if (s) { e.preventDefault(); s.focus(); }
     }
@@ -177,7 +197,7 @@
 
   window.App = {
     page(key, def) { pages[key] = def; },
-    pages, state, render, esc, vnd, num, pct, ty, mid, pill, docid, table, kpi, card, tabs, toast, HOME,
+    pages, state, render, esc, emptyState, loading, errorState, setMenu, vnd, num, pct, ty, mid, pill, docid, table, kpi, card, tabs, toast, HOME,
     login(role) { state.role = role; localStorage.setItem('pl.role', role); location.hash = '#/' + HOME[role]; },
     material: (id) => window.DATA.materials.find((m) => m.id === id),
     vendor: (id) => window.DATA.vendors.find((v) => v.id === id)
