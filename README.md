@@ -1,4 +1,4 @@
-# E-Procurement (ProcureLink)
+# E-Procurement
 
 Static single-page web app (no build step) implementing the ProcureLink e-procurement spec in `docs/`.
 Open `index.html` in a browser, or run `npx serve .` / `python3 -m http.server`.
