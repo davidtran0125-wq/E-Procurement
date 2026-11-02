@@ -123,7 +123,7 @@
         { h: 'OTIF', r: (v) => (v.otif != null ? pct(v.otif) : '—'), cls: 'num', w: '80px' },
         { h: 'Risk', r: (v) => pill(v.risk === '—' ? 'Pending' : v.risk, rTone(v.risk)) + (v.riskReasons.length && v.risk !== 'Low' ? `<div class="small muted">${esc(v.riskReasons[0])}${v.riskReasons.length > 1 ? ` +${v.riskReasons.length - 1}` : ''}</div>` : ''), w: 'minmax(150px,1.3fr)' },
         { h: 'Status', r: (v) => pill(v.status, sTone(v.status)), w: '140px' },
-        { h: 'Actions', r: (v) => { const o = openPos(v.id); return `<div class="row-acts" style="justify-content:flex-start"><button class="btn btn-sm" data-v="edit" data-id="${esc(v.id)}" aria-label="Edit ${esc(v.id)}">Edit</button><button class="btn btn-sm btn-d" data-v="delete" data-id="${esc(v.id)}" aria-label="Delete ${esc(v.id)}"${o.length ? ` disabled title="Open PO ${esc(o[0].id)} — set to Blocked instead"` : ''}>Delete</button></div>`; }, w: '150px' }
+        { h: 'Actions', r: (v) => { const o = openPos(v.id); return `<div class="row-acts start"><button class="btn btn-sm" data-v="edit" data-id="${esc(v.id)}" aria-label="Edit ${esc(v.id)}">Edit</button><button class="btn btn-sm btn-d" data-v="delete" data-id="${esc(v.id)}" aria-label="Delete ${esc(v.id)}"${o.length ? ` disabled title="Open PO ${esc(o[0].id)} — set to Blocked instead"` : ''}>Delete</button></div>`; }, w: '150px' }
       ], rows, { min: 1360, empty: 'No vendors match these filters', label: 'Vendors' })}
       <p class="muted small">Showing ${rows.length} of 142 vendors (sample loaded) · risk last checked ${esc(D().vendors[0].riskChecked)}</p>`,
     '<button class="btn btn-sm" data-v="recheck-all">Re-check risk</button><button class="btn btn-sm" data-act="toast" data-msg="Import Excel: template Vendor_import_v2.xlsx · MST is validated per row">Import Excel</button>');
@@ -131,7 +131,7 @@
   function delConfirm() {
     const v = st.confirmDel && App.vendor(st.confirmDel); if (!v) return '';
     return `<div class="alert alert-danger stack" role="alert"><div>Delete <b>${esc(v.id)} ${esc(v.name)}</b>? This removes the vendor and its Material ID links. Vendors with history are better set to Blocked.</div>
-      <div class="row-acts" style="justify-content:flex-start"><button class="btn btn-sm" data-v="del-cancel">Cancel</button><button class="btn btn-sm btn-d" data-v="del-ok" data-id="${esc(v.id)}">Delete vendor</button></div></div>`;
+      <div class="row-acts start"><button class="btn btn-sm" data-v="del-cancel">Cancel</button><button class="btn btn-sm btn-d" data-v="del-ok" data-id="${esc(v.id)}">Delete vendor</button></div></div>`;
   }
 
   /* ---------- Profile (F-21..F-26) ---------- */
@@ -148,12 +148,12 @@
       <dt>Tax status</dt><dd>${esc(v.taxStatus)} <span class="small muted">· checked ${esc(v.mstChecked)}</span></dd>
       <dt>Registered address</dt><dd>${esc(v.address || '—')}</dd><dt>Payment terms</dt><dd>${esc(v.terms || '—')}</dd>
       <dt>Contact</dt><dd>${esc(v.contact)}${v.phone ? ` · ${esc(v.phone)}` : ''}</dd><dt>Portal Gmail</dt><dd>${esc(v.email)}</dd><dt>Vendor since</dt><dd>${esc(v.since || '—')}</dd></dl>`);
-    const risk = card('Supplier risk', `<p style="margin-top:0">${pill(v.risk === '—' ? 'Pending' : v.risk, rTone(v.risk))} <span class="small muted">Last checked ${esc(v.riskChecked)}</span></p>
+    const risk = card('Supplier risk', `<p class="mt-0">${pill(v.risk === '—' ? 'Pending' : v.risk, rTone(v.risk))} <span class="small muted">Last checked ${esc(v.riskChecked)}</span></p>
       ${v.riskReasons.length ? `<ul class="plain small">${v.riskReasons.map((r) => `<li>${esc(r)}</li>`).join('')}</ul>` : '<p class="small muted">No risk factors found.</p>'}
       <p class="small muted">Rules: tax status not “Đang hoạt động”, GDT high-risk list, mandatory certificate expired, OTIF &lt; 85%, open NCRs, single source per Material ID. A High-risk vendor triggers a warning at PO creation.</p>`, `<button class="btn btn-sm" data-v="recheck" data-id="${esc(v.id)}">Re-check risk</button>`);
     const b = v.bank || {};
     const bank = card('Bank account', `<dl class="dl"><dt>In use</dt><dd class="mono">${esc(b.now || '—')}</dd></dl>
-      ${b.pending ? `<div class="alert alert-warning" role="status" style="margin-top:12px"><b>Pending Finance verification</b> · new account <span class="mono">${esc(b.pending)}</span> requested ${esc(b.requested)} by ${esc(b.by)}. The current account stays in use until Finance verifies it by call-back to the registered phone. SoD: the vendor-master editor cannot approve payments.</div>` : '<p class="small muted">No pending change.</p>'}`,
+      ${b.pending ? `<div class="alert alert-warning mt" role="status"><b>Pending Finance verification</b> · new account <span class="mono">${esc(b.pending)}</span> requested ${esc(b.requested)} by ${esc(b.by)}. The current account stays in use until Finance verifies it by call-back to the registered phone. SoD: the vendor-master editor cannot approve payments.</div>` : '<p class="small muted">No pending change.</p>'}`,
     b.pending ? '<a class="btn btn-sm" href="#/approvals">Open in My approvals</a>' : '');
     const usable = D().materials.filter((m) => !L.some((x) => x.m.id === m.id) && !v.proposed.includes(m.id) && m.status !== 'Blocked');
     const mats = card(`Material IDs supplied (${L.length})`, table([
@@ -162,10 +162,10 @@
       { h: 'Last price', r: (x) => (x.l[2] ? vnd(x.l[2]) : '—'), cls: 'num', w: '140px' }, { h: 'Lead time', r: (x) => (x.l[3] ? x.l[3] + ' days' : '—'), cls: 'num', w: '90px' },
       { h: '', r: (x) => `<button class="btn btn-sm" data-v="unlink" data-id="${esc(v.id)}" data-m="${esc(x.m.id)}" aria-label="Remove ${esc(x.m.id)} from ${esc(v.id)}">Remove</button>`, w: '100px' }
     ], L, { min: 720, empty: 'No approved Material IDs yet', label: 'Material IDs supplied' })
-      + (v.proposed.length ? `<div class="stack" style="margin-top:12px"><b class="small">Proposed links · approved per Material ID</b>${v.proposed.map((m) => `<div class="row-acts" style="justify-content:space-between;align-items:center"><span>${mid(m)} ${esc((App.material(m) || {}).name || '')} ${pill('Proposed', 'neutral')}</span><span><button class="btn btn-sm" data-v="reject-link" data-id="${esc(v.id)}" data-m="${esc(m)}">Reject</button> <button class="btn btn-sm" data-v="approve-link" data-id="${esc(v.id)}" data-m="${esc(m)}">Approve link</button></span></div>`).join('')}</div>` : '')
-      + `<div class="filters" style="margin-top:12px"><label class="sr" for="vp-add">Material ID to add</label><select class="inp grow" id="vp-add">${usable.map((m) => `<option value="${esc(m.id)}">${esc(m.id)} · ${esc(m.name)}${m.status !== 'Active' ? ' (' + esc(m.status) + ')' : ''}</option>`).join('')}</select><button class="btn btn-sm" data-v="propose" data-id="${esc(v.id)}">Add Material ID</button></div>
+      + (v.proposed.length ? `<div class="stack mt"><b class="small">Proposed links · approved per Material ID</b>${v.proposed.map((m) => `<div class="row-acts between"><span>${mid(m)} ${esc((App.material(m) || {}).name || '')} ${pill('Proposed', 'neutral')}</span><span><button class="btn btn-sm" data-v="reject-link" data-id="${esc(v.id)}" data-m="${esc(m)}">Reject</button> <button class="btn btn-sm" data-v="approve-link" data-id="${esc(v.id)}" data-m="${esc(m)}">Approve link</button></span></div>`).join('')}</div>` : '')
+      + `<div class="filters mt"><label class="sr" for="vp-add">Material ID to add</label><select class="inp grow" id="vp-add">${usable.map((m) => `<option value="${esc(m.id)}">${esc(m.id)} · ${esc(m.name)}${m.status !== 'Active' ? ' (' + esc(m.status) + ')' : ''}</option>`).join('')}</select><button class="btn btn-sm" data-v="propose" data-id="${esc(v.id)}">Add Material ID</button></div>
       ${v.mstVerified ? '' : '<p class="small tone-warning">MST not verified — links stay Proposed until the MST check passes.</p>'}`);
-    const ob = v.onboarding ? card('Onboarding review checklist', `<ul class="plain">${v.onboarding.map(([k, s], i) => `<li class="row-acts" style="justify-content:space-between;align-items:center"><span>${esc(k)}</span><span>${pill(s, s === 'OK' ? 'success' : 'danger')}${s !== 'OK' ? ` <button class="btn btn-sm" data-v="ob-ok" data-id="${esc(v.id)}" data-i="${i}">Mark OK</button>` : ''}</span></li>`).join('')}</ul>
+    const ob = v.onboarding ? card('Onboarding review checklist', `<ul class="plain">${v.onboarding.map(([k, s], i) => `<li class="row-acts between"><span>${esc(k)}</span><span>${pill(s, s === 'OK' ? 'success' : 'danger')}${s !== 'OK' ? ` <button class="btn btn-sm" data-v="ob-ok" data-id="${esc(v.id)}" data-i="${i}">Mark OK</button>` : ''}</span></li>`).join('')}</ul>
       <p class="small muted">${v.onboarding.filter((x) => x[1] === 'OK').length} of ${v.onboarding.length} items OK. Approve needs every item OK.</p>
       ${st.rejecting ? `<div class="field"><label for="vp-rej">Reason for rejection *</label><textarea id="vp-rej" aria-describedby="vp-rej-e">${esc(st.reject)}</textarea>${st.errs.reject ? `<span class="err" id="vp-rej-e" role="alert">${esc(st.errs.reject)}</span>` : ''}</div>` : ''}
       <div class="row-acts"><button class="btn btn-sm btn-d" data-v="ob-reject" data-id="${esc(v.id)}">${st.rejecting ? 'Confirm reject' : 'Reject'}</button><button class="btn btn-sm" data-v="ob-approve" data-id="${esc(v.id)}" data-s="Probation"${v.onboarding.some((x) => x[1] !== 'OK') ? ' disabled' : ''}>Approve → Probation</button><button class="btn btn-sm btn-p" data-v="ob-approve" data-id="${esc(v.id)}" data-s="Approved"${v.onboarding.some((x) => x[1] !== 'OK') ? ' disabled' : ''}>Approve → Active</button></div>`) : '';
@@ -173,7 +173,7 @@
       <p class="small muted">Active = Approved. Blocked vendors cannot be invited or receive new POs; open POs continue.</p>
       ${pos.length ? `<div class="alert alert-warning" role="status">Delete is blocked: open PO ${pos.map((p) => `<span class="mono">${esc(p.id)}</span>`).join(', ')}. Set the vendor to Blocked instead.</div>` : ''}
       ${delConfirm()}
-      <div class="row-acts" style="margin-top:12px"><button class="btn btn-sm btn-d" data-v="delete" data-id="${esc(v.id)}"${pos.length ? ' disabled' : ''}>Delete vendor</button></div>`);
+      <div class="row-acts mt"><button class="btn btn-sm btn-d" data-v="delete" data-id="${esc(v.id)}"${pos.length ? ' disabled' : ''}>Delete vendor</button></div>`);
     const docs = card('Open POs & contracts', table([
       { h: 'Number', r: (d) => (d.type === 'CT' ? `<a class="mono" href="#/contracts/${esc(d.id)}">${esc(d.id)}</a>` : `<a class="mono" href="#/po">${esc(d.id)}</a>`), w: '140px' }, { h: 'Title', r: (d) => esc(d.title) + (d.note ? `<div class="small muted">${esc(d.note)}</div>` : ''), w: 'minmax(200px,2fr)' },
       { h: 'Material IDs', r: (d) => `<div class="chips">${(d.mats || []).map(mid).join('')}</div>`, w: 'minmax(130px,1fr)' }, { h: 'Status', r: (d) => pill(d.status, /overdue|not confirmed|Expir/i.test(d.status + (d.note || '')) ? 'warning' : 'neutral'), w: 'minmax(130px,1fr)' }

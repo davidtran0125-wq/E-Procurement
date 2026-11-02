@@ -209,3 +209,12 @@ svg.chart { width: 100%; height: auto; }
 .bar > span.warn { background: var(--warn); }
 .dl dd { min-width: 0; overflow-wrap: anywhere; }
 .tbl-wrap { position: relative; }
+/* Phase-2 utilities (see docs/ui-guidelines.md) */
+.mt-0 { margin-top: 0; } .mt-s { margin-top: 8px; } .mt { margin-top: 12px; }
+.h-sub { font-size: 13px; font-weight: 600; margin: 16px 0 8px; }
+.row-acts.start { justify-content: flex-start; } .row-acts.between { justify-content: space-between; align-items: center; }
+ul.plain > li.row-acts { padding: 6px 0; border-top: 1px solid var(--divider); } ul.plain > li.row-acts:first-child { border-top: 0; }
+.chips.chips-inline { display: inline-flex; margin: 0; vertical-align: middle; }
+.inp.w-full { width: 100%; } .inp.inp-score { width: 84px; } .inp.inp-num { width: 80px; text-align: right; font-variant-numeric: tabular-nums; }
+.tbl-640 { min-width: 640px; } .tc-cols { grid-template-columns: minmax(180px,2fr) minmax(220px,2fr) 110px 90px; }
+.tbl .linkish { min-height: 36px; padding: 0 2px; }

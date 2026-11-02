@@ -103,13 +103,13 @@
   /* ---------- Timeline (F-39) & block rule (F-38) ---------- */
   function timeline() {
     const rows = D().certificates.filter((c) => !['Superseded', 'Rejected', 'Pending review'].includes(c.status)).map((c) => ({ c, d: App.daysTo(c.expiry) })).filter((x) => x.d >= 0 && x.d <= 90).sort((a, b) => a.d - b.d);
-    return card('Expiring in the next 90 days', rows.length ? `<div class="hbars">${rows.map(({ c, d }) => `<div class="hbar"><div class="hbar-l"><b>${esc(c.type)}</b> · <a href="#/vendors/${esc(c.vendor)}">${esc(App.vshort(App.vendor(c.vendor)))}</a> <span class="chips" style="display:inline-flex;margin:0">${c.mats.map(mid).join('')}</span></div>
+    return card('Expiring in the next 90 days', rows.length ? `<div class="hbars">${rows.map(({ c, d }) => `<div class="hbar"><div class="hbar-l"><b>${esc(c.type)}</b> · <a href="#/vendors/${esc(c.vendor)}">${esc(App.vshort(App.vendor(c.vendor)))}</a> <span class="chips chips-inline">${c.mats.map(mid).join('')}</span></div>
         <div class="bar" role="img" aria-label="${d} days left"><span class="${d <= 30 ? 'warn' : ''}" style="width:${Math.max(3, (d / 90) * 100).toFixed(1)}%"></span></div><div class="hbar-v num ${d <= 30 ? 'tone-warning' : ''}">${d} d · ${esc(c.expiry)}</div></div>`).join('')}</div>
       <p class="small muted">Orange = 30 days or less. The vendor and the certificate owner are reminded at 60 and 30 days; on expiry the status becomes Expired.</p>` : '<div class="empty">Nothing expires in the next 90 days</div>');
   }
   function blockRule() {
     const B = blocks();
-    return card('Block rule · expired mandatory certificates', `<p class="small" style="margin-top:0">When a certificate that a Material ID requires expires, the vendor is blocked for that Material ID: no new POs or awards, its bid on that line is marked Non-compliant at opening, and open POs continue.</p>
+    return card('Block rule · expired mandatory certificates', `<p class="small mt-0">When a certificate that a Material ID requires expires, the vendor is blocked for that Material ID: no new POs or awards, its bid on that line is marked Non-compliant at opening, and open POs continue.</p>
       ${B.length ? table([
         { h: 'Vendor', r: (b) => `<a href="#/vendors/${esc(b.c.vendor)}">${esc(App.vshort(App.vendor(b.c.vendor)))}</a>`, w: 'minmax(110px,1fr)' }, { h: 'Material ID', r: (b) => mid(b.m), w: '120px' },
         { h: 'Reason', r: (b) => `${esc(b.c.type)} expired ${esc(b.c.expiry)}${D().certificates.some((x) => x.replaces === b.c.id && x.status === 'Pending review') ? `<div><button class="linkish small" data-cert="review" data-id="${esc(D().certificates.find((x) => x.replaces === b.c.id).id)}">Renewal pending review</button></div>` : ''}`, w: 'minmax(170px,1.6fr)' }

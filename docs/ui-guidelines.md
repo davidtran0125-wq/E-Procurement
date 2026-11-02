@@ -33,3 +33,10 @@ Visual source of truth: `docs/04-design-brief.md` §3. Use tokens in `css/styles
 ## Access & shell
 - Register pages with `roles: [...]` when they show internal data. `App.render()` redirects other roles to `App.HOME[role]` with a "No access" notice.
 - Signed-in user: `App.state.user` (restored from `pl.user`). Shell labels go through `App.t(label)` (EN/VI, `pl.lang`). Text search uses `App.matches(text, q)` (accent-, case- and space-insensitive).
+
+## Spacing & layout utilities (Phase 2)
+- Spacing: `.mt-0`, `.mt-s` (8px), `.mt` (12px) instead of `style="margin-top:…"`. Sub-headings inside cards: `h3.h-sub`.
+- Action rows: `.row-acts` (right), `.row-acts.start` (left), `.row-acts.between` (label left, actions right; in `ul.plain` rows get dividers).
+- Inline chips in text: `.chips.chips-inline`. Inputs in tables: `.inp.w-full`, `.inp.inp-num` (right-aligned numbers), `.inp.inp-score`.
+- Editable grids: define column templates as a class (e.g. `.tc-cols`) and min width (`.tbl-640`); only data-driven widths (bar fills) may stay inline.
+- Text buttons inside tables (`.tbl .linkish`) get a 36px target.

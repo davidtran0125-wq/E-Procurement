@@ -27,7 +27,7 @@
     const cur = st.period === 'Q3/2026';
     const rows = cur ? D().scorecards : Object.entries(D().scoreHistory).map(([vid, h]) => ({ vendor: vid, h: h.find((x) => x[0] === st.period) })).filter((x) => x.h).map((x) => ({ vendor: x.vendor, status: 'Submitted', fixed: x.h[1], tpl: tplFor(App.vendor(x.vendor)) }));
     const cnt = (s) => rows.filter((r) => r.status === s).length;
-    return card(`Progress · ${st.period}`, `<p class="small muted" style="margin-top:0">${cnt('Submitted')} submitted · ${cnt('Draft')} draft · ${cnt('Not started')} not started${cur ? ' · due 15/11/2026' : ''}</p>` + table([
+    return card(`Progress · ${st.period}`, `<p class="small muted mt-0">${cnt('Submitted')} submitted · ${cnt('Draft')} draft · ${cnt('Not started')} not started${cur ? ' · due 15/11/2026' : ''}</p>` + table([
       { h: 'Vendor', r: (s) => `<a href="#/vendors/${esc(s.vendor)}"><span class="mono small">${esc(s.vendor)}</span> ${esc(App.vshort(App.vendor(s.vendor)))}</a>`, w: 'minmax(170px,2fr)' },
       { h: 'Template', r: (s) => esc(tpl(s.tpl).name), w: 'minmax(130px,1.4fr)' },
       { h: 'Score', r: (s) => { const x = s.fixed != null ? s.fixed : s.status === 'Not started' ? null : total(tpl(s.tpl), s.scores); return x == null ? '—' : `${num(x, 2)} · ${gradeOf(x)[0]}`; }, cls: 'num', w: '100px' },
@@ -39,7 +39,7 @@
   function scoreInput(c, i, sc, locked) {
     const val = st.draft[i]; const err = st.errs['s' + i];
     if (isAuto(c) || locked) return `<b>${val == null || val === '' ? '—' : num(+val, 1)}</b>${isAuto(c) ? ' <span class="small muted">auto</span>' : ''}`;
-    return `<input class="inp" style="width:84px" aria-label="Score for ${esc(c.name)} (0–5)" id="ev-s${i}" data-ev-score="${i}" type="number" min="0" max="5" step="0.1" value="${val == null ? '' : esc(val)}"${err ? ' aria-invalid="true" aria-describedby="ev-s' + i + '-e"' : ''}>${err ? `<div class="err small" id="ev-s${i}-e" role="alert">${esc(err)}</div>` : ''}`;
+    return `<input class="inp inp-score" aria-label="Score for ${esc(c.name)} (0–5)" id="ev-s${i}" data-ev-score="${i}" type="number" min="0" max="5" step="0.1" value="${val == null ? '' : esc(val)}"${err ? ' aria-invalid="true" aria-describedby="ev-s' + i + '-e"' : ''}>${err ? `<div class="err small" id="ev-s${i}-e" role="alert">${esc(err)}</div>` : ''}`;
   }
   function scorecard() {
     const v = App.vendor(st.vendor);
@@ -50,7 +50,7 @@
     const t = tpl(sc.tpl); const locked = sc.status === 'Submitted';
     if (!st.draft || st.draftFor !== v.id) { st.draft = sc.scores.slice(); st.comment = sc.comment; st.draftFor = v.id; }
     const tot = total(t, st.draft); const g = gradeOf(tot);
-    return card(`Scorecard · ${v.name}`, `<p class="small muted" style="margin-top:0"><span class="mono">${esc(v.id)}</span> · ${esc(t.name)} template · ${esc(st.period)} · basis: ${esc(sc.basis)} · evaluator ${esc(sc.by)} ${pill(sc.status, sTone(sc.status))}</p>
+    return card(`Scorecard · ${v.name}`, `<p class="small muted mt-0"><span class="mono">${esc(v.id)}</span> · ${esc(t.name)} template · ${esc(st.period)} · basis: ${esc(sc.basis)} · evaluator ${esc(sc.by)} ${pill(sc.status, sTone(sc.status))}</p>
       <form id="ev-form" novalidate class="stack">${table([
         { h: 'Criterion', r: (c) => `<b>${esc(c.name)}</b><div class="small muted">${esc(c.src)}</div>`, w: 'minmax(200px,2fr)' },
         { h: 'Weight', r: (c) => num(c.w) + '%', cls: 'num', w: '80px' },
@@ -72,17 +72,17 @@
   function templates() {
     if (!st.tdraft || st.tdraftFor !== st.tpl) { st.tdraft = tpl(st.tpl).criteria.map((c) => ({ ...c })); st.tdraftFor = st.tpl; st.terrs = []; }
     const sum = st.tdraft.reduce((a, c) => a + (+c.w || 0), 0);
-    const rows = st.tdraft.map((c, i) => `<div class="tr" role="row" style="grid-template-columns:minmax(180px,2fr) minmax(220px,2fr) 110px 90px">
-        <div class="td" role="cell"><input class="inp" style="width:100%" aria-label="Criterion ${i + 1} name" id="tc-n${i}" data-tc="name" data-i="${i}" value="${esc(c.name)}"></div>
-        <div class="td" role="cell"><select class="inp" style="width:100%" aria-label="Criterion ${i + 1} data source" id="tc-s${i}" data-tc="src" data-i="${i}">${SOURCES.map((s) => `<option${s === c.src ? ' selected' : ''}>${esc(s)}</option>`).join('')}</select></div>
-        <div class="td num" role="cell"><input class="inp" style="width:80px" aria-label="Criterion ${i + 1} weight %" id="tc-w${i}" data-tc="w" data-i="${i}" type="number" min="1" max="100" value="${esc(c.w)}"></div>
+    const rows = st.tdraft.map((c, i) => `<div class="tr tc-cols" role="row">
+        <div class="td" role="cell"><input class="inp w-full" aria-label="Criterion ${i + 1} name" id="tc-n${i}" data-tc="name" data-i="${i}" value="${esc(c.name)}"></div>
+        <div class="td" role="cell"><select class="inp w-full" aria-label="Criterion ${i + 1} data source" id="tc-s${i}" data-tc="src" data-i="${i}">${SOURCES.map((s) => `<option${s === c.src ? ' selected' : ''}>${esc(s)}</option>`).join('')}</select></div>
+        <div class="td num" role="cell"><input class="inp inp-num" aria-label="Criterion ${i + 1} weight %" id="tc-w${i}" data-tc="w" data-i="${i}" type="number" min="1" max="100" value="${esc(c.w)}"></div>
         <div class="td" role="cell"><button type="button" class="btn btn-sm" data-ev="tc-del" data-i="${i}" aria-label="Delete criterion ${esc(c.name || i + 1)}">Delete</button></div></div>`).join('');
-    const tblHtml = `<div class="tbl-wrap" tabindex="0" role="region" aria-label="Template criteria, scrolls horizontally"><div class="tbl" role="table" style="min-width:640px"><div class="tr thead" role="row" style="grid-template-columns:minmax(180px,2fr) minmax(220px,2fr) 110px 90px"><div class="th">Criterion</div><div class="th">Data source</div><div class="th num">Weight</div><div class="th"></div></div>${rows}</div></div>`;
+    const tblHtml = `<div class="tbl-wrap" tabindex="0" role="region" aria-label="Template criteria, scrolls horizontally"><div class="tbl tbl-640" role="table"><div class="tr thead tc-cols" role="row"><div class="th">Criterion</div><div class="th">Data source</div><div class="th num">Weight</div><div class="th"></div></div>${rows}</div></div>`;
     return `<div class="grid-2"><div class="stack">${card('Criteria template', `<div class="filters"><label class="sr" for="ev-tpl">Template</label><select class="inp" id="ev-tpl" data-evf="tpl">${D().evalTemplates.map((t) => `<option value="${t.id}"${t.id === st.tpl ? ' selected' : ''}>${esc(t.name)}</option>`).join('')}</select></div>
         ${tblHtml}
-        <div id="tc-sum" class="alert ${sum === 100 ? 'alert-success' : 'alert-warning'}" role="status" aria-live="polite" style="margin-top:12px">Total weight ${num(sum)}%${sum === 100 ? '' : ' · must be 100% to save'}</div>
-        ${st.terrs.length ? `<div class="alert alert-danger" role="alert" style="margin-top:8px">${st.terrs.map(esc).join('<br>')}</div>` : ''}
-        <div class="row-acts" style="margin-top:12px"><button class="btn" data-ev="tc-add">Add criterion</button><button class="btn" data-ev="tc-dup">Duplicate template</button><button class="btn btn-p" data-ev="tc-save">Save template</button></div>`)}</div>
+        <div id="tc-sum" class="alert mt ${sum === 100 ? 'alert-success' : 'alert-warning'}" role="status" aria-live="polite">Total weight ${num(sum)}%${sum === 100 ? '' : ' · must be 100% to save'}</div>
+        ${st.terrs.length ? `<div class="alert alert-danger mt-s" role="alert">${st.terrs.map(esc).join('<br>')}</div>` : ''}
+        <div class="row-acts mt"><button class="btn" data-ev="tc-add">Add criterion</button><button class="btn" data-ev="tc-dup">Duplicate template</button><button class="btn btn-p" data-ev="tc-save">Save template</button></div>`)}</div>
       <div class="stack">${card('Grade thresholds', table([{ h: 'Grade', r: (g) => `<b>${g[0]}</b>`, w: '70px' }, { h: 'Score', r: (g, i) => (g[0] === 'A' ? '≥ 4,20' : g[0] === 'B' ? '3,50 – 4,19' : g[0] === 'C' ? '3,00 – 3,49' : '< 3,00'), w: '110px' }, { h: 'Vendor status', r: (g) => pill(g[2], g[0] === 'A' ? 'success' : g[0] === 'B' ? 'info' : g[0] === 'C' ? 'warning' : 'danger') }], D().grades, { min: 300, label: 'Grade thresholds' }))}
         ${card('Auto data sources', `<ul class="plain small"><li><b>NCR rate & accepted qty</b> — NCRs per PO and accepted ÷ delivered qty from GRN quality inspection (R-07).</li><li><b>PO deliveries (OTIF)</b> — on time (received ≤ promised date) and in full (<b>accepted</b> qty ≥ scheduled qty) ÷ all deliveries.</li><li><b>Price by Material ID</b> — awarded price vs the Material ID’s 90-day average.</li><li><b>Tender response time</b> — days from invitation to bid submission.</li></ul>`)}</div></div>`;
   }
@@ -122,7 +122,7 @@
         const tot = total(t, st.draft); const box = root.querySelector('#ev-total'); if (box) box.innerHTML = totalText(tot, gradeOf(tot), sc);
       }
       if (e.target.id === 'ev-comment') st.comment = e.target.value;
-      if (e.target.dataset.tc) { readTpl(root); const sum = st.tdraft.reduce((a, c) => a + (+c.w || 0), 0); const b = root.querySelector('#tc-sum'); b.className = 'alert ' + (sum === 100 ? 'alert-success' : 'alert-warning'); b.textContent = `Total weight ${num(sum)}%${sum === 100 ? '' : ' · must be 100% to save'}`; }
+      if (e.target.dataset.tc) { readTpl(root); const sum = st.tdraft.reduce((a, c) => a + (+c.w || 0), 0); const b = root.querySelector('#tc-sum'); b.className = 'alert mt ' + (sum === 100 ? 'alert-success' : 'alert-warning'); b.textContent = `Total weight ${num(sum)}%${sum === 100 ? '' : ' · must be 100% to save'}`; }
     });
     root.addEventListener('change', (e) => {
       const k = e.target.dataset.evf;
