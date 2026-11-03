@@ -255,6 +255,8 @@
       box.querySelectorAll('[role=tabpanel]').forEach((p) => { p.hidden = p.id !== el.getAttribute('aria-controls'); });
     }
   });
+  // Keep focus (and pending field edits) on mousedown so a blur → change re-render cannot swallow the VI | EN click
+  document.addEventListener('mousedown', (e) => { if (e.target.closest('[data-act=lang]')) e.preventDefault(); });
   document.addEventListener('submit', (e) => {
     const f = e.target;
     if (f.dataset.act === 'search') {

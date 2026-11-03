@@ -64,7 +64,7 @@
         { h: t('ce.c.scope'), r: (c) => `<div class="chips">${c.mats.map(mid).join('')}</div>${requiredFor(c).length ? `<div class="small">${esc(t('ce.mandFor', { m: requiredFor(c).join(', ') }))}</div>` : `<div class="small muted">${esc(t('ce.notMand'))}</div>`}`, w: 'minmax(190px,1.7fr)' },
         { h: t('ce.c.issuer'), r: (c) => esc(c.issuer), w: 'minmax(140px,1.2fr)' },
         { h: t('ce.c.expiry'), r: (c) => `${esc(c.expiry)}<div>${daysNote(c)}</div>`, w: '140px' },
-        { h: t('ce.c.verified'), r: (c) => (c.verified ? `<span class="small">${esc(c.verified)}</span>` : c.uploaded ? `<span class="small muted">${esc(t('ce.uploadedAt', { v: c.uploaded }))}</span>` : '—'), w: 'minmax(150px,1.3fr)' },
+        { h: t('ce.c.verified'), r: (c) => (c.verified ? `<span class="small">${esc(c.verified)}</span>` : c.uploaded ? `<span class="small muted">${esc(t('ce.uploadedAt', { v: tv(c.uploaded) }))}</span>` : '—'), w: 'minmax(150px,1.3fr)' },
         { h: t('c.status'), r: (c) => pill(statusOf(c), sTone(statusOf(c))) + (statusOf(c) === 'Pending review' ? `<div><a class="small" href="#/certificates/review?id=${esc(c.id)}">${esc(t('ce.review'))}</a></div>` : ''), w: '150px' }
       ], rows, { empty: t('ce.empty'), label: t('ce.register') })}
       <p class="small muted">${esc(t('ce.showing', { n: rows.length, total: num(Object.values(D().certStats).reduce((a, x) => a + x, 0)) }))}</p>`,
@@ -78,7 +78,7 @@
       { h: t('ce.c.cert'), r: (c) => `<b>${esc(tv(c.type))}</b><div class="small muted mono">${esc(c.no)}</div>`, w: 'minmax(190px,1.8fr)' },
       { h: t('ce.holder'), r: (c) => `<span class="mono small">${esc(c.vendor)}</span> ${esc(vname(c.vendor))}`, w: 'minmax(150px,1.3fr)' },
       { h: t('ce.c.scope'), r: (c) => `<div class="chips">${c.mats.map(mid).join('')}</div>`, w: 'minmax(150px,1.3fr)' },
-      { h: t('c.uploaded'), r: (c) => esc(c.uploaded || '—'), w: 'minmax(150px,1.3fr)' },
+      { h: t('c.uploaded'), r: (c) => esc(c.uploaded ? tv(c.uploaded) : '—'), w: 'minmax(150px,1.3fr)' },
       { h: '', r: (c) => `<a class="btn btn-sm btn-p" href="#/certificates/review?id=${esc(c.id)}">${esc(t('ce.review'))}</a>`, w: '110px' }
     ], P, { min: 760, label: t('ce.pending') }) : `<div class="empty">${esc(t('ce.noPending'))}</div>`);
   }
@@ -89,7 +89,7 @@
     const auto = [[t('ce.ck.holder'), App.norm(r.holder) === App.norm(v.name)], [t('ce.ck.scope', { m: need.length ? need.join(', ') : t('ce.ck.theMats'), t: tv(c.type) }), need.every((m) => c.mats.includes(m))], [t('ce.ck.expiry'), validDate(r.expiry) && App.daysTo(r.expiry) > 0]];
     const old = c.replaces && D().certificates.find((x) => x.id === c.replaces);
     return block(t('ce.rvTitle', { t: tv(c.type), v: v.name }), `<form id="cert-rv" novalidate class="stack">
-      <div class="split-2"><div class="state" aria-label="${esc(t('ce.previewLbl'))}"><b>${esc(c.file || c.no + '.pdf')}</b><span class="muted small">${esc(t('ce.preview', { v: c.uploaded || '' }))}</span></div>
+      <div class="split-2"><div class="state" aria-label="${esc(t('ce.previewLbl'))}"><b>${esc(c.file || c.no + '.pdf')}</b><span class="muted small">${esc(t('ce.preview', { v: tv(c.uploaded) || '' }))}</span></div>
         <div class="stack">${fld('rv', e, 'no', 'ce.f.no', r.no, { req: true })}${fld('rv', e, 'issuer', 'ce.f.body', r.issuer, { req: true })}${fld('rv', e, 'holder', 'ce.f.holder', r.holder, { req: true })}${fld('rv', e, 'expiry', 'ce.f.expiry', r.expiry, { req: true, ph: 'dd/mm/yyyy' })}</div></div>
       <div><b class="small">${esc(t('ce.scope'))}</b> <span class="chips chips-inline">${c.mats.map(mid).join('')}</span>${c.replaces ? ` <span class="small muted">· ${esc(t('ce.replaces', { id: c.replaces }))}</span>` : ''}</div>
       <fieldset class="fs"><legend>${esc(t('ce.checklist'))}</legend>

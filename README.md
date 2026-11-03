@@ -29,7 +29,7 @@ Demo URL: `https://<owner>.github.io/<repo>/` — sign in with any role on the l
 | Workspace | Routes |
 |---|---|
 | Sign-in | `#/login` |
-| Procurement | `#/dashboard`, `#/notifications`, `#/search?q=`, `#/approvals(?id=)`, `#/materials`, `#/material360?id=`, `#/vendors(/<V-id>)`, `#/evaluation`, `#/contracts(/<CT>)`, `#/certificates`, `#/tenders(/new\|/<TND>)`, `#/pr(/new\|/<PR>)`, `#/po(/new?pr=\|tender=\|contract=)`, `#/po/<PO>(/print)`, `#/invoices(/<INV>)`, `#/price(?id=)`, `#/reports` |
+| Procurement | `#/dashboard`, `#/notifications`, `#/search?q=`, `#/approvals(/delegated\|history\|delegation)(?id=)`, `#/materials`, `#/material360?id=`, `#/vendors(/<V-id>)`, `#/evaluation`, `#/contracts(/<CT>)`, `#/certificates`, `#/tenders(/new\|/<TND>(/bids\|evaluation\|award\|qa\|files\|settings))`, `#/pr(/new\|/<PR>(/route\|files))`, `#/po(/new?pr=\|tender=\|contract=)`, `#/po/<PO>(/receipts\|match\|revisions\|print\|files)`, `#/invoices(/rules\|/<INV>(/match\|history))`, `#/price(/trend\|vendors\|rule)(?id=)`, `#/reports(/saving\|spend\|coverage\|cycle\|budget)` |
 | Supplier portal (F-87..F-98) | `#/supplier`, `#/supplier/invitations(/<TND>)`, `#/supplier/quotations`, `#/supplier/pos(/<PO>(/print))`, `#/supplier/deliveries`, `#/supplier/invoices`, `#/supplier/contracts`, `#/supplier/certificates`, `#/supplier/scorecard`, `#/supplier/profile` |
 | Admin console (F-99..F-108) | `#/admin/users`, `#/admin/access`, `#/admin/matrix`, `#/materials`, `#/admin/categories`, `#/admin/templates`, `#/admin/numbering`, `#/admin/tolerances`, `#/admin/integrations`, `#/admin/rules`, `#/admin/sod`, `#/admin/audit` |
 

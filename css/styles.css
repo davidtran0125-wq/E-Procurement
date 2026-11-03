@@ -135,7 +135,7 @@ svg.chart { width: 100%; height: auto; }
 .chips { margin-top: 6px; display: flex; flex-wrap: wrap; gap: 4px; }
 .row-acts { display: flex; flex-wrap: wrap; gap: 8px; justify-content: flex-end; }
 .chk { display: inline-flex; align-items: center; gap: 6px; min-height: 36px; margin-right: 12px; }
-.fs { border: 1px solid var(--border); border-radius: 8px; padding: 8px 12px; margin: 0; } .fs legend { font-size: 12px; font-weight: 600; color: var(--ink2); padding: 0 4px; }
+.fs { min-width: 0; border: 1px solid var(--border); border-radius: 8px; padding: 8px 12px; margin: 0; } .fs legend { font-size: 12px; font-weight: 600; color: var(--ink2); padding: 0 4px; }
 .field.inline { flex-direction: row; align-items: center; gap: 8px; }
 .seg { display: inline-flex; border: 1px solid var(--input); border-radius: 8px; overflow: hidden; }
 .seg button { border: 0; background: #fff; font: 600 13px var(--font); color: var(--ink2); padding: 0 12px; min-height: 36px; cursor: pointer; flex: 1; }
@@ -286,7 +286,7 @@ ul.plain > li.row-acts { padding: 6px 0; border-top: 1px solid var(--divider); }
 .nr-cols { grid-template-columns: minmax(200px,2fr) 120px minmax(160px,1.4fr) 80px 80px 80px 130px; }
 .po-doc { max-width: 960px; } .po-title { font-size: 18px; margin: 16px 0; }
 @media print {
-  .side, .top, .no-print, .skip, .toast { display: none !important; }
+  .side, .top, .no-print, .skip, .toast, .subnav, .kpis { display: none !important; }
   .layout, .main-col, .content { display: block; padding: 0; margin: 0; }
   .po-doc { border: 0; max-width: none; } .tbl-wrap { overflow: visible; }
 }

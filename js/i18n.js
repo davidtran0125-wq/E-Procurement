@@ -104,7 +104,10 @@
     [/^Release from (CT-[\d-]+) \(Q4 price (.*)\)$/, 'Phát hành từ $1 (giá Q4 $2)'],
     [/^Release (CT-[\d-]+)(.*)$/, 'Phát hành $1$2'],
     [/^Onboarding rejected: (.*)$/, 'Từ chối hồ sơ: $1'],
-    [/^(.*) \(portal\)$/, '$1 (cổng NCC)']
+    [/^(.*) \(portal\)$/, '$1 (cổng NCC)'],
+    [/^(.*) \(supplier\)$/, '$1 (NCC)'],
+    [/^(.+) · ([\d.,]+) (\S+) accepted$/, '$1 · đã nhận $2 $3'],
+    [/^(.+) · ([\d.,]+) (\S+) rejected$/, '$1 · loại $2 $3']
   ]);
 
   /* ---------- Enumerated data values (statuses, types, labels stored in DATA) → Vietnamese ---------- */

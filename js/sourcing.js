@@ -1,9 +1,22 @@
 /* Shared helpers for phase-3 sourcing pages (tenders, purchase requests, approvals). */
 (function () {
   const { esc, num, mid, pill, table, card } = App;
+  const T = (k, p) => App.t(k, p);
   const D = () => window.DATA;
   const me = () => (App.state.user && App.state.user.name) || (App.state.role === 'admin' ? 'Phạm Thu Trang' : App.state.role === 'supplier' ? 'Võ Thị Lan' : 'Nguyễn Minh Anh');
-  const vatLabel = (v) => (+v === 8 ? '8% (reduced, until 31/12/2026)' : v + '%');
+  I18N.add({
+    'src.vat8': ['8% (reduced, until 31/12/2026)', '8% (giảm, đến 31/12/2026)'],
+    'src.f.type': ['Type', 'Loại'], 'src.f.file': ['File', 'Tệp'], 'src.f.ver': ['Version', 'Phiên bản'], 'src.f.by': ['Uploaded by', 'Người tải lên'], 'src.f.mats': ['Material IDs', 'Mã vật tư'],
+    'src.f.supplier': ['Uploaded by supplier', 'NCC tải lên'], 'src.f.empty': ['No attachments yet', 'Chưa có tệp đính kèm'], 'src.f.title': ['Attachments ({n})', 'Tệp đính kèm ({n})'], 'src.f.label': ['Attachments', 'Tệp đính kèm'],
+    'src.f.name': ['File name', 'Tên tệp'], 'src.f.ph': ['e.g. spec_rev2.pdf', 'vd. spec_rev2.pdf'], 'src.f.hint': ['PDF, XLSX, DOCX or DWG', 'PDF, XLSX, DOCX hoặc DWG'],
+    'src.e.name': ['Enter the file name.', 'Nhập tên tệp.'], 'src.e.ext': ['Only PDF, XLSX, DOCX or DWG files.', 'Chỉ nhận tệp PDF, XLSX, DOCX hoặc DWG.'],
+    'src.e.dup': ['A file with this name is already attached. Upload it as a new version with a new name.', 'Đã có tệp trùng tên. Hãy tải lên phiên bản mới với tên mới.'],
+    'src.uploaded': ['{n} uploaded as {t} {v}', 'Đã tải lên {n} · {t} {v}']
+  });
+  I18N.values({ BOQ: 'BOQ (bảng khối lượng)', Addendum: 'Phụ lục hồ sơ mời thầu', Other: 'Khác', 'Bid opening minutes': 'Biên bản mở thầu', 'CO/CQ': 'CO/CQ', Catalogue: 'Catalogue', Photos: 'Ảnh chụp' });
+  const vatLabel = (v) => (+v === 8 ? App.t('src.vat8') : v + '%');
+  // Errors may be stored as i18n keys ('pr.e.x') or [key, params]; plain text passes through
+  const errText = (x) => (!x ? '' : Array.isArray(x) ? App.t(x[0], x[1]) : /^[a-z0-9]+(\.[\w-]+)+$/.test(x) ? App.t(x) : x);
   const validDate = (s) => { if (!/^\d{2}\/\d{2}\/\d{4}$/.test(s || '')) return false; const [d, m, y] = s.split('/').map(Number); const x = new Date(y, m - 1, d); return x.getDate() === d && x.getMonth() === m - 1; };
   const money = (s) => Number(String(s).replace(/[.\s₫]/g, '').replace(',', '.'));
   const read = (root, sel) => { const o = {}; root.querySelectorAll(`${sel} [name]`).forEach((el) => { if (el.type === 'checkbox') { (o[el.name] = o[el.name] || []); if (el.checked) o[el.name].push(el.value); } else o[el.name] = el.value.trim(); }); return o; };
@@ -11,10 +24,10 @@
     const err = errs[n]; const id = `${pre}-${n}`;
     const desc = [o.hint ? `${id}-h` : '', err ? `${id}-e` : ''].filter(Boolean).join(' ');
     const attrs = `id="${id}" name="${n}"${err ? ' aria-invalid="true"' : ''}${desc ? ` aria-describedby="${desc}"` : ''}${o.dis ? ' disabled' : ''}`;
-    const input = o.options ? `<select ${attrs}>${o.options.map((x) => { const [v, l] = Array.isArray(x) ? x : [x, x]; return `<option value="${esc(v)}"${String(val) === String(v) ? ' selected' : ''}>${esc(l)}</option>`; }).join('')}</select>`
+    const input = o.options ? `<select ${attrs}>${o.options.map((x) => { const [v, l] = Array.isArray(x) ? x : [x, App.tv(x)]; return `<option value="${esc(v)}"${String(val) === String(v) ? ' selected' : ''}>${esc(l)}</option>`; }).join('')}</select>`
       : o.area ? `<textarea ${attrs}>${esc(val)}</textarea>`
         : `<input ${attrs} value="${esc(val)}"${o.ph ? ` placeholder="${esc(o.ph)}"` : ''}${o.mode ? ` inputmode="${o.mode}"` : ''}>`;
-    return `<div class="field"><label for="${id}">${esc(label)}${o.req ? ' *' : ''}</label>${input}${o.hint ? `<span class="hint" id="${id}-h">${esc(o.hint)}</span>` : ''}${err ? `<span class="err" id="${id}-e" role="alert">${esc(err)}</span>` : ''}</div>`;
+    return `<div class="field"><label for="${id}">${esc(label)}${o.req ? ' *' : ''}</label>${input}${o.hint ? `<span class="hint" id="${id}-h">${esc(o.hint)}</span>` : ''}${err ? `<span class="err" id="${id}-e" role="alert">${esc(errText(err))}</span>` : ''}</div>`;
   }
   const focusErr = (sel) => { const x = document.querySelector(`${sel} [aria-invalid=true]`) || document.querySelector(`${sel} .alert-danger`); if (x) { if (!x.matches('input,select,textarea,button')) x.setAttribute('tabindex', '-1'); x.focus(); x.scrollIntoView({ block: 'center' }); } };
   const docOf = (id) => D().docs.find((d) => d.id === id);
@@ -24,27 +37,28 @@
 
   /* Typed, versioned attachments (R-19). state = { open, errs } kept by the caller; key identifies the forms. */
   const TYPES = ['Specification / drawing', 'BOQ', 'Quotation', 'Addendum', 'Other'];
-  function files(key, list, mats, up, types = TYPES) {
+  function files(key, list, mats, up, types = TYPES, opts = {}) {
     const body = table([
-      { h: 'Type', r: (f) => esc(f.type), w: 'minmax(140px,1.2fr)' },
-      { h: 'File', r: (f) => `<span class="mono small">${esc(f.name)}</span>${f.supplier ? ' ' + pill('Uploaded by supplier', 'info') : ''}`, w: 'minmax(200px,2fr)' },
-      { h: 'Version', k: 'ver', w: '80px' }, { h: 'Uploaded by', r: (f) => `${esc(f.by)}<div class="small muted">${esc(f.date)}</div>`, w: 'minmax(140px,1.2fr)' },
-      { h: 'Material IDs', r: (f) => (f.mats && f.mats.length ? `<span class="chips chips-inline">${f.mats.map(mid).join('')}</span>` : '—'), w: 'minmax(160px,1.6fr)' }
-    ], list.slice().reverse(), { min: 820, empty: 'No attachments yet', label: 'Attachments' });
+      { h: T('src.f.type'), r: (f) => esc(App.tv(f.type)), w: 'minmax(140px,1.2fr)' },
+      { h: T('src.f.file'), r: (f) => `<span class="mono small">${esc(f.name)}</span>${f.supplier ? ' ' + pill(T('src.f.supplier'), 'info') : ''}`, w: 'minmax(200px,2fr)' },
+      { h: T('src.f.ver'), k: 'ver', w: '80px' }, { h: T('src.f.by'), r: (f) => `${esc(App.tv(f.by))}<div class="small muted">${esc(f.date)}</div>`, w: 'minmax(140px,1.2fr)' },
+      { h: T('src.f.mats'), r: (f) => (f.mats && f.mats.length ? `<span class="chips chips-inline">${f.mats.map(mid).join('')}</span>` : '—'), w: 'minmax(160px,1.6fr)' }
+    ], list.slice().reverse(), { empty: T('src.f.empty'), label: T('src.f.label') });
     const e = (up && up.errs) || {};
-    const form = up ? `<form id="${key}-up" class="stack mt" novalidate><div class="form-grid">${field(key + '-up', e, 'type', 'Type', up.type || types[0], { options: types })}${field(key + '-up', e, 'name', 'File name', up.name || '', { req: true, ph: 'e.g. spec_rev2.pdf', hint: 'PDF, XLSX, DOCX or DWG' })}</div>
-      ${mats.length ? `<fieldset class="fs"><legend>Material IDs</legend>${mats.map((m) => `<label class="chk"><input type="checkbox" name="mats" value="${esc(m)}"${(up.mats || []).includes(m) ? ' checked' : ''}> ${esc(m)}</label>`).join('')}</fieldset>` : ''}
-      <div class="row-acts"><button type="button" class="btn btn-sm" data-files="cancel" data-key="${key}">Cancel</button><button type="submit" class="btn btn-sm btn-p">Upload</button></div></form>` : '';
-    return card(`Attachments (${list.length})`, body + form, up ? '' : `<button class="btn btn-sm" data-files="open" data-key="${key}">Upload</button>`);
+    const form = up ? `<form id="${key}-up" class="stack mt" novalidate><div class="form-grid">${field(key + '-up', e, 'type', T('src.f.type'), up.type || types[0], { options: types })}${field(key + '-up', e, 'name', T('src.f.name'), up.name || '', { req: true, ph: T('src.f.ph'), hint: T('src.f.hint') })}</div>
+      ${mats.length ? `<fieldset class="fs"><legend>${esc(T('src.f.mats'))}</legend>${mats.map((m) => `<label class="chk"><input type="checkbox" name="mats" value="${esc(m)}"${(up.mats || []).includes(m) ? ' checked' : ''}> ${esc(m)}</label>`).join('')}</fieldset>` : ''}
+      <div class="row-acts"><button type="button" class="btn btn-sm" data-files="cancel" data-key="${key}">${esc(T('c.cancel'))}</button><button type="submit" class="btn btn-sm btn-p">${esc(T('c.upload'))}</button></div></form>` : '';
+    const acts = up ? '' : `<button class="btn btn-sm" data-files="open" data-key="${key}">${esc(T('c.upload'))}</button>`;
+    return opts.block ? App.block(T('src.f.title', { n: list.length }), body + form, { actions: acts }) : card(T('src.f.title', { n: list.length }), body + form, acts);
   }
   function upload(root, key, list) {
     const x = read(root, `#${key}-up`); const errs = {};
-    if (!x.name) errs.name = 'Enter the file name.'; else if (!/\.(pdf|xlsx|docx|dwg)$/i.test(x.name)) errs.name = 'Only PDF, XLSX, DOCX or DWG files.';
-    else if (list.some((f) => f.name.toLowerCase() === x.name.toLowerCase())) errs.name = 'A file with this name is already attached. Upload it as a new version with a new name.';
+    if (!x.name) errs.name = 'src.e.name'; else if (!/\.(pdf|xlsx|docx|dwg)$/i.test(x.name)) errs.name = 'src.e.ext';
+    else if (list.some((f) => f.name.toLowerCase() === x.name.toLowerCase())) errs.name = 'src.e.dup';
     if (Object.keys(errs).length) return { errs, type: x.type, name: x.name, mats: x.mats || [] };
     const ver = nextVer(list, x.type);
     list.push({ type: x.type, name: x.name, ver, by: me(), date: D().today, mats: x.mats || [] });
-    App.toast(`${x.name} uploaded as ${x.type} ${ver}`);
+    App.toast(T('src.uploaded', { n: x.name, t: App.tv(x.type), v: ver }));
     return null;
   }
 
@@ -72,6 +86,6 @@
   let tick = 30;
   App.now = () => { tick += 1; const h = 10 + Math.floor(tick / 60), m = tick % 60; return `${D().today} ${String(h).padStart(2, '0')}:${String(m).padStart(2, '0')}`; };
   const audit = (type, action, ref) => { (D().audit = D().audit || []).unshift({ at: App.now(), user: me() + (App.state.user && App.state.user.vendor ? ` (${App.state.user.vendor})` : ''), type, action, ref: ref || '' }); if (D().auditStats) D().auditStats.total++; };
-  App.src = { me, offContract, audit, vatLabel, validDate, money, read, field, focusErr, docOf, prLink, tndLink, files, upload, nextVer, assignee, myQueue, dlgActive, delegable,
+  App.src = { errText, me, offContract, audit, vatLabel, validDate, money, read, field, focusErr, docOf, prLink, tndLink, files, upload, nextVer, assignee, myQueue, dlgActive, delegable,
     bar: (p, tone) => `<div class="bar" role="img" aria-label="${esc(num(p, 0))}%"><span class="${tone || ''}" style="width:${Math.max(0, Math.min(100, p)).toFixed(1)}%"></span></div>` };
 })();

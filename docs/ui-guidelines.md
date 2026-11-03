@@ -47,4 +47,18 @@ Rule: the main tab of a module shows only its core (KPI row + main list/primary 
 | Contracts | List | new, offcontract · detail `CT-x`: overview, prices, terms, files |
 | Certificates | Register | review (`?id=`), expiring, blocks, upload |
 
-Older conventions (`App.card`, `.grid-2`, `.grid-k`, `App.tabs`) remain for pages not yet migrated (tenders, PR, PO, invoices, approvals, price, reports, supplier, admin).
+## 6. Sub-function map (batch 2)
+| Module | Main | Sub-functions |
+|---|---|---|
+| Tenders | List (status chips, search, method) | new (`?pr=` / `?mat=`) · detail `TND-x`: overview & lines (progress, invited, committee), bids (sealed bids / opening minutes), evaluation (technical + price matrix), award (Tờ trình, notices, Create PO), qa (Q&A + addenda), files, settings (settings, e-auction, currency) |
+| Purchase requests | List | new (`?mat=`; `#/pr?mat=` still opens it) · detail `PR-x`: request & lines (editor while Draft/Returned), route (budget check + approval route), files |
+| My approvals | Inbox: queue + item detail (`?id=`) | delegated, history, delegation (delegation settings + SoD rules) |
+| Purchase orders | List (status chips, vendor, site) | new (`?pr=` / `?tender=` / `?contract=`; also on `#/po`) · draft `PO-x` opens the create form · detail `PO-x`: overview & lines (header, supplier confirmation), receipts (schedule, GRN form, NCR), match (3-way summary), revisions (change orders, cancel open qty), print, files |
+| Invoices | List (`?tab=`, `?q=`) + tolerance banner | rules (tolerances & legal checks) · detail `INV-x`: overview & legal checks (payment/stepper, XML fields, checks), match (chain + grid + exception), history |
+| Price history (`?id=`) | Price records + filters | trend (monthly chart), vendors (comparison), rule (alert threshold) |
+| Reports | OTIF (filters, trend, by vendor) | saving, spend (cube), coverage (off-contract POs), cycle, budget |
+
+Each sub has its own KPI row. Header actions carry the record's primary action (e.g. Record goods receipt jumps to `receipts`; invoice accept/ready/export).
+Free data text shown on these screens goes through `tv()`; text joined with ` · ` (PO notes, revisions, NCR responses) is translated per part.
+
+Older conventions (`App.card`, `.grid-2`, `.grid-k`, `App.tabs`) remain for pages not yet migrated (supplier, admin). `App.src.files(…, { block: true })` renders attachments as a layout block.
