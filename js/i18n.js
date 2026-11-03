@@ -116,7 +116,7 @@
   ]);
 
   /* Vietnamese data text → English (EN mode) */
-  valuesEn({ 'Phát hành CT-2026-008 · thép D16': 'Release CT-2026-008 · steel D16', 'Phát hành CT-2026-008 · thép D20 – Dự án Kho B': 'Release CT-2026-008 · steel D20 – Kho B project', 'Không tìm thấy hóa đơn trên hệ thống GDT': 'Invoice not found in the GDT system' });
+  valuesEn({ 'Đang hoạt động': 'Active', procurement: 'Procurement', supplier: 'Supplier', admin: 'Admin', 'procurement, admin': 'Procurement, Admin', 'admin, procurement': 'Admin, Procurement', 'Phát hành CT-2026-008 · thép D16': 'Release CT-2026-008 · steel D16', 'Phát hành CT-2026-008 · thép D20 – Dự án Kho B': 'Release CT-2026-008 · steel D20 – Kho B project', 'Không tìm thấy hóa đơn trên hệ thống GDT': 'Invoice not found in the GDT system' });
 
   /* ---------- Enumerated data values (statuses, types, labels stored in DATA) → Vietnamese ---------- */
   values({
@@ -149,7 +149,7 @@
     'Material IDs offered': 'Mã vật tư đề xuất', Certificates: 'Chứng chỉ', 'Code-of-conduct acceptance': 'Chấp nhận Bộ quy tắc ứng xử',
     'Q1/2026': 'Q1/2026', 'Q2/2026': 'Q2/2026', 'Q3/2026': 'Q3/2026',
     /* free text that appears on the main screens (notifications, change log, risk factors) */
-    'PR-2026-0431 Máy phát điện 500kVA waits for your approval (1,85 tỷ ₫)': 'PR-2026-0431 Máy phát điện 500kVA đang chờ bạn duyệt (1,85 tỷ ₫)',
+    'PR-2026-0431 Máy phát điện 500kVA waits for your approval (1,85 bn ₫)': 'PR-2026-0431 Máy phát điện 500kVA đang chờ bạn duyệt (1,85 tỷ ₫)',
     'PO-2026-0869 not confirmed by Đại Phong — 3 days overdue, escalated to buyer': 'PO-2026-0869 chưa được Đại Phong xác nhận — trễ 3 ngày, đã chuyển cấp cho người mua',
     'INV-2026-0322 Sao Việt — unit price +2,7% vs PO-2026-0874 (tolerance ±0,5%)': 'INV-2026-0322 Sao Việt — đơn giá +2,7% so với PO-2026-0874 (dung sai ±0,5%)',
     'TND-2026-031 closes 05/11/2026 17:00 · 4 of 5 bids received · sealed': 'TND-2026-031 đóng thầu 05/11/2026 17:00 · đã nhận 4/5 hồ sơ · niêm phong',

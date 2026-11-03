@@ -190,7 +190,7 @@ window.DATA = {
 
   /* Approval queue — 6 items waiting for Nguyễn Minh Anh (QA round 1 Q-03/Q-04/Q-05) */
   approvals: [
-    { id: 'PR-2026-0431', type: 'PR approval', title: 'Máy phát điện 500kVA – Nhà máy Bình Dương', mats: ['EQP-31007'], value: 1850000000, by: 'Lê Quốc Huy', step: 'Step 2 of 3', sla: '02/11/2026 17:00', note: 'Capex rule: EQP- above 1 tỷ ₫ adds the Finance Director' },
+    { id: 'PR-2026-0431', type: 'PR approval', title: 'Máy phát điện 500kVA – Nhà máy Bình Dương', mats: ['EQP-31007'], value: 1850000000, by: 'Lê Quốc Huy', step: 'Step 2 of 3', sla: '02/11/2026 17:00', note: 'Capex rule: EQP- above 1 bn ₫ adds the Finance Director' },
     { id: 'PR-2026-0438', type: 'PR approval', title: 'Quạt hút công nghiệp – Kho A', mats: ['EQP-31501'], value: 86000000, by: 'Lê Quốc Huy', step: 'Step 1 of 1', sla: '03/11/2026 17:00' },
     { id: 'EQP-31520', type: 'New Material ID', title: 'Bơm chìm nước thải 15kW', mats: ['EQP-31520'], value: null, by: 'Lê Quốc Huy', step: 'Step 2 of 3', sla: '04/11/2026 17:00', note: 'Duplicate check passed' },
     { id: 'PO-2026-0877 Rev.2', type: 'PO change order', title: 'Thép D16 · 80 → 85 tấn', mats: ['CON-24015'], value: 1292000000, by: 'Nguyễn Minh Anh', step: 'Step 1 of 2', sla: '03/11/2026 12:00', sod: true, note: 'Blocked — SoD: you raised this change order' },
@@ -200,7 +200,7 @@ window.DATA = {
 
   /* Notifications for the signed-in Procurement user — 6 unread (R-15) */
   notifications: [
-    { id: 'N-801', type: 'PR approval', text: 'PR-2026-0431 Máy phát điện 500kVA waits for your approval (1,85 tỷ ₫)', doc: 'PR-2026-0431', mats: ['EQP-31007'], at: '02/11/2026 08:15', read: false, action: 'Review', href: '#/approvals?id=PR-2026-0431' },
+    { id: 'N-801', type: 'PR approval', text: 'PR-2026-0431 Máy phát điện 500kVA waits for your approval (1,85 bn ₫)', doc: 'PR-2026-0431', mats: ['EQP-31007'], at: '02/11/2026 08:15', read: false, action: 'Review', href: '#/approvals?id=PR-2026-0431' },
     { id: 'N-802', type: 'PO overdue', text: 'PO-2026-0869 not confirmed by Đại Phong — 3 days overdue, escalated to buyer', doc: 'PO-2026-0869', mats: ['EQP-31244'], at: '02/11/2026 07:00', read: false, action: 'Follow up', href: '#/po/PO-2026-0869' },
     { id: 'N-803', type: 'Invoice exception', text: 'INV-2026-0322 Sao Việt — unit price +2,7% vs PO-2026-0874 (tolerance ±0,5%)', doc: 'INV-2026-0322', mats: ['LOG-61012'], at: '01/11/2026 16:42', read: false, action: 'Resolve', href: '#/invoices/INV-2026-0322' },
     { id: 'N-804', type: 'Tender', text: 'TND-2026-031 closes 05/11/2026 17:00 · 4 of 5 bids received · sealed', doc: 'TND-2026-031', mats: ['CON-24015', 'CON-24102', 'CON-24330'], at: '01/11/2026 09:00', read: false, action: 'Open', href: '#/tenders/TND-2026-031' },
@@ -429,7 +429,7 @@ window.DATA = {
 
   /* Approval detail: chain history per item (F-57) */
   D.approvalChains = {
-    'PR-2026-0431': [['Dept head · Nhà máy Bình Dương', 'Approved', '31/10/2026 16:05', 'Đúng kế hoạch capex 2026.'], ['Nguyễn Minh Anh · Procurement Lead', 'Waiting', 'Since 31/10/2026 16:05 · SLA ends 02/11/2026 17:00', ''], ['Đỗ Hoàng Nam · Finance Director', 'Next', 'Capex rule: EQP- above 1 tỷ ₫', '']],
+    'PR-2026-0431': [['Dept head · Nhà máy Bình Dương', 'Approved', '31/10/2026 16:05', 'Đúng kế hoạch capex 2026.'], ['Nguyễn Minh Anh · Procurement Lead', 'Waiting', 'Since 31/10/2026 16:05 · SLA ends 02/11/2026 17:00', ''], ['Đỗ Hoàng Nam · Finance Director', 'Next', 'Capex rule: EQP- above 1 bn ₫', '']],
     'PR-2026-0438': [['Lê Quốc Huy · Requester', 'Submitted', '29/10/2026 11:00', ''], ['Nguyễn Minh Anh · Dept head (Kho A acting)', 'Waiting', 'Since 29/10/2026 11:00 · SLA ends 03/11/2026 17:00', '']],
     'EQP-31520': [['Lê Quốc Huy · Requester', 'Submitted', '30/10/2026 10:05', 'Number reserved'], ['Nguyễn Minh Anh · Material master owner', 'Waiting', 'Since 31/10/2026 16:20', ''], ['Phạm Thu Trang · Admin (publish)', 'Next', '', '']],
     'PO-2026-0877 Rev.2': [['Nguyễn Minh Anh · Buyer', 'Raised', '01/11/2026 11:20', 'Thêm 5 tấn cho sàn tầng lửng.'], ['Approver step 1', 'Blocked — SoD', 'Requester cannot approve own change order → Đỗ Hoàng Nam', ''], ['Đỗ Hoàng Nam · Finance Director', 'Next', '', '']],

@@ -17,7 +17,7 @@
     });
   }
   let raf = 0; const later = () => { if (!raf) raf = requestAnimationFrame(() => { raf = 0; fit(); }); };
-  new MutationObserver(later).observe(document.documentElement, { childList: true, subtree: true });
+  if (typeof MutationObserver !== "undefined") new MutationObserver(later).observe(document.documentElement, { childList: true, subtree: true });
   addEventListener('resize', later);
   function draw(o, W) {
     const extra = o.series || []; const small = W < 480; const H = Math.round(Math.min(300, Math.max(200, W * 0.3))), L = small ? 44 : 56, R = o.target != null ? 84 : extra.length ? 16 : small ? 60 : 76, T = 16, B = 30;

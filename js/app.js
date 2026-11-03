@@ -28,6 +28,8 @@
   const pill = (text, tone = 'neutral') => `<span class="pill pill-${tone}">${esc(tv(text))}</span>`;
   // Notification / audit text: stored as an i18n key + params (k, p) or as data text translated with tv()
   const ntext = (n) => (n.k ? t(n.k, Object.fromEntries(Object.entries(n.p || {}).map(([a, b]) => [a, typeof b === 'string' ? tv(b) : b]))) : tv(n.text != null ? n.text : n.action));
+  // Data text joined with ' · ' is translated per part when it has no whole-string translation
+  const tvx = (s) => { if (!s) return s; const w = tv(s); return w !== s ? w : String(s).split(' · ').map((x) => tv(x)).join(' · '); };
   const docid = (id) => `<span class="mono">${esc(id)}</span>`;
 
   /* Generic table: cols = [{h, k | r(row), cls, w}], rows = array */
@@ -44,7 +46,6 @@
   }
 
   const kpi = (label, value, note, tone) => `<div class="card kpi"><div class="kpi-l">${esc(label)}</div><div class="kpi-v">${value}</div>${note ? `<div class="kpi-n ${tone ? 'tone-' + tone : ''}">${note}</div>` : ''}</div>`;
-  const card = (title, body, actions = '') => `<section class="card"><div class="card-h"><h2>${esc(title)}</h2><div class="card-a">${actions}</div></div>${body}</section>`;
 
   /* ---------- Layout system (docs/ui-guidelines.md) ----------
      block(title, body, {span: 12|6|4, actions, id}) → equal card in the 12-column block grid.
@@ -303,7 +304,7 @@
   window.App = {
     dt, daysTo, addDays, vshort,
     page(key, def) { pages[key] = def; },
-    pages, state, render, esc, norm, matches, t, tv, emptyState, loading, errorState, setMenu, vnd, num, pct, ty, tyU, ntext, mid, pill, docid, table, kpi, card, tabs, toast, HOME,
+    pages, state, render, esc, norm, matches, t, tv, emptyState, loading, errorState, setMenu, vnd, num, pct, ty, tyU, ntext, tvx, mid, pill, docid, table, kpi, tabs, toast, HOME,
     layout, block, subnav, sub, unknownSub, field, langBtn, i18n: I,
     login(role, user) { state.role = role; state.user = user || null; ls.set('pl.role', role); if (user) ls.set('pl.user', user.email); else ls.del('pl.user'); location.hash = '#/' + HOME[role]; },
     material: (id) => window.DATA.materials.find((m) => m.id === id),

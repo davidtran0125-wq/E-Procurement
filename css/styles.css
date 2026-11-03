@@ -52,9 +52,7 @@ h1 { font-size: 22px; margin: 0; } h2 { font-size: 16px; margin: 0; } h3 { font-
 .card { background: var(--surface); border: 1px solid var(--border); border-radius: 10px; padding: 20px; min-width: 0; }
 .card-h { display: flex; align-items: center; gap: 8px; margin-bottom: 12px; flex-wrap: wrap; } .card-a { margin-left: auto; display: flex; gap: 8px; flex-wrap: wrap; }
 .grid { display: grid; gap: 16px; grid-template-columns: repeat(auto-fit, minmax(min(320px, 100%), 1fr)); }
-.grid-k { display: grid; gap: 16px; grid-template-columns: repeat(auto-fit, minmax(min(190px, 100%), 1fr)); }
 .kpi-v { line-height: 1.25; margin: 4px 0 2px; }
-.grid-2 { display: grid; gap: 16px; grid-template-columns: minmax(0, 2fr) minmax(0, 1fr); }
 .kpi-l { font-size: 13px; color: var(--muted); } .kpi-v { font-size: 25px; font-weight: 700; font-variant-numeric: tabular-nums; } .kpi-n { font-size: 12px; color: var(--ink3); }
 .tone-success { color: var(--ok); } .tone-warning { color: var(--warn); } .tone-danger { color: var(--bad); }
 .dl { display: grid; grid-template-columns: max-content 1fr; gap: 6px 16px; margin: 0; } .dl dt { color: var(--muted); } .dl dd { margin: 0; }
@@ -119,12 +117,10 @@ svg.chart { width: 100%; height: auto; }
   .side { position: fixed; z-index: 20; left: -260px; transition: left .2s, visibility .2s; visibility: hidden; }
   .side.open { left: 0; visibility: visible; }
   .scrim:not([hidden]) { display: block; position: fixed; inset: 0; z-index: 15; background: rgba(17,24,39,.35); }
-  .grid-k { grid-template-columns: repeat(auto-fit, minmax(min(150px, 100%), 1fr)); gap: 12px; }
-  .grid-k .card { padding: 14px 16px; } .kpi-v { font-size: 22px; }
+  .kpi-v { font-size: 22px; }
   .page-h h1 { font-size: 20px; }
   .menu-btn { display: grid; } .un { display: none; }
   .top { padding: 0 16px; } .content { padding: 16px; }
-  .grid-2 { grid-template-columns: minmax(0, 1fr); }
 }
 
 /* ---- Phase 1 additions ---- */
@@ -275,7 +271,6 @@ ul.plain > li.row-acts { padding: 6px 0; border-top: 1px solid var(--divider); }
 .seg-wrap button { flex: 0 1 auto; border-bottom: 1px solid var(--input); margin-bottom: -1px; }
 .po-cols { grid-template-columns: minmax(200px,2fr) 150px 170px minmax(120px,1fr) 160px 130px minmax(170px,1.5fr); }
 .sb-cols { grid-template-columns: minmax(200px,2fr) 110px 170px minmax(150px,1.2fr) 120px 100px 160px; }
-.tbl-1000 { min-width: 1000px; } .tbl-980 { min-width: 980px; }
 .nr-cols { grid-template-columns: minmax(200px,2fr) 120px minmax(160px,1.4fr) 80px 80px 80px 130px; }
 .po-doc { max-width: 960px; } .po-title { font-size: 18px; margin: 16px 0; }
 @media print {
@@ -332,9 +327,6 @@ ol.plain.rev-list { list-style: none; margin: 0; padding: 0 0 0 22px; position: 
 /* Phase 5 · supplier portal & admin console */
 ul.plain:has(> li.row-acts), ul.plain.rows { list-style: none; padding-left: 0; }
 ul.plain.rows > li { padding: 8px 0; margin: 0; border-top: 1px solid var(--divider); } ul.plain.rows > li:first-child { border-top: 0; padding-top: 0; }
-ul.plain.qlinks { list-style: none; padding: 0; display: grid; gap: 6px; }
-ul.plain.qlinks li { margin: 0; } ul.plain.qlinks a { display: flex; align-items: center; justify-content: space-between; min-height: 40px; padding: 8px 12px; border: 1px solid var(--border); border-radius: 8px; text-decoration: none; color: var(--ink); font-weight: 500; }
-ul.plain.qlinks a::after { content: "›"; color: var(--muted); font-size: 18px; } ul.plain.qlinks a:hover { border-color: var(--primary); color: var(--primary); }
 @media (max-width: 600px) { .steps { flex-wrap: wrap; row-gap: 4px; overflow-x: visible; } }
 
 /* =====================================================================
@@ -388,7 +380,6 @@ ul.plain.qlinks a::after { content: "›"; color: var(--muted); font-size: 18px;
 .filters { gap: var(--s2); } .filters .inp { height: 40px; }
 /* Language switch: VI | EN */
 .lang { gap: 6px; } .lang span[aria-hidden] { color: var(--border); }
-.login-lang { align-self: flex-end; }
 /* Dashboard filters and Material 360 switcher inside page actions */
 .acts .field.inline { gap: var(--s2); } .acts .field.inline label { white-space: nowrap; }
 #m360-id { max-width: 280px; }

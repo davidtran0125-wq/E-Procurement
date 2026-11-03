@@ -550,7 +550,7 @@
     D().notifications.unshift({ id: 'N-' + (900 + D().notifications.length), type: 'PO declined', k: 'n.poDeclined', p: { id, v: App.vshort(App.vendor(p.vendor)), r: reason }, text: `${id} declined by ${App.vshort(App.vendor(p.vendor))}: ${reason}`, doc: id, mats: d.mats, at: NOW, read: false, action: 'Open', href: '#/po/' + id });
   }
   App.po = {
-    det, sched: (id) => sched(det(id)), openSlots: (id) => openSlots(det(id)), invoicesOf, vatSplit: (id) => vatSplit(det(id)), print: printPage, confirm: confirmPo, decline: declinePo, ncrsOf,
+    det, sched: (id) => sched(det(id)), openSlots: (id) => openSlots(det(id)), invoicesOf, vatSplit: (id) => vatSplit(det(id)), print: printPage, printDoc, confirm: confirmPo, decline: declinePo, ncrsOf,
     onDecide(a, dcs) {
       if (a.type === 'Delivery date change') { const r = a.req; const p = det(r.po); if (p && dcs === 'Approved') { p.lines[r.li].sched[r.si][1] = r.to; } r.status = dcs === 'Approved' ? 'Accepted by buyer ' + D().today : dcs; return; }
       if (a.type === 'PO approval') { const d = S.docOf(a.id); if (d) d.status = dcs === 'Approved' ? 'Approved' : 'Draft'; return; }

@@ -69,4 +69,25 @@ Batch-2 review rules:
 - Charts (`App.chart.line`) redraw at the box's pixel width; multi-series lines are named by the legend only; full-width (span 12) when filters sit above.
 - ≤600px: totals lists (`.dl-tot`) stack label over figure.
 
-Older conventions (`App.card`, `.grid-2`, `.grid-k`, `App.tabs`) remain for pages not yet migrated (supplier, admin). `App.src.files(…, { block: true })` renders attachments as a layout block.
+`App.src.files(…)` renders attachments as a layout block. `App.tabs` remains only for in-block tabs (Material 360° docs).
+
+## 7. Sub-function map (batch 3)
+| Module | Main | Sub-functions |
+|---|---|---|
+| Supplier overview | Action needed + notifications | — |
+| Invitations | List | results · detail `TND-x`: overview (lines + receipt), bid (sealed-bid form + files), qa (addenda + Q&A), results |
+| Quotations | Tender bids | spot |
+| Supplier POs | List | detail `PO-x`: overview (lines + confirmation/revisions), deliveries (schedule, ASN, GRNs), ncr, invoices, print |
+| Deliveries | Open deliveries (ASN, date change) | receipts, ncr |
+| Supplier invoices | My invoices + status flow | new (e-invoice submission) |
+| Contracts / Scorecard | Contracts / Criteria | — / trend |
+| Certificates | Register | upload |
+| Company profile | Company | bank, onboarding (checklist + consent), materials |
+| Admin users | List (filters, edit roles) | invites, privacy (data requests + delete) |
+| Access policy | Sign-in policy | allowlist, privacy (notice versions) |
+| Approval matrix | Bands & extra steps | delegation |
+| Integrations | Connections | mappings, log |
+| SoD rules | Rules | overrides |
+| Categories, numbering, tolerances, notification rules, audit | single screen | — |
+
+Batch-3 rules: notifications and audit entries are stored as `{ k, p }` (i18n key + params, with an English `text`/`action` copy for search) and rendered with `App.ntext()`; params that are data values go through `tv()`. Vietnamese data shown in EN uses `I18N.valuesEn`. `App.ty()` prints "bn ₫" in EN. The supplier portal reads only the signed-in vendor's records (`VID`); a foreign record id shows "not found".

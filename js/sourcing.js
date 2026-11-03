@@ -1,6 +1,6 @@
 /* Shared helpers for phase-3 sourcing pages (tenders, purchase requests, approvals). */
 (function () {
-  const { esc, num, mid, pill, table, card } = App;
+  const { esc, num, mid, pill, table } = App;
   const T = (k, p) => App.t(k, p);
   const D = () => window.DATA;
   const me = () => (App.state.user && App.state.user.name) || (App.state.role === 'admin' ? 'Phạm Thu Trang' : App.state.role === 'supplier' ? 'Võ Thị Lan' : 'Nguyễn Minh Anh');
@@ -51,7 +51,7 @@
       ${mats.length ? `<fieldset class="fs"><legend>${esc(T('src.f.mats'))}</legend>${mats.map((m) => `<label class="chk"><input type="checkbox" name="mats" value="${esc(m)}"${(up.mats || []).includes(m) ? ' checked' : ''}> ${esc(m)}</label>`).join('')}</fieldset>` : ''}
       <div class="row-acts"><button type="button" class="btn btn-sm" data-files="cancel" data-key="${key}">${esc(T('c.cancel'))}</button><button type="submit" class="btn btn-sm btn-p">${esc(T('c.upload'))}</button></div></form>` : '';
     const acts = up ? '' : `<button class="btn btn-sm" data-files="open" data-key="${key}">${esc(T('c.upload'))}</button>`;
-    return opts.block ? App.block(T('src.f.title', { n: list.length }), body + form, { actions: acts }) : card(T('src.f.title', { n: list.length }), body + form, acts);
+    return App.block(T('src.f.title', { n: list.length }), body + form, { actions: acts, span: opts.span });
   }
   function upload(root, key, list) {
     const x = read(root, `#${key}-up`); const errs = {};
@@ -87,7 +87,8 @@
   /* P5-09 · one demo clock (02/11/2026 from 10:31, one minute per event) for audit, notifications and supplier actions */
   let tick = 30;
   App.now = () => { tick += 1; const h = 10 + Math.floor(tick / 60), m = tick % 60; return `${D().today} ${String(h).padStart(2, '0')}:${String(m).padStart(2, '0')}`; };
-  const audit = (type, action, ref) => { (D().audit = D().audit || []).unshift({ at: App.now(), user: me() + (App.state.user && App.state.user.vendor ? ` (${App.state.user.vendor})` : ''), type, action, ref: ref || '' }); if (D().auditStats) D().auditStats.total++; };
+  // action = English text, or [i18nKey, params] (stored as k/p and rendered in the viewer's language; `action` keeps the English copy for search)
+  const audit = (type, action, ref) => { const kp = Array.isArray(action) ? { k: action[0], p: action[1] || {}, action: I18N.t('en', action[0], action[1]) } : { action }; (D().audit = D().audit || []).unshift(Object.assign({ at: App.now(), user: me() + (App.state.user && App.state.user.vendor ? ` (${App.state.user.vendor})` : ''), type, ref: ref || '' }, kp)); if (D().auditStats) D().auditStats.total++; };
   App.src = { errText, me, offContract, audit, vatLabel, vatCell, validDate, money, read, field, focusErr, docOf, prLink, tndLink, files, upload, nextVer, assignee, myQueue, dlgActive, delegable,
     bar: (p, tone) => `<div class="bar" role="img" aria-label="${esc(num(p, 0))}%"><span class="${tone || ''}" style="width:${Math.max(0, Math.min(100, p)).toFixed(1)}%"></span></div>` };
 })();
