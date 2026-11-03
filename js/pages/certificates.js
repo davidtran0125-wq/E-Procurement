@@ -119,7 +119,7 @@
     const unblocked = [];
     c.mats.forEach((m) => { const mat = App.material(m); const link = mat && mat.vendors.find((x) => x[0] === v.id); if (link && link[1] === 'Blocked') { link[1] = v.status === 'Probation' ? 'Probation' : 'Approved'; link.length = 5; unblocked.push(m); } });
     if (v.riskReasons) v.riskReasons = v.riskReasons.filter((x) => !x.includes(c.type));
-    D().notifications.unshift({ id: 'N-' + Date.now(), type: 'Certificate', text: `${c.type} of ${v.name} verified — ${unblocked.length ? 'unblocked for ' + unblocked.join(', ') : 'no block to lift'}`, doc: v.id, mats: c.mats, at: D().today + ' 10:30', read: true, action: 'Open', href: '#/certificates' });
+    D().notifications.unshift({ id: 'N-' + Date.now(), type: 'Certificate', k: unblocked.length ? 'n.certOkU' : 'n.certOk', p: { t: c.type, v: v.name, m: unblocked.join(', ') }, text: `${c.type} of ${v.name} verified`, doc: v.id, mats: c.mats, at: D().today + ' 10:30', read: true, action: 'Open', href: '#/certificates' });
     st.review = null; st.rv = null; location.hash = '#/certificates'; App.toast(t('ce.approved', { t: tv(c.type) }) + (unblocked.length ? t('ce.unblocked', { id: v.id, m: unblocked.join(', ') }) : ''));
   }
 

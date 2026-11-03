@@ -68,7 +68,7 @@
       kpi(t('m3.k.avg90'), m.avg90 ? vnd(m.avg90) : '—', d90 != null ? esc(t('m3.k.vsLast', { v: `${Math.abs(d90) < 0.05 ? '±' : d90 > 0 ? '+' : '−'}${pct(Math.abs(d90))}` })) + (Math.abs(d90) > D().priceAlertThreshold ? ' · ' + esc(t('m3.k.alert')) : '') : '', d90 != null && Math.abs(d90) > D().priceAlertThreshold ? (d90 > 0 ? 'danger' : 'success') : ''),
       kpi(t('m3.k.avg12'), m.avg12 ? vnd(m.avg12) : '—', esc(t('m3.k.weighted'))),
       kpi('OTIF', otifPct != null ? pct(otifPct) : '—', esc(m.otif[1] ? t('m3.k.otifN', { a: m.otif[0], b: m.otif[1] }) : t('m3.k.noDel')), otifPct != null ? (otifPct >= 95 ? 'success' : 'warning') : ''),
-      kpi(t('m3.k.spend'), m.spendYtd ? num(m.spendYtd, 2) + ' tỷ ₫' : '—', esc(saving ? t('m3.k.saving', { v: vnd(saving) }) : t('c.exclVat')))
+      kpi(t('m3.k.spend'), m.spendYtd ? num(m.spendYtd, 2) + App.tyU() : '—', esc(saving ? t('m3.k.saving', { v: vnd(saving) }) : t('c.exclVat')))
     ];
 
     const docTable = (rows, empty) => table([

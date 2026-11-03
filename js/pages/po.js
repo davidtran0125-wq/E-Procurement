@@ -34,7 +34,7 @@
     'po.e.noLines': ['No lines — choose a source.', 'Chưa có dòng — hãy chọn nguồn.'], 'po.e.prOnly': ['Only an approved PR can be used.', 'Chỉ dùng được PR đã duyệt.'], 'po.e.qty': ['Enter a quantity above 0.', 'Nhập số lượng lớn hơn 0.'], 'po.e.left': ['Only {n} {u} left on the contract.', 'Hợp đồng chỉ còn {n} {u}.'],
     'po.e.price': ['Enter a unit price above 0.', 'Nhập đơn giá lớn hơn 0.'], 'po.e.ceiling': ['The price may not exceed the contract price.', 'Giá không được vượt giá hợp đồng.'], 'po.e.due': ['Delivery date: dd/mm/yyyy after today.', 'Ngày giao: dd/mm/yyyy, sau hôm nay.'],
     'po.e.blocked': ['{v} is blocked for {m}.', '{v} bị chặn với {m}.'], 'po.e.site': ['Enter the delivery site.', 'Nhập nơi giao.'], 'po.e.ack': ['Confirm that you reviewed the high-risk vendor.', 'Xác nhận bạn đã xem xét NCC rủi ro cao.'],
-    'po.submitted': ['{id} submitted · {v} excl. VAT → Procurement Lead approval', 'Đã gửi {id} · {v} chưa VAT → Trưởng phòng Mua sắm duyệt'], 'po.savedDraft': ['{id} saved as draft', 'Đã lưu nháp {id}'],
+    'po.submitted': ['{id} submitted · {v} excl. VAT → {a} approves', 'Đã gửi {id} · {v} chưa VAT → {a} duyệt'], 'po.savedDraft': ['{id} saved as draft', 'Đã lưu nháp {id}'],
     'po.lines': ['Lines by Material ID ({n})', 'Dòng theo mã vật tư ({n})'], 'po.cancelled': ['−{n} cancelled', '−{n} đã hủy'], 'po.c.vatAmt': ['VAT amount', 'Tiền VAT'],
     'po.sch.title': ['Delivery schedule & goods receipt', 'Lịch giao & nhận hàng'], 'po.sch.recv': ['receiver {r} · inspector {i}', 'người nhận {r} · kiểm tra {i}'], 'po.sch.sla': ['SLA {a} vs target {b}', 'SLA {a} so với mục tiêu {b}'], 'po.ok': ['OK', 'Đạt'], 'po.missing': ['Missing', 'Thiếu'],
     'po.rejected': ['Rejected {n} {u} — {r}', 'Loại {n} {u} — {r}'], 'po.c.sched': ['Scheduled', 'Theo lịch'], 'po.c.promised': ['Promised', 'Hẹn giao'], 'po.archived': ['Archived', 'Lưu trữ'], 'po.late': ['Late · not received', 'Trễ · chưa nhận'], 'po.open': ['Open', 'Đang mở'],
@@ -271,7 +271,7 @@
     return [form, side, pc];
   }
   function readNew(root) {
-    const f = st.nf; const x = S.read(root, '#po-new .form-grid'); f.site = x.site; if (x.terms !== tv(f.terms)) f.terms = x.terms; if (x.vendor) f.vendor = x.vendor;
+    const f = st.nf; const x = S.read(root, '#po-new .form-grid'); f.site = x.site; if (x.terms !== tv(f.terms)) { f.terms = x.terms; f.termsEdited = true; } if (x.vendor) f.vendor = x.vendor;
     const ack = root.querySelector('#po-new [name=ack]'); f.ack = !!(ack && ack.checked);
     root.querySelectorAll('[data-pn=qty],[data-pn=price],[data-pn=due]').forEach((el) => { const l = f.lines[+el.dataset.i]; const k = el.dataset.pn; if (k === 'qty') l.qty = el.value.replace(',', '.').trim(); else if (k === 'price') l.price = el.value === '' ? '' : S.money(el.value); else l.due = el.value.trim(); });
   }
@@ -296,15 +296,16 @@
     const title = `${m0.name}${lines.length > 1 ? ` + ${lines.length - 1}` : ''} – ${short(f.site)}`;
     if (!d) { d = { id, type: 'PO', title, date: D().today, status: 'Draft', mats: [], vendor: f.vendor, qty: '', price: 0, value: 0 }; D().docs.push(d); }
     Object.assign(d, { vendor: f.vendor, mats: [...new Set(lines.map((l) => l.mat))], qty: `${num(lines[0].qty)} ${m0.uom}`, price: lines[0].price, value: net });
+    let lead = '';
     if (submit) {
-      d.status = 'Pending approval'; const lead = S.me() === 'Nguyễn Minh Anh' ? 'Đỗ Hoàng Nam' : 'Nguyễn Minh Anh'; const n = net > D().approvalBands[1][0] ? 2 : 1;
+      d.status = 'Pending approval'; lead = S.me() === 'Nguyễn Minh Anh' ? 'Đỗ Hoàng Nam' : 'Nguyễn Minh Anh'; const n = net > D().approvalBands[1][0] ? 2 : 1;
       D().approvals = D().approvals.filter((a) => a.id !== id);
       D().approvals.push({ id, type: 'PO approval', title: d.title, mats: d.mats, value: net, by: S.me(), step: 'Step 1 of ' + n, sla: App.addDays(D().today, 2) + ' 17:00', assignee: lead });
       D().approvalChains[id] = [[`${S.me()} · Buyer`, 'Submitted', NOW, ''], [`${lead} · Procurement Lead`, 'Waiting', 'SLA 2 working days', '']].concat(n > 1 ? [['Đỗ Hoàng Nam · Finance Director', 'Next', '', '']] : []);
       p.revs = [{ no: 0, status: 'Current', at: NOW, by: S.me(), diff: 'Original issue from ' + f.ref, reason: '' }];
     }
     st.nf = null; st.cur = null; const h = '#/po/' + id; if (location.hash === h) App.render(); else location.hash = h;
-    App.toast(submit ? t('po.submitted', { id, v: vnd(net) }) : t('po.savedDraft', { id }));
+    App.toast(submit ? t('po.submitted', { id, v: vnd(net), a: lead }) : t('po.savedDraft', { id }));
   }
 
   /* ---------- F-63..F-69 detail blocks ---------- */
@@ -526,7 +527,7 @@
     return layout({
       crumbs: `<a href="#/po">${esc(t('nav.po'))}</a> / ${esc(id)}`, titleHtml: `<span class="mono">${esc(id)}</span> <span class="small muted">Rev.${p.rev}</span> ${esc(d.title)}`,
       subtitle: `${v ? esc(v.name) : ''} · ${pill(d.status, tone(d.status))}${d.note ? ` · <span class="small">${esc(tvx(d.note))}</span>` : ''}`,
-      actions: cur === 'print' ? printActs(d, p) : `<a class="btn" href="#/po/${esc(id)}/print">${esc(t('po.print'))}</a>${canRecv ? `<button class="btn btn-p" data-po="grn-open">${esc(t('po.grnOpen'))}</button>` : ''}`,
+      actions: cur === 'print' ? printActs(d, p) : `<a class="btn" href="#/po/${esc(id)}/print">${esc(t('po.print'))}</a>${canRecv && cur !== 'receipts' ? `<button class="btn btn-p" data-po="grn-open">${esc(t('po.grnOpen'))}</button>` : ''}`,
       alerts: App.unknownSub(DSUBS, subArg) + alerts, kpis, subnav: App.subnav('po/' + id, DSUBS, cur), blocks
     });
   }
@@ -546,7 +547,7 @@
   function declinePo(id, reason, by) {
     const p = det(id); const d = S.docOf(id);
     p.confirm = { status: 'Declined', sent: (p.confirm && p.confirm.sent) || NOW, note: `Declined by ${by} · ${reason}` }; d.status = 'Sent · declined by supplier'; d.note = 'Declined: ' + reason;
-    D().notifications.unshift({ id: 'N-' + (900 + D().notifications.length), type: 'PO declined', text: `${id} declined by ${App.vshort(App.vendor(p.vendor))}: ${reason}`, doc: id, mats: d.mats, at: NOW, read: false, action: 'Open', href: '#/po/' + id });
+    D().notifications.unshift({ id: 'N-' + (900 + D().notifications.length), type: 'PO declined', k: 'n.poDeclined', p: { id, v: App.vshort(App.vendor(p.vendor)), r: reason }, text: `${id} declined by ${App.vshort(App.vendor(p.vendor))}: ${reason}`, doc: id, mats: d.mats, at: NOW, read: false, action: 'Open', href: '#/po/' + id });
   }
   App.po = {
     det, sched: (id) => sched(det(id)), openSlots: (id) => openSlots(det(id)), invoicesOf, vatSplit: (id) => vatSplit(det(id)), print: printPage, confirm: confirmPo, decline: declinePo, ncrsOf,
@@ -581,10 +582,10 @@
           subnav: cur === 'draft' ? '' : App.subnav('po', LSUBS, cur, qs), blocks
         });
       };
-      if (isNew) { if (!st.nf) st.nf = initNew(p); const qs = ['pr', 'tender', 'contract'].filter((k) => p[k]).map((k) => k + '=' + encodeURIComponent(p[k])).join('&'); return listLayout(newBlocks(), 'new', qs); }
+      if (isNew) { const nsrc = ['pr', 'tender', 'contract'].map((k) => p[k] || '').join('|'); if (st.nf && st.nfSrc !== nsrc) st.nf = null; st.nfSrc = nsrc; if (!st.nf) st.nf = initNew(p); const qs = ['pr', 'tender', 'contract'].filter((k) => p[k]).map((k) => k + '=' + encodeURIComponent(p[k])).join('&'); return listLayout(newBlocks(), 'new', qs); }
       if (head) {
         const d = all.find((x) => x.id === head); if (!d) return notFound(head);
-        if (d.status === 'Draft') { if (!st.nf) st.nf = initNew(p, head); return listLayout(newBlocks(), 'draft'); }
+        if (d.status === 'Draft') { if (st.nf && st.nf.id !== head) st.nf = null; st.nfSrc = null; if (!st.nf) st.nf = initNew(p, head); return listLayout(newBlocks(), 'draft'); }
         return detail(d, parts.slice(1).join('/'));
       }
       if (p.q != null && p.q !== st.lastQ) { st.q = p.q; st.lastQ = p.q; st.chip = 'all'; }
@@ -598,7 +599,7 @@
         const k = e.target.dataset.pof; if (k === 'vendor' || k === 'site') { st[k] = e.target.value; App.render(); return; }
         const pn = e.target.dataset.pn; if (!pn || !st.nf) return;
         if (pn === 'ref') { const f = build(st.nf.src, e.target.value); f.id = (existingFor(f).find((d) => d.status === 'Draft') || {}).id; st.nf = f; st.nerr = {}; App.render(); document.getElementById('pn-ref').focus(); return; }
-        if (pn === 'vendor') { readNew(root); if (st.nf.src === 'tender') { st.nf = build('tender', st.nf.ref, e.target.value); } else st.nf.vendor = e.target.value; App.render(); document.getElementById('pn-vendor').focus(); return; }
+        if (pn === 'vendor') { readNew(root); if (st.nf.src === 'tender') { st.nf = build('tender', st.nf.ref, e.target.value); } else { st.nf.vendor = e.target.value; if (!st.nf.termsEdited) st.nf.terms = ((App.vendor(st.nf.vendor) || {}).terms || '30 days').split(' ·')[0].replace(/^(\d+) days$/, '$1 days after invoice'); } App.render(); document.getElementById('pn-vendor').focus(); return; }
         readNew(root); if (st.hold) { st.hold = false; return; } const id = e.target.id; App.render(); const x = document.getElementById(id); x && x.focus();
       });
       root.addEventListener('submit', (e) => {

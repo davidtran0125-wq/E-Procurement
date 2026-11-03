@@ -23,7 +23,7 @@
     'tn.env.single': ['Single envelope', 'Một túi hồ sơ'], 'tn.env.two': ['Two envelopes (technical + price)', 'Hai túi hồ sơ (kỹ thuật + giá)'], 'tn.f.close': ['Closing date', 'Ngày đóng thầu'], 'tn.f.time': ['Closing time', 'Giờ đóng thầu'],
     'tn.f.validity': ['Bid validity (days)', 'Hiệu lực hồ sơ (ngày)'], 'tn.f.validityHint': ['At least 90 days', 'Tối thiểu 90 ngày'], 'tn.f.currency': ['Bid currency', 'Đồng tiền dự thầu'],
     'tn.cur.both': ['VND or USD (converted at the bank selling rate on the opening day)', 'VND hoặc USD (quy đổi theo tỷ giá bán của ngân hàng ngày mở thầu)'], 'tn.f.secPct': ['Bid security (% of estimated value)', 'Bảo đảm dự thầu (% giá trị ước tính)'],
-    'tn.f.secHint': ['Suggested 1–1,5% for goods/services ≤ 10 tỷ ₫ · = {v}', 'Đề xuất 1–1,5% cho hàng hóa/dịch vụ ≤ 10 tỷ ₫ · = {v}'], 'tn.f.delivery': ['Last delivery date', 'Ngày giao cuối'],
+    'tn.f.secHint': ['Suggested 1–1,5% for goods/services ≤ 10 bn ₫ · = {v}', 'Đề xuất 1–1,5% cho hàng hóa/dịch vụ ≤ 10 tỷ ₫ · = {v}'], 'tn.f.delivery': ['Last delivery date', 'Ngày giao cuối'],
     'tn.f.wt': ['Technical weight %', 'Trọng số kỹ thuật %'], 'tn.f.wp': ['Price weight %', 'Trọng số giá %'], 'tn.f.wHint': ['Technical + price = 100%', 'Kỹ thuật + giá = 100%'],
     'tn.vat8note': ['8% reduction ends 31/12/2026 — rate is set at invoice date. Lines delivered in 2027 are invoiced at the standard VAT.', 'Giảm 8% kết thúc 31/12/2026 — thuế suất xác định theo ngày hóa đơn. Dòng giao năm 2027 xuất hóa đơn theo VAT chuẩn.'],
     'tn.linesN': ['Lines ({n})', 'Dòng ({n})'], 'tn.c.qty': ['Qty', 'SL'], 'tn.c.est': ['Est. value excl. VAT', 'Giá trị ước tính chưa VAT'], 'tn.noLines': ['Choose a PR or start from a Material ID', 'Chọn PR hoặc bắt đầu từ một mã vật tư'],
@@ -37,7 +37,7 @@
     'tn.progress': ['Tender progress', 'Tiến độ gói thầu'], 'tn.done': ['(done)', '(xong)'],
     'tn.lines': ['Lines by Material ID ({n})', 'Dòng theo mã vật tư ({n})'], 'tn.c.avg90': ['90-day avg excl. VAT', 'BQ 90 ngày chưa VAT'], 'tn.pkgNote': ['Estimated package {v} excl. VAT · source {pr}', 'Ước tính gói thầu {v} chưa VAT · nguồn {pr}'],
     'tn.settings': ['Settings', 'Thiết lập'], 'tn.s.secIn': ['Within the suggested 1–1,5%', 'Trong mức đề xuất 1–1,5%'], 'tn.s.secNone': ['No bid security (RFQ)', 'Không yêu cầu bảo đảm dự thầu (RFQ)'], 'tn.s.secOut': ['Outside the suggested 1–1,5% — note the reason', 'Ngoài mức đề xuất 1–1,5% — ghi rõ lý do'],
-    'tn.s.single': ['Single', 'Một túi'], 'tn.s.two': ['Two (technical + price)', 'Hai túi (kỹ thuật + giá)'], 'tn.s.secPct': ['Bid security %', 'Bảo đảm dự thầu %'], 'tn.s.secHint': ['Suggested 1–1,5% for goods/services ≤ 10 tỷ ₫', 'Đề xuất 1–1,5% cho hàng hóa/dịch vụ ≤ 10 tỷ ₫'],
+    'tn.s.single': ['Single', 'Một túi'], 'tn.s.two': ['Two (technical + price)', 'Hai túi (kỹ thuật + giá)'], 'tn.s.secPct': ['Bid security %', 'Bảo đảm dự thầu %'], 'tn.s.secHint': ['Suggested 1–1,5% for goods/services ≤ 10 bn ₫', 'Đề xuất 1–1,5% cho hàng hóa/dịch vụ ≤ 10 tỷ ₫'],
     'tn.s.atLeast90': ['At least 90', 'Tối thiểu 90'], 'tn.s.currency': ['Currency', 'Đồng tiền'], 'tn.s.save': ['Save settings', 'Lưu thiết lập'], 'tn.s.sec': ['Bid security', 'Bảo đảm dự thầu'], 'tn.s.none': ['None', 'Không'],
     'tn.s.weights': ['Weights', 'Trọng số'], 'tn.s.weightsV': ['Technical {a}% · price {b}% · pass mark {p}/100', 'Kỹ thuật {a}% · giá {b}% · điểm đạt {p}/100'], 'tn.s.priceScore': ['Price score', 'Điểm giá'], 'tn.s.priceScoreV': ['Lowest total ÷ bidder total × 100', 'Tổng thấp nhất ÷ tổng của nhà thầu × 100'],
     'tn.s.validity': ['Bid validity', 'Hiệu lực hồ sơ'], 'tn.s.lastDelivery': ['Last delivery', 'Giao lần cuối'], 'tn.s.visibility': ['Visibility', 'Phạm vi'], 'tn.s.invitedOnly': ['Invited vendors only', 'Chỉ NCC được mời'],
@@ -81,7 +81,7 @@
     'tn.aw.held': ['Held until performance security', 'Giữ đến khi có bảo đảm thực hiện HĐ'], 'tn.aw.release': ['Release by {d}', 'Hoàn trả trước {d}'], 'tn.createPo': ['Create PO', 'Tạo PO'], 'tn.createCt': ['Create contract', 'Tạo hợp đồng'], 'tn.aw.afterApproval': ['Enabled after the award is approved', 'Mở sau khi trao thầu được duyệt'],
     'tn.aw.value': ['Award value', 'Giá trị trao thầu'], 'tn.aw.baseline': ['Baseline', 'Giá cơ sở'], 'tn.aw.baselineV': ['{v} (last PO price per Material ID)', '{v} (giá PO gần nhất theo mã vật tư)'], 'tn.aw.savingL': ['Saving', 'Tiết kiệm'],
     'tn.aw.savingV': ['= {p} · (baseline − awarded) × qty per line', '= {p} · (giá cơ sở − giá trúng) × SL mỗi dòng'], 'tn.aw.route': ['Route', 'Luồng duyệt'],
-    'tn.aw.routeV': ['≤ 2 tỷ ₫ band needs the Procurement Lead, but Nguyễn Minh Anh evaluated this tender (SoD: evaluator ≠ award approver) → Đỗ Hoàng Nam approves.', 'Mức ≤ 2 tỷ ₫ do Trưởng phòng Mua sắm duyệt, nhưng Nguyễn Minh Anh đã chấm gói thầu này (SoD: người chấm ≠ người duyệt trao thầu) → Đỗ Hoàng Nam duyệt.'],
+    'tn.aw.routeV': ['≤ 2 bn ₫ band needs the Procurement Lead, but Nguyễn Minh Anh evaluated this tender (SoD: evaluator ≠ award approver) → Đỗ Hoàng Nam approves.', 'Mức ≤ 2 tỷ ₫ do Trưởng phòng Mua sắm duyệt, nhưng Nguyễn Minh Anh đã chấm gói thầu này (SoD: người chấm ≠ người duyệt trao thầu) → Đỗ Hoàng Nam duyệt.'],
     'tn.aw.just': ['Justification', 'Giải trình'], 'tn.aw.justReq': ['Justification (required: a line is not awarded to the lowest price)', 'Giải trình (bắt buộc: có dòng không trao cho giá thấp nhất)'], 'tn.aw.submit': ['Submit award recommendation', 'Gửi tờ trình trao thầu'],
     'tn.aw.e.why': ['Explain in at least 20 characters why the lowest price is not chosen on every line.', 'Giải trình ít nhất 20 ký tự vì sao không chọn giá thấp nhất ở mọi dòng.'], 'tn.aw.sent': ['{id} award recommendation sent to Đỗ Hoàng Nam', 'Đã gửi tờ trình trao thầu {id} cho Đỗ Hoàng Nam'],
     'tn.aw.simple': ['Award', 'Trao thầu'], 'tn.aw.to': ['Awarded to', 'Trao cho'], 'tn.aw.exVat': ['{v} excl. VAT', '{v} chưa VAT'], 'tn.aw.none': ['No award yet', 'Chưa trao thầu'], 'tn.aw.noneN': ['The award recommendation is prepared after the evaluation.', 'Tờ trình trao thầu được lập sau khi đánh giá.'],
@@ -150,6 +150,10 @@
 
   /* ---------- New tender from a PR (L-09 step 1–2) ---------- */
   function newBlock(p) {
+    // RB2-02: the form is keyed on its source (?pr= / ?mat=); a different source starts a fresh form
+    const src = (p.pr || '') + '|' + (p.mat || '');
+    if (st.nf && st.nfSrc !== src) st.nf = null;
+    st.nfSrc = src;
     if (!st.nf) {
       const pr = p.pr || (p.mat ? '' : 'PR-2026-0436');
       const est = pr && D().prs[pr] ? D().prs[pr].lines.reduce((a, l) => a + estOf(l), 0) : Infinity;
@@ -450,7 +454,7 @@
     return layout({
       crumbs: `<a href="#/tenders">${esc(t('nav.tenders'))}</a> / ${esc(doc.id)}`, titleHtml: `<span class="mono">${esc(doc.id)}</span> ${esc(doc.title)}`,
       subtitle: `${esc(tv(tn.method))} · ${esc(catName(doc.cat))} · ${esc(t('tn.closesAt', { d: closeAt(doc, tn) }))} · ${pill(doc.status, tones[doc.status] || 'neutral')}`,
-      actions: `<button class="btn" data-act="toast" data-msg="${esc(t('tn.remindMsg'))}">${esc(t('tn.remind'))}</button>${doc.status === 'Draft' ? `<button class="btn btn-p" data-tn="invite">${esc(t('tn.invite'))}</button>` : ''}`,
+      actions: `${/^(Open|Q&A)$/.test(doc.status) && App.daysTo(doc.close) >= 0 ? `<button class="btn" data-act="toast" data-msg="${esc(t('tn.remindMsg'))}">${esc(t('tn.remind'))}</button>` : doc.status === 'Awarded' || (tn.award && tn.award.status === 'Approved') ? `<a class="btn" href="#/po?tender=${esc(doc.id)}">${esc(t('tn.createPo'))}</a>` : /Evaluation|Closed/.test(doc.status) || App.daysTo(doc.close) < 0 ? `<a class="btn" href="#/tenders/${esc(doc.id)}/award">${esc(t('tn.d.award'))}</a>` : ''}${doc.status === 'Draft' ? `<button class="btn btn-p" data-tn="invite">${esc(t('tn.invite'))}</button>` : ''}`,
       alerts: App.unknownSub(DSUBS, subArg) + alerts, kpis, subnav: App.subnav('tenders/' + doc.id, DSUBS, cur), blocks
     });
   }

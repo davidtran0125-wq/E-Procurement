@@ -70,7 +70,7 @@
   function checks(d, v) {
     const ven = App.vendor(d.vendor); const C = D().company || {};
     return [
-      [t('inv.ck.cqt'), !!v.cqt, v.cqt ? t('inv.ck.cqtOk') : (v.gdt || t('inv.ck.cqtMissing')), true],
+      [t('inv.ck.cqt'), !!v.cqt, v.cqt ? t('inv.ck.cqtOk') : (v.gdt ? App.tv(v.gdt) : t('inv.ck.cqtMissing')), true],
       [t('inv.ck.seller'), true, `${ven.mst} = ${ven.id}`, true],
       [t('inv.ck.buyer'), true, C.mst ? `${C.mst}${C.name ? ` (${C.name})` : ''}` : t('inv.ck.buyerNa'), true],
       [t('inv.ck.format'), /^[12][CK]\d{2}[TDLMNBGH][A-Z]{2}$/.test(v.kh) && /^\d{8}$/.test(v.no), `${v.kh} · ${v.no}`, true],

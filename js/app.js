@@ -20,11 +20,14 @@
   const vnd = (n) => (n == null ? '' : Math.round(n).toLocaleString('vi-VN') + ' ₫');
   const num = (n, d = 0) => Number(n).toLocaleString('vi-VN', { minimumFractionDigits: d, maximumFractionDigits: d });
   const pct = (n, d = 1) => num(n, d) + '%';
-  const ty = (n) => num(n / 1e9, 1) + ' tỷ ₫';
+  const ty = (n) => num(n / 1e9, 1) + (state.lang === 'en' ? ' bn ₫' : ' tỷ ₫'); // RB2-09
+  const tyU = () => (state.lang === 'en' ? ' bn ₫' : ' tỷ ₫');
   // Material ID chip — always a link to Material 360°
   const mid = (id) => `<a class="mid" href="#/material360?id=${esc(id)}">${esc(id)}</a>`;
   // Status pill: tone = success | warning | danger | info | neutral. Data values are translated (App.tv).
   const pill = (text, tone = 'neutral') => `<span class="pill pill-${tone}">${esc(tv(text))}</span>`;
+  // Notification / audit text: stored as an i18n key + params (k, p) or as data text translated with tv()
+  const ntext = (n) => (n.k ? t(n.k, Object.fromEntries(Object.entries(n.p || {}).map(([a, b]) => [a, typeof b === 'string' ? tv(b) : b]))) : tv(n.text != null ? n.text : n.action));
   const docid = (id) => `<span class="mono">${esc(id)}</span>`;
 
   /* Generic table: cols = [{h, k | r(row), cls, w}], rows = array */
@@ -243,8 +246,11 @@
     else if (a === 'lang') {
       // RB1-01: keep unsaved form input across the re-render
       const snap = [...document.querySelectorAll('#main input[id], #main select[id], #main textarea[id]')].filter((x) => x.type !== 'file').map((x) => [x.id, x.type === 'checkbox' || x.type === 'radio' ? x.checked : x.value, x.type]);
+      // RB2-05: checkbox / radio groups without ids are restored by name + value
+      const grp = [...document.querySelectorAll('#main input[type=checkbox][name]:not([id]), #main input[type=radio][name]:not([id])')].map((x) => [x.name, x.value, x.checked]);
       state.lang = state.lang === 'vi' ? 'en' : 'vi'; ls.set('pl.lang', state.lang); render();
-      snap.forEach(([id, v, ty]) => { const x = document.getElementById(id); if (!x) return; if (ty === 'checkbox' || ty === 'radio') x.checked = v; else x.value = v; }); const b = document.querySelector('[data-act=lang]'); b && b.focus(); }
+      snap.forEach(([id, v, ty]) => { const x = document.getElementById(id); if (!x) return; if (ty === 'checkbox' || ty === 'radio') x.checked = v; else x.value = v; });
+      grp.forEach(([n, v, c]) => { const x = [...document.querySelectorAll('#main input[name]')].find((y) => y.name === n && y.value === v); if (x) x.checked = c; }); const b = document.querySelector('[data-act=lang]'); b && b.focus(); }
     else if (a === 'menu') setMenu(!document.getElementById('side').classList.contains('open'));
     else if (a === 'menu-close') setMenu(false);
     else if (a === 'skip') { e.preventDefault(); const m = document.getElementById('main'); m && m.focus(); }
@@ -297,7 +303,7 @@
   window.App = {
     dt, daysTo, addDays, vshort,
     page(key, def) { pages[key] = def; },
-    pages, state, render, esc, norm, matches, t, tv, emptyState, loading, errorState, setMenu, vnd, num, pct, ty, mid, pill, docid, table, kpi, card, tabs, toast, HOME,
+    pages, state, render, esc, norm, matches, t, tv, emptyState, loading, errorState, setMenu, vnd, num, pct, ty, tyU, ntext, mid, pill, docid, table, kpi, card, tabs, toast, HOME,
     layout, block, subnav, sub, unknownSub, field, langBtn, i18n: I,
     login(role, user) { state.role = role; state.user = user || null; ls.set('pl.role', role); if (user) ls.set('pl.user', user.email); else ls.del('pl.user'); location.hash = '#/' + HOME[role]; },
     material: (id) => window.DATA.materials.find((m) => m.id === id),

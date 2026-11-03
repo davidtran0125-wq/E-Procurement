@@ -23,8 +23,8 @@
     'rp.c.record': ['Record', 'Bản ghi'], 'rp.c.calc': ['Calculation', 'Cách tính'], 'rp.c.saving': ['Saving', 'Tiết kiệm'], 'rp.valByFin': ['Validated by Finance', 'Tài chính đã xác nhận'], 'rp.submit': ['Submit', 'Gửi'], 'rp.validate': ['Validate', 'Xác nhận'],
     'rp.finYou': ['You validate as Finance (Đỗ Hoàng Nam).', 'Bạn xác nhận với vai trò Tài chính (Đỗ Hoàng Nam).'], 'rp.finOnly': ['Only Finance (Đỗ Hoàng Nam) can validate saving records.', 'Chỉ Tài chính (Đỗ Hoàng Nam) được xác nhận bản ghi tiết kiệm.'], 'rp.savExport': ['Export saving records', 'Xuất bản ghi tiết kiệm'], 'rp.savExportMsg': ['Exported Saving_records_2026.xlsx', 'Đã xuất Saving_records_2026.xlsx'],
     'rp.baseTxt': ['1.520.000.000 ₫ (last PO per line)', '1.520.000.000 ₫ (PO gần nhất mỗi dòng)'], 'rp.submitted': ['{id} submitted to Finance', 'Đã gửi {id} cho Tài chính'], 'rp.validated': ['{id} validated by Finance', '{id} đã được Tài chính xác nhận'],
-    'rp.cube': ['Spend cube', 'Khối chi tiêu'], 'rp.spendBy': ['Spend by', 'Chi tiêu theo'], 'rp.byV': ['By vendor', 'Theo NCC'], 'rp.byM': ['By Material ID', 'Theo mã vật tư'], 'rp.byP': ['By project', 'Theo dự án'], 'rp.top5': ['top 5', 'top 5'], 'rp.other': ['Other {n} vendors', '{n} NCC khác'],
-    'rp.spendNote': ['Spend YTD {v} tỷ ₫ excl. VAT · keyed by Material ID → category.', 'Chi tiêu từ đầu năm {v} tỷ ₫ chưa VAT · theo mã vật tư → nhóm hàng.'], 'rp.conc': ['Top 5 vendors = {a} tỷ ₫ = {p} (concentration).', '5 NCC lớn nhất = {a} tỷ ₫ = {p} (mức độ tập trung).'], 'rp.projNote': ['Project spend = invoiced + committed.', 'Chi tiêu dự án = đã hóa đơn + đã cam kết.'], 'rp.matNote': ['Material IDs in this sample.', 'Các mã vật tư trong mẫu.'],
+    'rp.cube': ['Spend cube', 'Khối chi tiêu'], 'rp.spendBy': ['Spend by', 'Chi tiêu theo'], 'rp.byV': ['By vendor', 'Theo NCC'], 'rp.byM': ['By Material ID', 'Theo mã vật tư'], 'rp.byP': ['By project', 'Theo dự án'], 'rp.top5': ['top 5', 'nhóm 5 lớn nhất'], 'rp.other': ['Other {n} vendors', '{n} NCC khác'],
+    'rp.spendNote': ['Spend YTD {v} bn ₫ excl. VAT · keyed by Material ID → category.', 'Chi tiêu từ đầu năm {v} tỷ ₫ chưa VAT · theo mã vật tư → nhóm hàng.'], 'rp.conc': ['Top 5 vendors = {a} bn ₫ = {p} (concentration).', '5 NCC lớn nhất = {a} tỷ ₫ = {p} (mức độ tập trung).'], 'rp.projNote': ['Project spend = invoiced + committed.', 'Chi tiêu dự án = đã hóa đơn + đã cam kết.'], 'rp.matNote': ['Material IDs in this sample.', 'Các mã vật tư trong mẫu.'],
     'rp.k.spend': ['Spend YTD', 'Chi tiêu từ đầu năm'], 'rp.k.spendN': ['excl. VAT', 'chưa VAT'], 'rp.k.top5': ['Top 5 vendors', '5 NCC lớn nhất'], 'rp.k.vendors': ['Active vendors', 'NCC có chi tiêu'], 'rp.k.vendorsN': ['{n} named + {o} others', '{n} có tên + {o} khác'],
     'rp.cov.k': ['Contract coverage', 'Độ phủ hợp đồng'], 'rp.cov.kN': ['Spend under an active contract', 'Chi tiêu theo hợp đồng hiệu lực'], 'rp.off.k': ['Off-contract', 'Ngoài hợp đồng'], 'rp.off.kN': ['Bought outside an active contract, or after it expired', 'Mua ngoài hợp đồng hiệu lực, hoặc sau khi hợp đồng hết hạn'],
     'rp.off.n': ['Off-contract POs', 'PO ngoài hợp đồng'], 'rp.off.title': ['Off-contract POs', 'PO ngoài hợp đồng'], 'rp.c.from': ['Bought from', 'Mua từ'], 'rp.c.contract': ['Contract', 'Hợp đồng'], 'rp.c.value': ['Value excl. VAT', 'Giá trị chưa VAT'], 'rp.off.none': ['No off-contract POs', 'Không có PO ngoài hợp đồng'],
@@ -39,6 +39,7 @@
     '≤ 200tr · Dept head': '≤ 200tr · Trưởng bộ phận', '≤ 2 tỷ · + Procurement Lead': '≤ 2 tỷ · + Trưởng phòng Mua sắm', '> 2 tỷ · + Finance Director': '> 2 tỷ · + Giám đốc Tài chính', 'Contract release (no tender)': 'Phát hành từ hợp đồng (không đấu thầu)',
     'Nhà xưởng C2 · Steel': 'Nhà xưởng C2 · Thép'
   });
+  I18N.valuesEn({ '≤ 200tr · Dept head': '≤ 200 m ₫ · Dept head', '≤ 2 tỷ · + Procurement Lead': '≤ 2 bn ₫ · + Procurement Lead', '> 2 tỷ · + Finance Director': '> 2 bn ₫ · + Finance Director', 'Nhà xưởng C2 · Thép': 'Nhà xưởng C2 · Steel' });
   const CAT = { CON: 'Construction', EQP: 'Equipment', SRV: 'Services', LOG: 'Logistics' };
   const st = { period: 'ytd', cat: 'all', vendor: 'all', mat: 'all', cube: 'vendor', extraVal: 0 };
   const R = () => D().reports;
@@ -76,8 +77,8 @@
   }
   function saving() {
     const K = D().kpi; const SV = savings(); const sv = R().saving; const validated = sv.validated + st.extraVal / 1e9;
-    const kpis = [kpi(t('rp.k.sav'), num(sv.reported, 1) + ' tỷ ₫', esc(t('rp.k.savN', { r: pct(sv.rate), t: pct(sv.target, 0) })), 'success'), kpi(t('rp.k.val'), num(validated, 1) + ' tỷ ₫', esc(t('rp.k.valN', { p: pct(validated / sv.reported * 100, 0) }))),
-      kpi(t('rp.k.avoid'), num(sv.avoidance, 1) + ' tỷ ₫', esc(t('rp.k.avoidN'))), kpi(t('rp.k.rate'), pct(sv.rate), esc(t(sv.rate >= sv.target ? 'rp.above' : 'rp.below')), sv.rate >= sv.target ? 'success' : 'warning')];
+    const kpis = [kpi(t('rp.k.sav'), num(sv.reported, 1) + App.tyU(), esc(t('rp.k.savN', { r: pct(sv.rate), t: pct(sv.target, 0) })), 'success'), kpi(t('rp.k.val'), num(validated, 1) + App.tyU(), esc(t('rp.k.valN', { p: pct(validated / sv.reported * 100, 0) }))),
+      kpi(t('rp.k.avoid'), num(sv.avoidance, 1) + App.tyU(), esc(t('rp.k.avoidN'))), kpi(t('rp.k.rate'), pct(sv.rate), esc(t(sv.rate >= sv.target ? 'rp.above' : 'rp.below')), sv.rate >= sv.target ? 'success' : 'warning')];
     const isFin = S.me() === 'Đỗ Hoàng Nam';
     const recs = block(t('rp.recs'), `<p class="small mt-0">${esc(t('rp.formula'))}</p>` + table([
       { h: t('rp.c.record'), r: (s) => `<span class="mono small">${esc(s.id)}</span><div class="small muted">${esc(s.doc)}</div>`, w: 'minmax(150px,1.4fr)' }, { h: t('c.mid'), r: (s) => mid(s.mat), w: '120px' },
@@ -86,7 +87,7 @@
       { h: t('rp.c.saving'), r: (s) => `<b>${vnd(s.val)}</b>`, cls: 'num', w: '140px' },
       { h: t('c.status'), r: (s) => `${pill(s.status === 'Validated' ? t('rp.valByFin') : s.status, s.status === 'Validated' ? 'success' : s.status === 'Submitted' ? 'warning' : 'neutral')}${s.by ? `<div class="small muted">${esc(s.by)}</div>` : ''}${s.status === 'Draft' && !s.tender ? `<div class="mt-s"><button class="btn btn-sm" data-rp="submit" data-id="${s.id}">${esc(t('rp.submit'))}</button></div>` : ''}${s.status === 'Submitted' ? `<div class="mt-s"><button class="btn btn-sm" data-rp="validate" data-id="${s.id}"${isFin ? '' : ' disabled aria-describedby="rp-fin-h"'}>${esc(t('rp.validate'))}</button></div>` : ''}`, w: 'minmax(170px,1.4fr)' }
     ], SV, { label: t('rp.recs') }) + `<p class="small muted" id="rp-fin-h">${esc(t(isFin ? 'rp.finYou' : 'rp.finOnly'))}</p>`, { actions: `<button class="btn btn-sm" data-act="toast" data-msg="${esc(t('rp.savExportMsg'))}">${esc(t('rp.savExport'))}</button>` });
-    const byCat = block(t('rp.byCat'), App.chart.bars(Object.keys(CAT).map((c) => ({ label: tv(CAT[c]), value: K.byCat[c].saving })), (v) => num(v, 1) + ' tỷ ₫') + `<p class="small muted">${esc(t('rp.byCatN'))}</p>`);
+    const byCat = block(t('rp.byCat'), App.chart.bars(Object.keys(CAT).map((c) => ({ label: tv(CAT[c]), value: K.byCat[c].saving })), (v) => num(v, 1) + App.tyU()) + `<p class="small muted">${esc(t('rp.byCatN'))}</p>`);
     return { kpis, blocks: [recs, byCat] };
   }
   const SPEND = 186.4;
@@ -95,8 +96,8 @@
     const rows = st.cube === 'vendor' ? SV.map(([v, x], i) => ({ label: App.vshort(App.vendor(v)), value: x, note: i < 5 ? t('rp.top5') : '', href: '#/vendors/' + v })).concat([{ label: t('rp.other', { n: R().otherVendors }), value: SPEND - SV.reduce((a, x) => a + x[1], 0), dim: true }])
       : st.cube === 'mat' ? D().materials.filter((m) => m.spendYtd).sort((a, b) => b.spendYtd - a.spendYtd).map((m) => ({ label: `${m.id} ${m.name}`, value: m.spendYtd, href: '#/material360?id=' + m.id }))
         : Object.values(D().budgets).map((b) => ({ label: tv(b.name), value: (b.invoiced + b.committed) / 1e9 }));
-    const kpis = [kpi(t('rp.k.spend'), num(SPEND, 1) + ' tỷ ₫', esc(t('rp.k.spendN'))), kpi(t('rp.k.top5'), pct(top5 / SPEND * 100), `${num(top5, 2)} tỷ ₫`, top5 / SPEND > 0.4 ? 'warning' : ''), kpi(t('rp.k.vendors'), num(SV.length + R().otherVendors), esc(t('rp.k.vendorsN', { n: SV.length, o: R().otherVendors }))), kpi(t('rp.cov.k'), pct(R().coverage), esc(t('rp.cov.kN')))];
-    return { kpis, blocks: [block(t('rp.cube'), `<div class="seg seg-wrap" role="group" aria-label="${esc(t('rp.spendBy'))}">${[['vendor', 'rp.byV'], ['mat', 'rp.byM'], ['project', 'rp.byP']].map(([k, l]) => `<button data-rp="cube" data-k="${k}" aria-pressed="${st.cube === k}">${esc(t(l))}</button>`).join('')}</div><div class="mt">${App.chart.bars(rows, (v) => num(v, 2) + ' tỷ ₫')}</div>
+    const kpis = [kpi(t('rp.k.spend'), num(SPEND, 1) + App.tyU(), esc(t('rp.k.spendN'))), kpi(t('rp.k.top5'), pct(top5 / SPEND * 100), `${num(top5, 2)}${App.tyU()}`, top5 / SPEND > 0.4 ? 'warning' : ''), kpi(t('rp.k.vendors'), num(SV.length + R().otherVendors), esc(t('rp.k.vendorsN', { n: SV.length, o: R().otherVendors }))), kpi(t('rp.cov.k'), pct(R().coverage), esc(t('rp.cov.kN')))];
+    return { kpis, blocks: [block(t('rp.cube'), `<div class="seg seg-wrap" role="group" aria-label="${esc(t('rp.spendBy'))}">${[['vendor', 'rp.byV'], ['mat', 'rp.byM'], ['project', 'rp.byP']].map(([k, l]) => `<button data-rp="cube" data-k="${k}" aria-pressed="${st.cube === k}">${esc(t(l))}</button>`).join('')}</div><div class="mt">${App.chart.bars(rows, (v) => num(v, 2) + App.tyU())}</div>
       <p class="small muted">${esc(t('rp.spendNote', { v: num(SPEND, 1) }))} ${esc(st.cube === 'vendor' ? t('rp.conc', { a: num(top5, 2), p: pct(top5 / SPEND * 100) }) : st.cube === 'project' ? t('rp.projNote') : t('rp.matNote'))}</p>`)] };
   }
   function coverage() {

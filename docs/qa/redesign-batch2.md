@@ -113,3 +113,19 @@ R-requirements observed in this pass: the following still hold.
 - R-25: consent on every login.
 
 The NCR-blocks-invoice and tolerance rules also hold. RB2-04 weakens payment-term consistency.
+
+## Fix status (Agent 1)
+
+| ID | Status | Fix |
+|---|---|---|
+| RB2-01 | Fixed | `approvals.js`: opening an item from the queue rewrites the URL to `?id=<item>` (`window.history.replaceState`) and sets `lastId`; leaving My approvals (any other hash) clears `lastId`, so the next `?id=` always selects. Verified: repro now selects PR-2026-0438. |
+| RB2-02 | Fixed | `tenders.js` new-tender form keyed on `?pr=|?mat=` (`st.nfSrc`); `po.js` new-PO form keyed on `?pr=|?tender=|?contract=`, draft form keyed on its PO id. |
+| RB2-03 | Fixed (batch 3) | Notifications can be stored as `{ k, p }` and are rendered with `App.ntext()` (dashboard / notifications). Supplier-portal, PO-declined and certificate notifications now use keys; the supplier portal is fully translated in batch 3. |
+| RB2-04 | Fixed | Vendor change recomputes payment terms from the vendor master unless the user edited the terms (`termsEdited`). |
+| RB2-05 | Fixed | Language toggle also snapshots/restores id-less checkbox and radio groups by name + value. |
+| RB2-06 | Fixed | `po.submitted` names the computed approver (`→ {a} duyệt`). |
+| RB2-07 | Fixed | `DATA.deptHeads` maps departments to head users; the dept-head step is assigned to that user, with requester ≠ approver SoD (`pr.sod.head`). |
+| RB2-08 | Fixed | "Remind bidders" only while Open/Q&A and before closing; Awarded → Create PO, Evaluation/closed → Award. |
+| RB2-09 | Fixed | `App.ty()` / `App.tyU()` print "bn ₫" in EN; EN keys and report band labels (`I18N.valuesEn`) no longer show "tỷ". |
+| RB2-10 | Fixed | Data changed to "Thép", "Phát hành CT-…", "thông số mã vật tư"; "top 5" translated; new `I18N.valuesEn` (VI data → EN) used for the GDT message and the release PO titles. |
+| Agent 3 | Fixed | PO receipts tab keeps one primary "Ghi nhận nhập kho" (block action only); price "vs 90-day average" note shortened to "BQ {a} · {n} bản ghi". |

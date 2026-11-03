@@ -126,7 +126,7 @@ window.DATA = {
     { id: 'PO-2026-0812', type: 'PO', title: 'Thuê kho bãi Phú Mỹ Q4', date: '25/09/2026', status: 'Delivered', mats: ['LOG-61045'], vendor: 'V-1006', qty: '1.000 m²/tháng', price: 105000, value: 315000000 },
     { id: 'PO-2026-0846', type: 'PO', title: 'Quạt hút công nghiệp – Kho C', date: '05/10/2026', status: 'Delivered', mats: ['EQP-31501'], vendor: 'V-1004', qty: '13 cái', price: 6615000, value: 86000000 },
     { id: 'PO-2026-0848', type: 'PO', title: 'Bê tông M300 + bơm – Kho A', date: '07/10/2026', status: 'Delivered', mats: ['CON-24330', 'SRV-52210'], vendor: 'V-1009', qty: '420 m³', price: 1320000, value: 580400000 },
-    { id: 'PO-2026-0858', type: 'PO', title: 'Release CT-2026-008 · thép D16', date: '14/10/2026', status: 'Delivered', mats: ['CON-24015'], vendor: 'V-1001', qty: '45 tấn', price: 15627500, value: 703237500 },
+    { id: 'PO-2026-0858', type: 'PO', title: 'Phát hành CT-2026-008 · thép D16', date: '14/10/2026', status: 'Delivered', mats: ['CON-24015'], vendor: 'V-1001', qty: '45 tấn', price: 15627500, value: 703237500 },
     { id: 'PO-2026-0861', type: 'PO', title: 'Xi măng PCB40 – Dự án Kho A', date: '16/10/2026', status: 'Partially received', mats: ['CON-24102'], vendor: 'V-1002', qty: '120 tấn', price: 1680000, value: 201600000, note: 'NCR-2026-014 open · 5 tấn rejected' },
     { id: 'PO-2026-0866', type: 'PO', title: 'Thép D20 – Nhà xưởng C2', date: '19/10/2026', status: 'Partially received', mats: ['CON-24020'], vendor: 'V-1001', qty: '30 tấn', price: 15350000, value: 460500000 },
     { id: 'PO-2026-0869', type: 'PO', title: 'Bơm ly tâm 75kW – Nhà máy Bình Dương', date: '29/10/2026', status: 'Sent · not confirmed', mats: ['EQP-31244'], vendor: 'V-1003', qty: '2 cái', price: 182000000, value: 364000000, note: '3 days overdue' },
@@ -166,7 +166,7 @@ window.DATA = {
     { id: 'PO-2026-0831', type: 'PO', title: 'Dịch vụ vệ sinh công nghiệp T10', date: '01/10/2026', status: 'Delivered', mats: ['SRV-52118'], vendor: 'V-1005', qty: '1 tháng', price: 62000000, value: 62000000 },
     { id: 'PO-2026-0844', type: 'PO', title: 'Bê tông M250 – Kho A', date: '03/10/2026', status: 'Closed', mats: ['CON-24325'], vendor: 'V-1009', qty: '300 m³', price: 1150000, value: 345000000 },
     { id: 'PO-2026-0855', type: 'PO', title: 'Bơm ly tâm 75kW – Trạm bơm', date: '13/10/2026', status: 'Delivered', mats: ['EQP-31244'], vendor: 'V-1003', qty: '2 cái', price: 182000000, value: 364000000 },
-    { id: 'PO-2026-0889', type: 'PO', title: 'Release CT-2026-008 · thép D20 – Dự án Kho B', date: '01/11/2026', status: 'Sent · not confirmed', mats: ['CON-24020'], vendor: 'V-1001', qty: '20 tấn', price: 14354500, value: 287090000, note: 'Confirm within 48 h · due 03/11/2026 16:00' },
+    { id: 'PO-2026-0889', type: 'PO', title: 'Phát hành CT-2026-008 · thép D20 – Dự án Kho B', date: '01/11/2026', status: 'Sent · not confirmed', mats: ['CON-24020'], vendor: 'V-1001', qty: '20 tấn', price: 14354500, value: 287090000, note: 'Confirm within 48 h · due 03/11/2026 16:00' },
     { id: 'PO-2026-0870', type: 'PO', title: 'Bảo trì hệ thống HVAC T11', date: '27/10/2026', status: 'Confirmed', mats: ['SRV-52003'], vendor: 'V-1005', qty: '1 tháng', price: 48000000, value: 48000000 }
   ],
 
@@ -391,7 +391,7 @@ window.DATA = {
         { type: 'BOQ', name: 'TND-031_BOQ_KhoB.xlsx', ver: 'v1', by: 'Nguyễn Minh Anh', date: '22/10/2026', mats: ['CON-24015', 'CON-24102', 'CON-24330'] }] },
     'TND-2026-032': { method: 'Two-envelope', envelopes: 'Two', pr: 'PR-2026-0434', owner: 'Lê Quốc Huy', delivery: '15/12/2026', currency: 'VND or USD', fx: 'USD bids converted at the Vietcombank selling rate on the opening day', validity: 90, secPct: 1.5, closeTime: '17:00', step: 2,
       lines: [{ mat: 'EQP-31244', qty: 6 }], weights: [40, 60], pass: 70,
-      qa: [{ no: 1, line: 'EQP-31244', q: 'Có chấp nhận động cơ IE2 không?', a: 'Không. Yêu cầu tối thiểu IE3 theo spec Material ID.', at: '30/10/2026 09:30' }], addenda: [] },
+      qa: [{ no: 1, line: 'EQP-31244', q: 'Có chấp nhận động cơ IE2 không?', a: 'Không. Yêu cầu tối thiểu IE3 theo thông số mã vật tư.', at: '30/10/2026 09:30' }], addenda: [] },
     'TND-2026-033': { method: 'RFQ', envelopes: 'Single', pr: 'PR-2026-0427', owner: 'Trần Bảo Ngọc', delivery: '31/12/2027', currency: 'VND', validity: 90, secPct: 0, closeTime: '17:00', lines: [{ mat: 'SRV-52003', qty: 12 }], step: 3 },
     'TND-2026-034': { method: 'e-Auction', envelopes: 'Single', pr: 'PR-2026-0435', owner: 'Trần Bảo Ngọc', delivery: '31/03/2027', currency: 'VND', validity: 90, secPct: 1, closeTime: '10:00', step: 3,
       lines: [{ mat: 'LOG-61012', qty: 60 }],
@@ -404,7 +404,7 @@ window.DATA = {
     'KHOB-VLXD': { name: 'Dự án Kho B · Vật liệu xây dựng', budget: 12000000000, invoiced: 2150000000, committed: 5400000000 },
     'BD-CAPEX': { name: 'Nhà máy Bình Dương · Capex thiết bị', budget: 5000000000, invoiced: 900000000, committed: 1200000000 },
     'KHOA-OPEX': { name: 'Kho A · Bảo trì & thiết bị nhỏ', budget: 800000000, invoiced: 310000000, committed: 120000000 },
-    'C2-STEEL': { name: 'Nhà xưởng C2 · Steel', budget: 6000000000, invoiced: 2900000000, committed: 916500000 }
+    'C2-STEEL': { name: 'Nhà xưởng C2 · Thép', budget: 6000000000, invoiced: 2900000000, committed: 916500000 }
   };
   D.prs = {
     'PR-2026-0452': { requester: 'Nguyễn Minh Anh', dept: 'Phòng Mua hàng', project: 'Dự án Kho B · giai đoạn 2', cc: 'KHOB-VLXD', cat: 'CON', need: '15/12/2026', site: 'Kho B · KCN Tân Uyên, Bình Dương',
@@ -441,6 +441,8 @@ window.DATA = {
     { id: 'PO-2026-0866', type: 'PO change order', title: 'Thép D20 · ngày giao 24/10 → 27/10', decision: 'Approved', by: 'Lê Quốc Huy', onBehalf: 'Nguyễn Minh Anh', at: '20/10/2026 14:02', comment: 'Đổi ngày giao, không đổi giá.' },
     { id: 'PR-2026-0424', type: 'PR approval', title: 'Văn phòng phẩm Q4', decision: 'Returned', by: 'Nguyễn Minh Anh', at: '15/10/2026 09:30', comment: 'Thiếu Material ID cho 2 dòng.' }
   ];
+  /* Department → head user (first PR approval step, RB2-07) */
+  D.deptHeads = { 'Phòng Mua hàng': 'Nguyễn Minh Anh', 'Nhà máy Bình Dương': 'Lê Quốc Huy', 'Nhà xưởng C2': 'Lê Quốc Huy', 'Kho A': 'Trần Bảo Ngọc', 'Kho B': 'Trần Bảo Ngọc' };
   D.delegation = { to: 'Lê Quốc Huy', from: '10/11/2026', until: '14/11/2026', cap: 500000000, types: ['PR approval', 'PO change order'], above: 'Đỗ Hoàng Nam' };
   D.sodRules = [['Requester ≠ approver of the same PR / change order / Material ID request', 'Block'], ['Vendor creator ≠ vendor approver', 'Block'], ['PO buyer ≠ GRN receiver', 'Warn'], ['Tender evaluator ≠ award approver', 'Block']];
 })(window.DATA);

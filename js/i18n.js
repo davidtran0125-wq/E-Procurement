@@ -30,14 +30,18 @@
   }
   const pats = [];
   function patterns(list) { list.forEach((x) => pats.push(x)); }
+  /* Vietnamese source text shown in EN mode (data typed in Vietnamese): valuesEn({ 'Tiếng Việt': 'English' }) */
+  const valsEn = {};
+  function valuesEn(entries) { Object.assign(valsEn, entries); }
   function tv(lang, s) {
-    if (lang !== 'vi' || s == null) return s;
+    if (s == null) return s;
+    if (lang !== 'vi') return valsEn[String(s)] != null ? valsEn[String(s)] : s;
     const k = String(s);
     if (vals[k] != null) return vals[k];
     for (const [rx, rep] of pats) if (rx.test(k)) return k.replace(rx, rep);
     return k;
   }
-  window.I18N = { dict, vals, add, values, patterns, t, tv };
+  window.I18N = { dict, vals, valsEn, add, values, valuesEn, patterns, t, tv };
 
   /* ---------- Shared keys: shell, navigation, common words ---------- */
   add({
@@ -78,7 +82,8 @@
     'c.exported': ['Exported {n} rows to Excel', 'Đã xuất {n} dòng ra Excel'], 'c.dateFmt': ['Use dd/mm/yyyy.', 'Nhập theo dạng dd/mm/yyyy.'], 'c.target': ['Target {v}', 'Mục tiêu {v}'],
     'cat.CON': ['Construction', 'Xây dựng'], 'cat.EQP': ['Equipment', 'Thiết bị'], 'cat.SRV': ['Services', 'Dịch vụ'], 'cat.LOG': ['Logistics', 'Logistics'],
     'doc.PR': ['PRs', 'PR'], 'doc.TND': ['Tenders', 'Gói thầu'], 'doc.PO': ['POs', 'PO'], 'doc.GRN': ['Deliveries', 'Giao hàng'], 'doc.CT': ['Contracts', 'Hợp đồng'], 'doc.INV': ['Invoices', 'Hóa đơn'], 'doc.NCR': ['NCRs', 'NCR'],
-    'login.title': ['Sign in', 'Đăng nhập']
+    'login.title': ['Sign in', 'Đăng nhập'],
+    'n.poDeclined': ['{id} declined by {v}: {r}', '{id} bị {v} từ chối: {r}'], 'n.certOk': ['{t} of {v} verified — no block to lift', 'Đã xác minh {t} của {v} — không có chặn cần gỡ'], 'n.certOkU': ['{t} of {v} verified — unblocked for {m}', 'Đã xác minh {t} của {v} — gỡ chặn cho {m}']
   });
 
   /* Legacy English-text keys still used by pages not yet migrated (tenders, pr, po, invoices, approvals, price, reports, supplier, admin). */
@@ -109,6 +114,9 @@
     [/^(.+) · ([\d.,]+) (\S+) accepted$/, '$1 · đã nhận $2 $3'],
     [/^(.+) · ([\d.,]+) (\S+) rejected$/, '$1 · loại $2 $3']
   ]);
+
+  /* Vietnamese data text → English (EN mode) */
+  valuesEn({ 'Phát hành CT-2026-008 · thép D16': 'Release CT-2026-008 · steel D16', 'Phát hành CT-2026-008 · thép D20 – Dự án Kho B': 'Release CT-2026-008 · steel D20 – Kho B project', 'Không tìm thấy hóa đơn trên hệ thống GDT': 'Invoice not found in the GDT system' });
 
   /* ---------- Enumerated data values (statuses, types, labels stored in DATA) → Vietnamese ---------- */
   values({

@@ -218,7 +218,7 @@
       return layout({
         title: t('ct.title'), subtitle: esc(t('ct.subtitle')),
         actions: cur === 'new' ? '' : `<a class="btn btn-p" href="#/contracts/new">${esc(t('ct.new'))}</a>`,
-        kpis: [kpi(t('ct.k.active'), `${D().contractStats.active} / ${D().contractStats.total}`, esc(t('ct.k.allVendors'))), kpi(t('ct.k.value'), num(D().contractStats.value, 1) + ' tỷ ₫', esc(t('ct.k.ceilings'))),
+        kpis: [kpi(t('ct.k.active'), `${D().contractStats.active} / ${D().contractStats.total}`, esc(t('ct.k.allVendors'))), kpi(t('ct.k.value'), num(D().contractStats.value, 1) + App.tyU(), esc(t('ct.k.ceilings'))),
           kpi(t('ct.k.expiring'), String(exp.length), esc(exp.map((c) => c.id).join(', ') || t('c.none')), exp.length ? 'warning' : ''), kpi(t('ct.k.avg'), pct(D().contractStats.avgUse, 0), esc(t('ct.k.avgN', { p: pct(avg, 0) })))],
         subnav: App.subnav('contracts', LSUBS, cur), blocks: [cur === 'new' ? newForm() : cur === 'offcontract' ? offContract() : list()]
       });

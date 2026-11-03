@@ -15,7 +15,7 @@
     'pr.src.contract': ['Release PO from contract {c} · {b} / {cm} {u} left', 'Phát hành PO từ hợp đồng {c} · còn {b} / {cm} {u}'], 'pr.src.after': ['{n} {u} left after this line', 'Còn {n} {u} sau dòng này'],
     'pr.src.short': ['Contract {c} has only {b} {u} left — tender the rest', 'Hợp đồng {c} chỉ còn {b} {u} — phần còn lại phải đấu thầu'], 'pr.src.tender': ['Tender required, value > 500tr', 'Bắt buộc đấu thầu, giá trị > 500tr'],
     'pr.src.noCt': ['No active contract for this Material ID', 'Mã vật tư chưa có hợp đồng hiệu lực'], 'pr.src.rfq': ['RFQ · 3 quotations (≤ 500tr)', 'Chào giá · 3 báo giá (≤ 500tr)'], 'pr.src.Contract': ['Contract', 'Hợp đồng'], 'pr.src.Tender': ['Tender', 'Đấu thầu'], 'pr.src.RFQ': ['RFQ', 'Chào giá'],
-    'pr.sod.lead': ['SoD: requester is the Procurement Lead', 'SoD: người đề nghị là Trưởng phòng Mua sắm'], 'pr.capexRule': ['capex rule EQP- > {v}', 'quy tắc capex EQP- > {v}'], 'pr.skipped': ['skipped (already approved earlier step)', 'bỏ qua (đã duyệt ở bước trước)'],
+    'pr.sod.head': ['SoD: requester is the department head', 'SoD: người đề nghị là trưởng bộ phận'], 'pr.sod.lead': ['SoD: requester is the Procurement Lead', 'SoD: người đề nghị là Trưởng phòng Mua sắm'], 'pr.capexRule': ['capex rule EQP- > {v}', 'quy tắc capex EQP- > {v}'], 'pr.skipped': ['skipped (already approved earlier step)', 'bỏ qua (đã duyệt ở bước trước)'],
     'pr.fd': ['Finance Director', 'Giám đốc Tài chính'],
     'pr.l.mat': ['Material ID for line {n}', 'Mã vật tư dòng {n}'], 'pr.l.ph': ['Type a Material ID or name', 'Nhập mã vật tư hoặc tên'], 'pr.l.sugg': ['Material ID suggestions', 'Gợi ý mã vật tư'], 'pr.l.qty': ['Quantity line {n}', 'Số lượng dòng {n}'], 'pr.l.price': ['Unit price line {n}', 'Đơn giá dòng {n}'],
     'pr.l.last': ['Last {po}', 'Gần nhất {po}'], 'pr.l.remove': ['Remove line {n}', 'Xóa dòng {n}'], 'pr.l.table': ['PR lines', 'Dòng PR'], 'pr.c.qty': ['Qty', 'SL'], 'pr.c.unit': ['Unit price excl. VAT', 'Đơn giá chưa VAT'], 'pr.c.amount': ['Amount excl. VAT', 'Thành tiền chưa VAT'], 'pr.c.sourcing': ['Sourcing', 'Hình thức mua'],
@@ -76,7 +76,10 @@
   function route(pr, lines) {
     const tot = totals(lines).net; const b = D().budgets[pr.cc]; const avail = b ? b.budget - b.invoiced - b.committed : Infinity;
     const B1 = D().approvalBands[0][0], B2 = D().approvalBands[1][0], CR = D().approvalRules[0], CX = CR.above; const capOn = CR.on !== false, budOn = D().approvalRules[1].on !== false;
-    const steps = [['Dept head', pr.dept, '']];
+    // RB2-07: the dept-head step goes to the department's head user; requester ≠ approver (SoD) moves it to the Procurement Lead's deputy
+    let head = (D().deptHeads || {})[pr.dept] || pr.dept; let hn = '';
+    if (head === pr.requester) { head = pr.requester === 'Nguyễn Minh Anh' ? 'Đỗ Hoàng Nam' : 'Nguyễn Minh Anh'; hn = t('pr.sod.head'); }
+    const steps = [['Dept head', head, hn]];
     if (tot > B1) steps.push(pr.requester === 'Nguyễn Minh Anh' ? ['Procurement Lead', 'Đỗ Hoàng Nam', t('pr.sod.lead')] : ['Procurement Lead', 'Nguyễn Minh Anh', '']);
     const capex = capOn && lines.some((l) => /^EQP-/.test(l.mat)) && tot > CX;
     if (tot > B2 || capex) steps.push(['Finance Director', 'Đỗ Hoàng Nam', tot <= B2 && capex ? t('pr.capexRule', { v: App.ty(CX) }) : '']);

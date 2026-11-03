@@ -56,7 +56,7 @@
     return `<ul class="nlist">${items.map((n) => `<li class="nitem${n.read ? '' : ' unread'}">
       <span class="ndot" aria-hidden="true"></span>
       <div class="nbody"><div class="nmeta">${pill(n.type, typeTone[n.type] || 'neutral')} <span class="mono small">${esc(n.doc)}</span> <span class="muted small">· ${esc(n.at)}</span>${n.read ? '' : ` <span class="sr">${esc(t('nt.unreadSr'))}</span>`}</div>
-        <div>${esc(tv(n.text))}</div>${n.mats && n.mats.length ? `<div class="chips">${n.mats.map(mid).join(' ')}</div>` : ''}</div>
+        <div>${esc(App.ntext(n))}</div>${n.mats && n.mats.length ? `<div class="chips">${n.mats.map(mid).join(' ')}</div>` : ''}</div>
       <div class="nacts"><a class="btn btn-sm${n.read ? '' : ' btn-p'}" href="${esc(n.href)}" data-nopen="${n.id}">${esc(tv(n.action))}</a>${opts.toggle ? `<button class="btn btn-sm" data-ntoggle="${n.id}">${esc(t(n.read ? 'nt.markUnread' : 'nt.markRead'))}</button>` : ''}</div></li>`).join('')}</ul>`;
   }
   const filterNotifs = (s, base) => base.filter((n) => (s.type === 'all' || n.type === s.type) && (s.show === 'all' || (s.show === 'unread' ? !n.read : n.read)));
@@ -95,8 +95,8 @@
     const yoy = st.period === 'ytd' && st.cat === 'all' ? t('db.k.yoy', { v: num(((K.spendYtd - K.spendPrevYtd) / K.spendPrevYtd) * 100, 1) }) : esc(plabel);
 
     const kpis = [
-      kpi(t('db.k.spend', { p: ps }), num(spend, 1) + ' tỷ ₫', yoy + ' · ' + t('c.exclVat')),
-      kpi(t('db.k.saving', { p: ps }), num(saving, 1) + ' tỷ ₫', esc(t('db.k.savingNote', { p: pct(savingPct), t: K.savingTarget })), savingPct >= K.savingTarget ? 'success' : 'warning'),
+      kpi(t('db.k.spend', { p: ps }), num(spend, 1) + App.tyU(), yoy + ' · ' + t('c.exclVat')),
+      kpi(t('db.k.saving', { p: ps }), num(saving, 1) + App.tyU(), esc(t('db.k.savingNote', { p: pct(savingPct), t: K.savingTarget })), savingPct >= K.savingTarget ? 'success' : 'warning'),
       kpi(t('db.k.otif'), pct(otif90), esc(t(otif90 >= K.otifTarget ? 'db.k.above' : 'db.k.below', { t: K.otifTarget, v: num(Math.abs(otif90 - K.otifTarget), 1) })), otif90 >= K.otifTarget ? 'success' : 'warning'),
       kpi(t('db.k.openPr'), num(openPr), `<a href="#/approvals">${esc(t('db.k.awaiting', { n: prAw }))}</a>`),
       kpi(t('db.k.tenders'), num(tenders.length), esc(t('db.k.closing', { n: tenders.filter((x) => x.close && daysTo(x.close) >= 0 && daysTo(x.close) <= 6).length })))
@@ -109,7 +109,7 @@
         + `<p class="muted small">${esc(t('db.otifNote'))} ${esc(st.cat !== 'all' ? t('db.otifCat', { c: t('cat.' + st.cat), v: pct(otif90) }) : t('db.allCats'))}</p>`, { span: 6, actions: `<a class="btn btn-sm" href="#/reports">${esc(t('db.otifReport'))}</a>` });
       const all = sum(Object.keys(K.byCat).map(spendOf));
       const rows = Object.keys(K.byCat).map((c) => ({ label: t('cat.' + c), value: spendOf(c), note: t('db.activeVendors', { n: K.byCat[c].vendors, p: pct((spendOf(c) / all) * 100) }), dim: st.cat !== 'all' && st.cat !== c })).sort((x, y) => y.value - x.value);
-      const spendCard = block(t('db.spend'), App.chart.bars(rows, (v) => num(v, 1) + ' tỷ ₫') + `<p class="muted small">${esc(t('db.spendNote', { p: plabel }))}</p>`, { span: 6 });
+      const spendCard = block(t('db.spend'), App.chart.bars(rows, (v) => num(v, 1) + App.tyU()) + `<p class="muted small">${esc(t('db.spendNote', { p: plabel }))}</p>`, { span: 6 });
       blocks = [otifChart, spendCard];
     } else if (cur === 'tenders') {
       blocks = [block(t('db.tenders'), table([

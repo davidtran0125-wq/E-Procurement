@@ -189,6 +189,8 @@
     return t('ap.msg.' + d, { id: a.id }) + (ob ? t('ap.msg.ob', { n: ob }) : '');
   }
 
+  // RB2-01: leaving My approvals forgets the last deep link, so the next ?id= always selects its item
+  window.addEventListener('hashchange', () => { if (!/^#\/approvals(\/|\?|$)/.test(location.hash)) st.lastId = null; });
   const SUBS = [['', 'ap.sub.inbox'], ['delegated', 'ap.sub.delegated'], ['history', 'ap.sub.history'], ['delegation', 'ap.sub.settings']];
   App.page('approvals', {
     titleKey: 'nav.approvals', ws: 'procurement', roles: ['procurement', 'admin'],
@@ -227,7 +229,7 @@
       });
       root.addEventListener('click', (e) => {
         const b = e.target.closest('[data-ap]'); if (!b) return; const k = b.dataset.ap;
-        if (k === 'open') { st.sel = b.dataset.id; st.comment = ''; st.cerr = ''; App.render(); const f = document.getElementById('ap-c'); if (f) { f.closest('.card').scrollIntoView({ block: 'start' }); f.focus({ preventScroll: true }); } }
+        if (k === 'open') { st.sel = b.dataset.id; st.lastId = b.dataset.id; st.comment = ''; st.cerr = ''; const sb = (location.hash.match(/^#\/approvals(\/[^?]*)?/) || [])[1] || ''; window.history.replaceState(null, '', '#/approvals' + sb + '?id=' + encodeURIComponent(b.dataset.id)); App.render(); const f = document.getElementById('ap-c'); if (f) { f.closest('.card').scrollIntoView({ block: 'start' }); f.focus({ preventScroll: true }); } }
         else if (k === 'decide') {
           const a = D().approvals.find((x) => x.id === st.sel); if (!a) return; const d = b.dataset.d; const c = (st.comment || '').trim();
           if (d !== 'Approved' && c.length < 10) { st.cerr = d === 'Rejected' ? 'ap.e.reject' : 'ap.e.return'; App.render(); document.getElementById('ap-c').focus(); return; }
