@@ -65,13 +65,13 @@
     const kpis = [kpi('OTIF', pct(o), esc(t('rp.k.otifN', { s: scope, t: pct(D().otif.target, 0) })), o >= 95 ? 'success' : 'warning'), kpi(t('rp.k.ontime'), onTime != null ? pct(onTime) : '—', esc(t('rp.k.ontimeN'))), kpi(t('rp.k.infull'), inFull != null ? pct(inFull) : '—', esc(t('rp.k.infullN'))),
       kpi(t('rp.k.dels'), dels != null ? num(dels) : '—', esc(st.cat === 'all' && st.vendor === 'all' && st.mat === 'all' ? t('rp.k.delsN', { a: num(R().otif.late), b: num(R().otif.short) }) : t('rp.k.inScope')))];
     const O = D().otif;
-    const trend = block(t('rp.trend'), filters + App.chart.line({ labels: O.months, values: O.values, target: O.target, targetLabel: t('rp.target95'), min: 85, max: 97, fmt: (v) => pct(v), label: t('rp.trendLabel', { a: O.months[0], b: O.months[11] }) }) + `<p class="small muted">${esc(t('rp.otifDef'))}</p>`, { span: 6 });
+    const trend = block(t('rp.trend'), filters + App.chart.line({ labels: O.months, values: O.values, target: O.target, targetLabel: t('rp.target95'), min: 85, max: 97, fmt: (v) => pct(v), label: t('rp.trendLabel', { a: O.months[0], b: O.months[11] }) }) + `<p class="small muted">${esc(t('rp.otifDef'))}</p>`);
     const vrows = V.filter((v) => ov[v.id]).map((v) => ({ v, x: ov[v.id] })).sort((a, b) => b.v.otif - a.v.otif);
     const byVendor = block(t('rp.byVendor'), table([
       { h: t('c.vendor'), r: (r) => `<a href="#/vendors/${r.v.id}">${esc(App.vshort(r.v))}</a>`, w: 'minmax(120px,1.6fr)' }, { h: t('rp.k.dels'), r: (r) => num(r.x[0]), cls: 'num', w: '80px' },
       { h: t('rp.k.ontime'), r: (r) => pct(r.x[1]), cls: 'num', w: '80px' }, { h: t('rp.k.infull'), r: (r) => pct(r.x[2]), cls: 'num', w: '80px' }, { h: 'OTIF', r: (r) => `<b>${pct(r.v.otif)}</b>`, cls: 'num', w: '70px' },
       { h: t('rp.label'), r: (r) => (r.v.otif >= 95 ? pill(t('rp.onTarget'), 'success') : r.v.otif < 85 ? pill(t('rp.risk85'), 'danger') : pill(t('rp.below'), 'warning')), w: '120px' }
-    ], vrows, { label: t('rp.byVendor') }), { span: 6 });
+    ], vrows, { label: t('rp.byVendor') }));
     return { kpis, blocks: [trend, byVendor] };
   }
   function saving() {
@@ -82,11 +82,11 @@
     const recs = block(t('rp.recs'), `<p class="small mt-0">${esc(t('rp.formula'))}</p>` + table([
       { h: t('rp.c.record'), r: (s) => `<span class="mono small">${esc(s.id)}</span><div class="small muted">${esc(s.doc)}</div>`, w: 'minmax(150px,1.4fr)' }, { h: t('c.mid'), r: (s) => mid(s.mat), w: '120px' },
       { h: t('c.type'), r: (s) => pill(s.type, s.type === 'Cost avoidance' ? 'neutral' : 'info'), w: '150px' },
-      { h: t('rp.c.calc'), r: (s) => (s.tender ? `${esc(t('rp.baseTxt'))} − ${esc(s.awardTxt)}` : `(${vnd(s.base)} − ${vnd(s.award)}) × ${num(s.qty)}`), cls: 'num', w: 'minmax(220px,2fr)' },
+      { h: t('rp.c.calc'), r: (s) => (s.tender ? `${esc(t('rp.baseTxt'))}<div class="small muted">− ${esc(s.awardTxt)}</div>` : `(${vnd(s.base)} − ${vnd(s.award)}) × ${num(s.qty)}`), cls: 'num wrap', w: 'minmax(220px,2fr)' },
       { h: t('rp.c.saving'), r: (s) => `<b>${vnd(s.val)}</b>`, cls: 'num', w: '140px' },
       { h: t('c.status'), r: (s) => `${pill(s.status === 'Validated' ? t('rp.valByFin') : s.status, s.status === 'Validated' ? 'success' : s.status === 'Submitted' ? 'warning' : 'neutral')}${s.by ? `<div class="small muted">${esc(s.by)}</div>` : ''}${s.status === 'Draft' && !s.tender ? `<div class="mt-s"><button class="btn btn-sm" data-rp="submit" data-id="${s.id}">${esc(t('rp.submit'))}</button></div>` : ''}${s.status === 'Submitted' ? `<div class="mt-s"><button class="btn btn-sm" data-rp="validate" data-id="${s.id}"${isFin ? '' : ' disabled aria-describedby="rp-fin-h"'}>${esc(t('rp.validate'))}</button></div>` : ''}`, w: 'minmax(170px,1.4fr)' }
     ], SV, { label: t('rp.recs') }) + `<p class="small muted" id="rp-fin-h">${esc(t(isFin ? 'rp.finYou' : 'rp.finOnly'))}</p>`, { actions: `<button class="btn btn-sm" data-act="toast" data-msg="${esc(t('rp.savExportMsg'))}">${esc(t('rp.savExport'))}</button>` });
-    const byCat = block(t('rp.byCat'), App.chart.bars(Object.keys(CAT).map((c) => ({ label: tv(CAT[c]), value: K.byCat[c].saving })), (v) => num(v, 1) + ' tỷ ₫') + `<p class="small muted">${esc(t('rp.byCatN'))}</p>`, { span: 6 });
+    const byCat = block(t('rp.byCat'), App.chart.bars(Object.keys(CAT).map((c) => ({ label: tv(CAT[c]), value: K.byCat[c].saving })), (v) => num(v, 1) + ' tỷ ₫') + `<p class="small muted">${esc(t('rp.byCatN'))}</p>`);
     return { kpis, blocks: [recs, byCat] };
   }
   const SPEND = 186.4;

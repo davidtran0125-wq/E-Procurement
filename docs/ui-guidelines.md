@@ -61,4 +61,12 @@ Rule: the main tab of a module shows only its core (KPI row + main list/primary 
 Each sub has its own KPI row. Header actions carry the record's primary action (e.g. Record goods receipt jumps to `receipts`; invoice accept/ready/export).
 Free data text shown on these screens goes through `tv()`; text joined with ` · ` (PO notes, revisions, NCR responses) is translated per part.
 
+Batch-2 review rules:
+- VAT in table cells: `App.src.vatCell(rate)` (rate + small condition line); full text `vatLabel` only in prose/totals.
+- Matrices (tender comparison, match grid, PO/PR lines) fit 1440 without inner scroll: fold secondary facts (VAT, formulas) into a small second line of an existing cell; numeric cells that hold a formula use `cls: 'num wrap'`.
+- Before approval, follow-up actions (Create PO/contract) are quiet + disabled beside the block's one primary submit.
+- KPI values size to the tile (container units) and never break inside a number.
+- Charts (`App.chart.line`) redraw at the box's pixel width; multi-series lines are named by the legend only; full-width (span 12) when filters sit above.
+- ≤600px: totals lists (`.dl-tot`) stack label over figure.
+
 Older conventions (`App.card`, `.grid-2`, `.grid-k`, `App.tabs`) remain for pages not yet migrated (supplier, admin). `App.src.files(…, { block: true })` renders attachments as a layout block.

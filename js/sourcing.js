@@ -5,7 +5,7 @@
   const D = () => window.DATA;
   const me = () => (App.state.user && App.state.user.name) || (App.state.role === 'admin' ? 'Phạm Thu Trang' : App.state.role === 'supplier' ? 'Võ Thị Lan' : 'Nguyễn Minh Anh');
   I18N.add({
-    'src.vat8': ['8% (reduced, until 31/12/2026)', '8% (giảm, đến 31/12/2026)'],
+    'src.vat8': ['8% (reduced, until 31/12/2026)', '8% (giảm, đến 31/12/2026)'], 'src.vat8s': ['reduced to 31/12/2026', 'giảm đến 31/12/2026'],
     'src.f.type': ['Type', 'Loại'], 'src.f.file': ['File', 'Tệp'], 'src.f.ver': ['Version', 'Phiên bản'], 'src.f.by': ['Uploaded by', 'Người tải lên'], 'src.f.mats': ['Material IDs', 'Mã vật tư'],
     'src.f.supplier': ['Uploaded by supplier', 'NCC tải lên'], 'src.f.empty': ['No attachments yet', 'Chưa có tệp đính kèm'], 'src.f.title': ['Attachments ({n})', 'Tệp đính kèm ({n})'], 'src.f.label': ['Attachments', 'Tệp đính kèm'],
     'src.f.name': ['File name', 'Tên tệp'], 'src.f.ph': ['e.g. spec_rev2.pdf', 'vd. spec_rev2.pdf'], 'src.f.hint': ['PDF, XLSX, DOCX or DWG', 'PDF, XLSX, DOCX hoặc DWG'],
@@ -15,6 +15,8 @@
   });
   I18N.values({ BOQ: 'BOQ (bảng khối lượng)', Addendum: 'Phụ lục hồ sơ mời thầu', Other: 'Khác', 'Bid opening minutes': 'Biên bản mở thầu', 'CO/CQ': 'CO/CQ', Catalogue: 'Catalogue', Photos: 'Ảnh chụp' });
   const vatLabel = (v) => (+v === 8 ? App.t('src.vat8') : v + '%');
+  // Table cell: rate on line 1, the reduced-rate condition as a small second line (keeps VAT columns narrow)
+  const vatCell = (v) => (+v === 8 ? `8%<div class="small muted">${App.esc(App.t('src.vat8s'))}</div>` : App.esc(v + '%'));
   // Errors may be stored as i18n keys ('pr.e.x') or [key, params]; plain text passes through
   const errText = (x) => (!x ? '' : Array.isArray(x) ? App.t(x[0], x[1]) : /^[a-z0-9]+(\.[\w-]+)+$/.test(x) ? App.t(x) : x);
   const validDate = (s) => { if (!/^\d{2}\/\d{2}\/\d{4}$/.test(s || '')) return false; const [d, m, y] = s.split('/').map(Number); const x = new Date(y, m - 1, d); return x.getDate() === d && x.getMonth() === m - 1; };
@@ -86,6 +88,6 @@
   let tick = 30;
   App.now = () => { tick += 1; const h = 10 + Math.floor(tick / 60), m = tick % 60; return `${D().today} ${String(h).padStart(2, '0')}:${String(m).padStart(2, '0')}`; };
   const audit = (type, action, ref) => { (D().audit = D().audit || []).unshift({ at: App.now(), user: me() + (App.state.user && App.state.user.vendor ? ` (${App.state.user.vendor})` : ''), type, action, ref: ref || '' }); if (D().auditStats) D().auditStats.total++; };
-  App.src = { errText, me, offContract, audit, vatLabel, validDate, money, read, field, focusErr, docOf, prLink, tndLink, files, upload, nextVer, assignee, myQueue, dlgActive, delegable,
+  App.src = { errText, me, offContract, audit, vatLabel, vatCell, validDate, money, read, field, focusErr, docOf, prLink, tndLink, files, upload, nextVer, assignee, myQueue, dlgActive, delegable,
     bar: (p, tone) => `<div class="bar" role="img" aria-label="${esc(num(p, 0))}%"><span class="${tone || ''}" style="width:${Math.max(0, Math.min(100, p)).toFixed(1)}%"></span></div>` };
 })();

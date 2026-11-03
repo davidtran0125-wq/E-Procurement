@@ -217,12 +217,14 @@ ul.plain .linkish { min-height: 36px; padding: 0 4px; }
 ul.plain > li.row-acts { padding: 6px 0; border-top: 1px solid var(--divider); } ul.plain > li.row-acts:first-child { border-top: 0; }
 .chips.chips-inline { display: inline-flex; margin: 0; vertical-align: middle; }
 .inp.w-full { width: 100%; } .inp.inp-score { width: 84px; } .inp.inp-num { width: 80px; text-align: right; font-variant-numeric: tabular-nums; }
-.sb-cols .inp.inp-num.w-full, .po-cols .inp.inp-num.w-full { width: 100%; }
+.sb-cols .inp.inp-num.w-full, .po-cols .inp.inp-num.w-full, .pr-cols .inp.inp-num.w-full { width: 100%; min-width: 0; }
 .tbl-640 { min-width: 640px; } .tc-cols { grid-template-columns: minmax(180px,2fr) minmax(220px,2fr) 110px 90px; }
 .tbl .linkish { min-height: 36px; padding: 0 2px; }
 
 /* Phase 3 · sourcing (tenders, PR, approvals) */
-.tbl-1100 { min-width: 1150px; } .pr-cols { grid-template-columns: minmax(240px,2.2fr) 140px 190px minmax(120px,1fr) 150px minmax(200px,1.8fr) 90px; }
+.tbl-1100 { min-width: 1100px; } .tbl-pr { min-width: 980px; }
+.pr-cols { grid-template-columns: minmax(200px,2fr) 130px 160px 120px 150px minmax(180px,1.6fr) 64px; }
+.pr-cols > .td:nth-child(2) { display: flex; align-items: center; gap: 6px; }
 .look { position: relative; }
 .look-l { position: static; margin: 2px 0 0; padding: 0; list-style: none; background: #fff; border: 1px solid var(--border); border-radius: 8px; box-shadow: 0 4px 16px rgba(16,24,40,.12); max-height: 260px; overflow: auto; }
 .look-l:empty { display: none; }
@@ -230,9 +232,6 @@ ul.plain > li.row-acts { padding: 6px 0; border-top: 1px solid var(--divider); }
 .stack-bar { display: flex; height: 14px; border-radius: 4px; overflow: hidden; background: var(--divider); }
 .stack-bar span { display: block; height: 100%; } .sb-inv { background: var(--ink2); } .sb-warn { background: var(--warn); } .sb-pr { background: var(--primary); } .sb-rest { background: var(--ok); }
 .chain li.on { border-color: var(--primary); background: var(--primary-soft); }
-.ap-cols { grid-template-columns: 44px minmax(220px,2.2fr) minmax(150px,1.4fr) 150px minmax(150px,1.3fr) 110px; }
-.tbl-900 { min-width: 900px; }
-.ap-row.sel { background: var(--primary-soft); }
 .td .chk { margin: 0; }
 
 /* ---- Phase 3 UI polish (Agent 3) ---- */
@@ -245,11 +244,7 @@ ul.plain > li.row-acts { padding: 6px 0; border-top: 1px solid var(--divider); }
 .steps .st-n { width: 24px; height: 24px; border-radius: 50%; display: grid; place-items: center; font-size: 12px; font-weight: 700; background: var(--neu-bg); color: var(--ink2); flex: none; }
 .steps li.done, .steps li.cur { background: none; } .steps li.done { color: var(--ok); } .steps li.done .st-n { background: var(--ok-bg); color: var(--ok); }
 .steps li.cur { color: var(--primary); font-weight: 700; } .steps li.cur .st-n { background: var(--primary); color: #fff; }
-/* Section nav (tender detail): sticky under the top bar */
-.sec-nav { position: sticky; top: 60px; z-index: 4; display: flex; gap: 4px; overflow-x: auto; background: var(--bg); padding: 6px 0; border-bottom: 1px solid var(--border); }
-.sec-nav button { flex: none; border: 1px solid var(--border); background: var(--surface); color: var(--ink2); font: 600 12px var(--font); min-height: 36px; padding: 0 12px; border-radius: 99px; cursor: pointer; }
-.sec-nav button:hover { border-color: var(--primary); color: var(--primary); }
-.card[id^="tn-s"] { scroll-margin-top: 120px; } .card:focus { outline: none; } .card:focus-visible { outline: 2px solid var(--primary); }
+.card:focus { outline: none; } .card:focus-visible { outline: 2px solid var(--primary); }
 /* Comparison matrix: sticky label column, lowest cell highlighted, summary rows shaded */
 .mtx .tr > .td:first-child, .mtx .tr > .th:first-child { position: sticky; left: 0; background: var(--surface); z-index: 1; box-shadow: 1px 0 0 var(--divider); }
 .mtx .thead > .th:first-child { background: var(--thead); }
@@ -259,8 +254,6 @@ ul.plain > li.row-acts { padding: 6px 0; border-top: 1px solid var(--divider); }
 .mtx .th.num { text-align: right; }
 .th.num { text-align: right; }
 /* Approvals: list / detail */
-.ap-split { display: grid; gap: 16px; grid-template-columns: minmax(0, 1fr); align-items: start; }
-@media (min-width: 1200px) { .ap-split { grid-template-columns: minmax(0, 1fr) minmax(0, 1.25fr); } .ap-split > .card:last-child { position: sticky; top: 76px; max-height: calc(100vh - 92px); overflow-y: auto; } }
 .ap-list { list-style: none; margin: 12px 0 0; padding: 0; border: 1px solid var(--border); border-radius: 8px; }
 .ap-item { display: grid; grid-template-columns: 28px minmax(0, 1fr) auto; gap: 4px 10px; padding: 12px; border-top: 1px solid var(--divider); align-items: start; }
 .ap-item:first-child { border-top: 0; } .ap-item.sel { background: var(--primary-soft); box-shadow: inset 3px 0 0 var(--primary); }
@@ -294,8 +287,6 @@ ul.plain > li.row-acts { padding: 6px 0; border-top: 1px solid var(--divider); }
 
 /* ---- Phase 4 UI polish (Agent 3) ---- */
 .nowrap { white-space: nowrap; }
-/* KPI money tiles: smaller value so "₫" never orphans; wraps between number groups only when it must */
-.kpi-money .kpi-v { font-size: clamp(18px, .6vw + 10px, 22px); }
 /* Totals block: label left, figures right-aligned, total row ruled */
 .dl-tot, .dl-num { grid-template-columns: minmax(0, 1fr) max-content; } .dl-tot dd, .dl-num dd { text-align: right; font-variant-numeric: tabular-nums; }
 .dl-tot dt.tot, .dl-tot dd.tot, .dl-num dt.tot, .dl-num dd.tot { border-top: 1px solid var(--border); padding-top: 8px; }
@@ -323,12 +314,11 @@ ol.plain.rev-list { list-style: none; margin: 0; padding: 0 0 0 22px; position: 
 .lg-sw { width: 12px; height: 12px; border-radius: 50%; flex: none; } .lg-0 { background: #2a78d6; } .lg-1 { background: #eb6834; } .lg-2 { background: #1baf7a; } .lg-3 { background: #eda100; }
 /* Bars: "other" row muted by colour (opacity would drop text contrast) */
 .hbar.dim { opacity: 1; } .hbar.dim .bar span { background: var(--input); } .hbar.dim .hbar-l, .hbar.dim .hbar-v { color: var(--muted); }
-.seg-nw button { white-space: nowrap; }
 /* Print: A4, white page, no app chrome, colours kept for pills */
 @page { size: A4; margin: 14mm 12mm; }
 @media print {
   body, .content { background: #fff !important; }
-  .crumbs, .sec-nav { display: none !important; }
+  .crumbs { display: none !important; }
   .po-doc { padding: 0; box-shadow: none; } .po-doc .tbl { min-width: 0 !important; } .po-doc .tbl-wrap { border-color: #999; }
   .po-doc .tr { break-inside: avoid; } .po-sign { break-inside: avoid; margin-top: 24px; }
   .po-doc .grid { grid-template-columns: 1fr 1fr; }
@@ -431,3 +421,22 @@ ul.plain.qlinks a::after { content: "›"; color: var(--muted); font-size: 18px;
   .page-h .acts > .btn { flex: 1 1 0; justify-content: center; }
 }
 @media (max-width: 900px) { .blk-b > .filters > .seg { flex: 1 1 100%; } .blk-b > .filters > .seg button { flex: 1; } }
+/* ---- Redesign batch 2 · UI review (Agent 3) ---- */
+/* KPI values size to their tile (container units) and only break between words, never inside a number */
+.kpis .kpi { container-type: inline-size; }
+.kpis .kpi-v { overflow-wrap: normal; word-break: keep-all; font-size: clamp(15px, 11cqi, var(--fs-xl)); }
+/* Quiet secondary button (row tools such as Remove) */
+.btn.btn-q { border-color: transparent; color: var(--ink2); background: none; } .btn.btn-q:hover { border-color: var(--input); }
+/* Numeric cells that carry a formula may wrap */
+.td.num.wrap { white-space: normal; }
+/* Charts render at the box's pixel width (js/charts.js) */
+.chart-box { min-width: 0; } .chart-box svg.chart { display: block; width: 100%; height: auto; }
+/* Approval detail panel: line table fits the half-width block */
+.ap-item .ap-side .btn { min-width: 92px; justify-content: center; }
+@media (max-width: 600px) {
+  /* Totals: label above figure so long "a + VAT b" lines never squeeze the label */
+  .dl-tot, .dl-num { grid-template-columns: minmax(0, 1fr); row-gap: 0; }
+  .dl-tot dd, .dl-num dd { text-align: left; margin-bottom: 8px; }
+  .dl-tot dd.tot, .dl-num dd.tot { border-top: 0; padding-top: 0; }
+  .row-acts > .btn { flex: 1 1 auto; justify-content: center; }
+}

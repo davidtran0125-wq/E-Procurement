@@ -248,7 +248,7 @@
       return `<div class="tr po-cols" role="row"><div class="td" role="cell">${mid(l.mat)}<div class="small">${esc(m.name)}</div>${err ? `<div class="err small" id="pn-e${i}" role="alert">${esc(S.errText(err))}</div>` : ''}</div>
         <div class="td num" role="cell"><label class="sr" for="pn-q${i}">${esc(t('po.l.qty', { n: i + 1 }))}</label><input class="inp inp-num w-full" id="pn-q${i}" data-pn="qty" data-i="${i}" inputmode="decimal" value="${esc(l.qty)}"${err ? ` aria-invalid="true" aria-describedby="pn-e${i}"` : ''}> <span class="small muted">${esc(m.uom)}</span>${l.left != null ? `<div class="small muted">${esc(t('po.l.ctLeft', { n: num(l.left) }))}</div>` : ''}</div>
         <div class="td num" role="cell"><label class="sr" for="pn-p${i}">${esc(t('po.l.price', { n: i + 1 }))}</label><input class="inp inp-num w-full" id="pn-p${i}" data-pn="price" data-i="${i}" inputmode="numeric" value="${esc(l.price === '' ? '' : num(l.price))}"${f.src !== 'pr' ? ' readonly aria-readonly="true"' : ''}></div>
-        <div class="td" role="cell">${esc(S.vatLabel(m.vat))}</div><div class="td num" role="cell">${vnd((+l.qty || 0) * (+l.price || 0))}<div class="small muted">VAT ${vnd((+l.qty || 0) * (+l.price || 0) * m.vat / 100)}</div></div>
+        <div class="td" role="cell">${S.vatCell(m.vat)}</div><div class="td num" role="cell">${vnd((+l.qty || 0) * (+l.price || 0))}<div class="small muted">VAT ${vnd((+l.qty || 0) * (+l.price || 0) * m.vat / 100)}</div></div>
         <div class="td" role="cell"><label class="sr" for="pn-d${i}">${esc(t('po.l.due', { n: i + 1 }))}</label><input class="inp w-full" id="pn-d${i}" data-pn="due" data-i="${i}" value="${esc(l.due)}" placeholder="dd/mm/yyyy"></div>
         <div class="td small" role="cell">${priceCheck(l)}</div></div>`; }).join('');
     const linesTbl = `<div class="tbl-wrap" tabindex="0" role="region" aria-label="${esc(t('c.scrolls', { label: t('po.l.table') }))}"><div class="tbl tbl-1100" role="table"><div class="tr thead po-cols" role="row"><div class="th">${esc(t('c.mid'))}</div><div class="th num">${esc(t('po.c.qty'))}</div><div class="th num">${esc(t('po.c.unit'))}</div><div class="th">VAT</div><div class="th num">${esc(t('po.c.amount'))}</div><div class="th">${esc(t('po.c.due'))}</div><div class="th">${esc(t('po.c.pc'))}</div></div>${lineRows || `<div class="empty">${esc(t('po.l.none'))}</div>`}</div></div>`;
@@ -314,7 +314,7 @@
       { h: t('c.mid'), r: (l) => `${mid(l.mat)}<div class="small">${esc(mat(l.mat).name)}</div>`, w: 'minmax(160px,2fr)' },
       { h: t('po.c.qty'), r: (l) => `<span class="nowrap">${num(l.qty)} ${esc(mat(l.mat).uom)}</span>${l.cancelled ? `<div class="small tone-danger">${esc(t('po.cancelled', { n: num(l.cancelled) }))}</div>` : ''}`, cls: 'num', w: '110px' },
       { h: t('po.c.unit'), r: (l) => vnd(l.price), cls: 'num', w: '130px' },
-      { h: 'VAT', r: (l) => esc(S.vatLabel(mat(l.mat).vat)), w: 'minmax(70px,.6fr)' },
+      { h: 'VAT', r: (l) => S.vatCell(mat(l.mat).vat), w: 'minmax(90px,.8fr)' },
       { h: t('po.c.vatAmt'), r: (l) => vnd(lineNet(l) * mat(l.mat).vat / 100), cls: 'num', w: '120px' },
       { h: t('po.c.amount'), r: (l) => vnd(lineNet(l)), cls: 'num', w: '140px' }
     ], p.lines, { label: t('po.l.table') }) + vatDl(tt, 'dl-tot'));

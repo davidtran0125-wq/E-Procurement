@@ -110,12 +110,10 @@
     if (!a) return block(t('ap.details'), App.emptyState(t('ap.choose'), t('ap.chooseN')), { span: 6 });
     const pr = D().prs[a.id]; const chain = D().approvalChains[a.id] || [];
     const lines = pr ? table([
-      { h: t('c.mid'), r: (l) => `${mid(l.mat)}<div class="small">${esc(App.material(l.mat).name)}</div>`, w: 'minmax(170px,2fr)' },
-      { h: t('ap.c.qty'), r: (l) => `${num(l.qty)} ${esc(App.material(l.mat).uom)}`, cls: 'num', w: '80px' },
-      { h: t('ap.c.est'), r: (l) => vnd(l.price), cls: 'num', w: '140px' },
-      { h: t('ap.c.last'), r: (l) => { const m = App.material(l.mat); return m.last ? `${vnd(m.last)}<div class="small muted">${esc(m.lastPo)} · ${esc(App.vshort(App.vendor(m.lastVendor)))}</div>` : '—'; }, cls: 'num', w: '170px' },
-      { h: t('ap.c.avg'), r: (l) => { const m = App.material(l.mat); return m.avg90 ? `${vnd(m.avg90)}<div class="small ${l.price > m.avg90 * 1.05 ? 'tone-warning' : 'muted'}">${l.price >= m.avg90 ? '+' : '−'}${pct(Math.abs(l.price / m.avg90 - 1) * 100)}</div>` : '—'; }, cls: 'num', w: '140px' },
-      { h: 'VAT', r: (l) => esc(S.vatLabel(App.material(l.mat).vat)), w: 'minmax(110px,1fr)' }
+      { h: t('c.mid'), r: (l) => `${mid(l.mat)}<div class="small">${esc(App.material(l.mat).name)}</div>`, w: 'minmax(150px,2fr)' },
+      { h: t('ap.c.qty'), r: (l) => `${num(l.qty)} ${esc(App.material(l.mat).uom)}<div class="small muted">VAT ${esc(App.material(l.mat).vat)}%</div>`, cls: 'num', w: '80px' },
+      { h: t('ap.c.est'), r: (l) => { const m = App.material(l.mat); return `${vnd(l.price)}${m.avg90 ? `<div class="small ${l.price > m.avg90 * 1.05 ? 'tone-warning' : 'muted'}">${l.price >= m.avg90 ? '+' : '−'}${pct(Math.abs(l.price / m.avg90 - 1) * 100)} ${esc(t('ap.c.avg'))}</div>` : ''}`; }, cls: 'num', w: '150px' },
+      { h: t('ap.c.last'), r: (l) => { const m = App.material(l.mat); return m.last ? `${vnd(m.last)}<div class="small muted">${esc(m.lastPo)} · ${esc(App.vshort(App.vendor(m.lastVendor)))}</div>` : '—'; }, cls: 'num', w: '140px' }
     ], pr.lines, { label: t('ap.lines') }) : a.mats.length ? `<div class="chips">${a.mats.map(chipPrice).join('')}</div>` : '';
     const b = pr && D().budgets[pr.cc]; const avail = b ? b.budget - b.invoiced - b.committed : 0;
     const budget = b ? `<h3 class="h-sub">${esc(t('ap.budget'))}</h3><dl class="dl"><dt>${esc(t('ap.b.line'))}</dt><dd>${esc(tv(b.name))}</dd><dt>${esc(t('ap.b.avail'))}</dt><dd>${vnd(avail)}</dd><dt>${esc(t('ap.b.this'))}</dt><dd>−${vnd(a.value)}</dd><dt>${esc(t('ap.b.after'))}</dt><dd><b>${vnd(avail - a.value)}</b></dd></dl>` : '';

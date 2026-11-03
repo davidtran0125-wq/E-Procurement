@@ -139,11 +139,11 @@
         <label class="sr" for="tn-m">${esc(t('tn.method'))}</label><select class="inp" id="tn-m" data-tnf="method"><option value="all">${esc(t('tn.allMethods'))}</option>${METHODS.map((m) => `<option value="${esc(m)}"${st.method === m ? ' selected' : ''}>${esc(tv(m))}</option>`).join('')}</select></div>
         ${table([
           { h: t('tn.c.tender'), r: (d) => `${S.tndLink(d.id)}<div class="small">${esc(d.title)}</div>`, w: 'minmax(220px,2.2fr)' },
-          { h: t('tn.method'), r: (d) => esc(tv((det(d.id) || {}).method || '—')), w: '130px' },
-          { h: t('c.mids'), r: (d) => `<span class="chips chips-inline">${d.mats.map(mid).join('')}</span>`, w: 'minmax(170px,1.6fr)' },
-          { h: t('tn.c.closes'), r: (d) => `${esc(d.close || '—')}${['Open', 'Q&A'].includes(d.status) && d.close ? `<div class="small muted">${esc(t('tn.daysN', { n: App.daysTo(d.close) }))}</div>` : ''}`, w: '110px' },
+          { h: t('tn.method'), r: (d) => esc(tv((det(d.id) || {}).method || '—')), w: '150px' },
+          { h: t('c.mids'), r: (d) => `<span class="chips chips-inline">${d.mats.map(mid).join('')}</span>`, w: 'minmax(150px,1.4fr)' },
+          { h: t('tn.c.closes'), r: (d) => `${esc(d.close || '—')}${['Open', 'Q&A'].includes(d.status) && d.close ? `<div class="small muted">${esc(t('tn.daysN', { n: App.daysTo(d.close) }))}</div>` : ''}`, w: '120px' },
           { h: t('tn.c.bids'), r: (d) => `${d.bids} / ${d.invited}${(det(d.id) || {}).bidders && d.sealed ? `<div class="small muted">${esc(t('tn.sealed'))}</div>` : ''}`, cls: 'num', w: '90px' },
-          { h: t('c.status'), r: (d) => `${pill(d.status, tones[d.status] || 'neutral')}${vat8Flag(det(d.id)) ? `<div class="mt-s">${pill(t('tn.vat8end'), 'warning')}</div>` : ''}`, w: 'minmax(150px,1.3fr)' }
+          { h: t('c.status'), r: (d) => `${pill(d.status, tones[d.status] || 'neutral')}${vat8Flag(det(d.id)) ? `<div class="small tone-warning">${esc(t('tn.vat8end'))}</div>` : ''}`, w: 'minmax(170px,1.4fr)' }
         ], rows, { empty: t('tn.empty'), label: t('tn.sub.list') })}`,
     { actions: `<button class="btn btn-sm" data-act="toast" data-msg="${esc(t('tn.exportMsg', { n: rows.length }))}">${esc(t('c.export'))}</button>` });
   }
@@ -177,7 +177,7 @@
         ${flag ? `<div class="alert alert-warning" role="status">${esc(t('tn.vat8note'))}</div>` : ''}
         <h3 class="h-sub">${esc(t('tn.linesN', { n: lines.length }))}</h3>
         ${table([{ h: t('c.mid'), r: (l) => mid(l.mat), w: '120px' }, { h: t('c.description'), r: (l) => esc(mat(l.mat).name), w: 'minmax(160px,2fr)' }, { h: t('tn.c.qty'), r: (l) => `${num(l.qty)} ${esc(mat(l.mat).uom)}`, cls: 'num', w: '110px' },
-          { h: 'VAT', r: (l) => esc(S.vatLabel(mat(l.mat).vat)), w: 'minmax(120px,1.2fr)' }, { h: t('tn.c.est'), r: (l) => vnd(estOf(l)), cls: 'num', w: '160px' }], lines, { empty: t('tn.noLines'), label: t('tn.linesN', { n: lines.length }) })}
+          { h: 'VAT', r: (l) => S.vatCell(mat(l.mat).vat), w: 'minmax(120px,1fr)' }, { h: t('tn.c.est'), r: (l) => vnd(estOf(l)), cls: 'num', w: '160px' }], lines, { empty: t('tn.noLines'), label: t('tn.linesN', { n: lines.length }) })}
         <p class="small muted mt-0">${esc(t('tn.estNote', { v: vnd(est) }))}</p>
         <div class="row-acts"><a class="btn" href="#/tenders">${esc(t('c.cancel'))}</a><button type="submit" class="btn btn-p">${esc(t('tn.saveDraft'))}</button></div></form>`);
   }
@@ -210,7 +210,7 @@
   function linesBlock(doc, tn, step) {
     return block(t('tn.lines', { n: tn.lines.length }), progress(step, doc.status === 'Awarded') + table([
       { h: t('c.mid'), r: (l) => mid(l.mat), w: '120px' }, { h: t('c.description'), r: (l) => esc(mat(l.mat).name), w: 'minmax(170px,2fr)' },
-      { h: t('tn.c.qty'), r: (l) => `${num(l.qty)} ${esc(mat(l.mat).uom)}`, cls: 'num', w: '100px' }, { h: 'VAT', r: (l) => esc(S.vatLabel(mat(l.mat).vat)), w: 'minmax(130px,1.3fr)' },
+      { h: t('tn.c.qty'), r: (l) => `${num(l.qty)} ${esc(mat(l.mat).uom)}`, cls: 'num', w: '100px' }, { h: 'VAT', r: (l) => S.vatCell(mat(l.mat).vat), w: 'minmax(130px,1.3fr)' },
       { h: t('tn.c.avg90'), r: (l) => vnd(mat(l.mat).avg90 || mat(l.mat).last), cls: 'num', w: '150px' }, { h: t('tn.c.est'), r: (l) => vnd(estOf(l)), cls: 'num', w: '150px' }
     ], tn.lines, { label: t('tn.lines', { n: tn.lines.length }) }) + `<p class="small muted">${t('tn.pkgNote', { v: vnd(estTotal(tn)), pr: S.prLink(tn.pr) })}${tn.benchmark ? ' · ' + esc(tv(tn.benchmark)) : ''}</p>`);
   }
@@ -353,25 +353,24 @@
   function matrixBlock(tn) {
     const B = opened(tn); const R = ranking(tn); const rk = (b) => R.find((r) => r.b === b);
     const cols = [
-      { h: t('tn.mx.line'), r: (r) => (r.mat ? `${mid(r.mat)}<div class="small">${esc(mat(r.mat).name)}</div>` : `<b>${esc(r.label)}</b>`), w: 'minmax(170px,1.8fr)' },
+      { h: t('tn.mx.line'), r: (r) => (r.mat ? `${mid(r.mat)}<div class="small">${esc(mat(r.mat).name)}</div><div class="small muted">VAT ${esc(S.vatLabel(mat(r.mat).vat))}</div>` : `<b>${esc(r.label)}</b>`), w: 'minmax(200px,2fr)' },
       { h: t('tn.c.qty'), r: (r) => (r.mat ? `${num(r.qty)} ${esc(mat(r.mat).uom)}` : ''), cls: 'num', w: '90px' },
-      { h: 'VAT', r: (r) => (r.mat ? esc(S.vatLabel(mat(r.mat).vat)) : ''), w: 'minmax(120px,1fr)' },
       { h: t('tn.mx.base'), r: (r) => (r.mat ? `${vnd(baseline(r))}<div class="small muted">${esc(mat(r.mat).lastPo || t('tn.mx.firstAvg'))}</div>` : r.k === 'sub' ? vnd(tn.lines.reduce((a, l) => a + baseline(l) * l.qty, 0)) : ''), cls: 'num', w: '150px' },
-      ...B.map((b) => ({ h: vname(b), cls: 'num', w: 'minmax(170px,1.4fr)', r: (r) => {
+      ...B.map((b) => ({ h: vname(b), cls: 'num', w: 'minmax(160px,1.4fr)', r: (r) => {
         const ok = compliant(tn, b); const x = rk(b);
         if (r.mat) { const i = r.i; const lo = lowestOn(tn, i); return `<div class="${lo === b ? 'best' : ''}">${vnd(b.prices[i])}<div class="small muted">${vnd(b.prices[i] * r.qty)}</div>${lo === b ? pill(t('tn.mx.lowest'), 'success') : ''}</div>`; }
         if (r.k === 'sub') return `<b>${vnd(bidTotal(tn, b))}</b>`;
         if (r.k === 'vat') return vnd(tn.lines.reduce((a, l, i) => a + l.qty * b.prices[i] * mat(l.mat).vat / 100, 0));
         if (r.k === 'tot') return vnd(tn.lines.reduce((a, l, i) => a + l.qty * b.prices[i] * (1 + mat(l.mat).vat / 100), 0));
         if (r.k === 'sec') return b.sec >= tn.secAmount ? `${vnd(b.sec)} ${pill('OK', 'success')}` : pill(t('tn.mx.secNon'), 'danger');
-        if (r.k === 'score') return ok && x ? `${num(techAvg(b), 1)} × ${tn.weights[0]}% + ${num(x.ps, 2)} × ${tn.weights[1]}% = <b>${num(x.ws, 2)}</b>` : `<span class="muted">${esc(t('tn.mx.excluded'))}</span>`;
+        if (r.k === 'score') return ok && x ? `<b>${num(x.ws, 2)}</b><div class="small muted">${num(techAvg(b), 1)} × ${tn.weights[0]}% + ${num(x.ps, 2)} × ${tn.weights[1]}%</div>` : `<span class="muted">${esc(t('tn.mx.excluded'))}</span>`;
         if (r.k === 'rank') return ok && x ? pill(t('tn.mx.rank', { n: x.rank }), x.rank === 1 ? 'success' : 'neutral') : pill(t('tn.mx.non'), 'danger');
         return '';
       } }))
     ];
     const rows = [...tn.lines.map((l, i) => Object.assign({ i }, l)), { label: t('tn.mx.sub'), k: 'sub' }, { label: 'VAT', k: 'vat' }, { label: t('tn.mx.tot'), k: 'tot' }, { label: t('tn.mx.secRow', { v: vnd(tn.secAmount) }), k: 'sec' }, { label: t('tn.mx.score'), k: 'score' }, { label: t('tn.mx.ranking'), k: 'rank' }];
     const fail = tn.bidders.filter((b) => !passed(tn, b));
-    return block(t('tn.mx.title'), table(cols, rows, { min: 560 + B.length * 180, label: t('tn.mx.label'), cls: 'mtx' })
+    return block(t('tn.mx.title'), table(cols, rows, { min: 450 + B.length * 160, label: t('tn.mx.label'), cls: 'mtx' })
       + `<p class="small muted">${esc(t('tn.mx.note', { a: tn.weights[0], b: tn.weights[1], fail: fail.map((b) => b.name).join(', ') || '—' }))}</p>`);
   }
 
@@ -400,14 +399,15 @@
       { h: t('tn.aw.channel'), r: () => esc(t('tn.aw.gmailPortal')), w: '130px' },
       { h: t('tn.s.sec'), r: (b) => (b.sec ? esc(award.pick.includes(b.vid) ? t('tn.aw.held') : t('tn.aw.release', { d: App.addDays(award.at.slice(0, 10), 14) })) : '—'), w: 'minmax(160px,1.4fr)' }
     ], tn.bidders, { label: t('tn.aw.notices') })}` : '';
-    const poBtn = award && award.status === 'Approved' ? `<a class="btn btn-p" href="#/po?tender=${esc(doc.id)}">${esc(t('tn.createPo'))}</a><a class="btn" href="#/contracts/new">${esc(t('tn.createCt'))}</a>`
-      : `<button class="btn btn-p" disabled aria-describedby="aw-po-h">${esc(t('tn.createPo'))}</button><button class="btn" disabled>${esc(t('tn.createCt'))}</button><span class="small muted" id="aw-po-h">${esc(t('tn.aw.afterApproval'))}</span>`;
+    // One primary per block: before approval the submit button is primary and the PO/contract buttons are quiet + disabled
+    const poBtn = award && award.status === 'Approved' ? `<a class="btn" href="#/contracts/new">${esc(t('tn.createCt'))}</a><a class="btn btn-p" href="#/po?tender=${esc(doc.id)}">${esc(t('tn.createPo'))}</a>`
+      : `<span class="small muted grow" id="aw-po-h">${esc(t('tn.aw.afterApproval'))}</span><button type="button" class="btn" disabled aria-describedby="aw-po-h">${esc(t('tn.createCt'))}</button><button type="button" class="btn" disabled aria-describedby="aw-po-h">${esc(t('tn.createPo'))}</button>`;
     return block(t('tn.aw.title'), `${status}${tbl}
       <dl class="dl mt"><dt>${esc(t('tn.aw.value'))}</dt><dd><b>${vnd(val)}</b> ${esc(t('c.exclVat'))}</dd><dt>${esc(t('tn.aw.baseline'))}</dt><dd>${esc(t('tn.aw.baselineV', { v: vnd(base) }))}</dd><dt>${esc(t('tn.aw.savingL'))}</dt><dd><b>${vnd(saving)}</b> ${esc(t('tn.aw.savingV', { p: pct(saving / base * 100) }))}</dd>
         <dt>${esc(t('tn.aw.route'))}</dt><dd>${esc(t('tn.aw.routeV'))}</dd></dl>
       ${award ? (award.why ? `<p class="small"><b>${esc(t('tn.aw.just'))}:</b> ${esc(award.why)}</p>` : '') : `<form id="tn-aw" class="stack mt" novalidate>${S.field('aw', e, 'why', notLowest.some(Boolean) ? t('tn.aw.justReq') : t('tn.aw.just'), a.why, { area: true, req: notLowest.some(Boolean) })}
-        <div class="row-acts"><button type="submit" class="btn btn-p">${esc(t('tn.aw.submit'))}</button></div></form>`}
-      ${notices}<div class="row-acts mt">${poBtn}</div>`);
+        <div class="row-acts">${poBtn}<button type="submit" class="btn btn-p">${esc(t('tn.aw.submit'))}</button></div></form>`}
+      ${notices}${award ? `<div class="row-acts mt">${poBtn}</div>` : ''}`);
   }
   function submitAward(root, doc, tn) {
     const a = st.aw; a.why = ((root.querySelector('#aw-why') || {}).value || '').trim();

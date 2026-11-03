@@ -120,12 +120,12 @@
       <div class="filters"><label class="sr" for="inv-q">${esc(t('inv.searchLbl'))}</label><input class="inp grow" id="inv-q" type="search" data-invf="q" value="${esc(st.q)}" placeholder="${esc(t('inv.searchPh'))}"></div>
         ${table([
           { h: t('inv.c.inv'), r: (d) => `<a class="mono" href="#/invoices/${esc(d.id)}">${esc(d.id)}</a><div class="small">${esc(d.title)}</div>`, w: 'minmax(190px,2fr)' },
-          { h: t('inv.c.khno'), r: (d) => { const v = D().invoices[d.id]; return `<span class="mono small">${esc(v.kh)} · ${esc(v.no)}</span><div class="small muted">${esc(tv(v.src))} · ${esc(tv(v.type))}</div>`; }, w: '150px' },
+          { h: t('inv.c.khno'), r: (d) => { const v = D().invoices[d.id]; return `<span class="mono small nowrap">${esc(v.kh)} · ${esc(v.no)}</span><div class="small muted">${esc(tv(v.src))} · ${esc(tv(v.type))}</div>`; }, w: '170px' },
           { h: t('inv.c.sellerMst'), r: (d) => `<span class="mono small">${esc(App.vendor(d.vendor).mst)}</span><div class="small">${esc(App.vshort(App.vendor(d.vendor)))}</div>`, w: '130px' },
           { h: 'PO · GRN', r: (d) => { const v = D().invoices[d.id]; return `<a class="mono small" href="#/po/${esc(v.po)}">${esc(v.po)}</a><div class="mono small muted">${esc(v.grn)}</div>`; }, w: '130px' },
           { h: t('inv.c.exVat'), r: (d) => vnd(totals(D().invoices[d.id]).net), cls: 'num', w: '130px' },
           { h: 'VAT', r: (d) => vnd(totals(D().invoices[d.id]).vat), cls: 'num', w: '110px' },
-          { h: t('inv.c.legal'), r: (d) => { const v = D().invoices[d.id]; const ok = legalOk(d, v); const nm = v.lines.filter((l) => !l[0]).length; return `${pill(t(ok ? 'inv.legalOk' : 'inv.legalFail'), ok ? 'success' : 'danger')}<div class="mt-s">${pill(d.status, sTone(d.status))}</div>${nm ? `<div class="small tone-warning">${esc(t('inv.noMidN', { n: nm }))}</div>` : ''}`; }, w: 'minmax(170px,1.4fr)' }
+          { h: t('inv.c.legal'), r: (d) => { const v = D().invoices[d.id]; const ok = legalOk(d, v); const nm = v.lines.filter((l) => !l[0]).length; return `${pill(t(ok ? 'inv.legalOk' : 'inv.legalFail'), ok ? 'success' : 'danger')}<div class="mt-s">${pill(d.status, sTone(d.status))}</div>${nm && tv(d.status) !== t('inv.noMidN', { n: nm }) ? `<div class="small tone-warning">${esc(t('inv.noMidN', { n: nm }))}</div>` : ''}`; }, w: 'minmax(170px,1.4fr)' }
         ], rows, { empty: t('inv.empty'), label: t('inv.sub.list') })}`);
   }
   function rulesBlocks() {
